@@ -3,14 +3,17 @@ ROM ?= rom6
 BUILD := build/$(ROM)
 OBJDUMP ?= $(shell ls ../nokia-dct3-emu/build/tic54x-objdump 2>/dev/null)
 
-.PHONY: verify disasm disasm-rom6 disasm-rom4 fingerprint test help
+.PHONY: verify disasm disasm-rom6 disasm-rom4 fingerprint test coverage help
 
 help:
-	@echo "targets: verify | test | disasm [ROM=rom6|rom4|rom3|rom5] | fingerprint FLS=path/to/phone.fls"
+	@echo "targets: verify | test | coverage | disasm [ROM=rom6|rom4|rom3|rom5] | fingerprint FLS=path/to/phone.fls"
 
 test:
 	python3 tests/test_table_walk.py
 	python3 tests/test_verdict.py
+
+coverage:
+	python3 tools/coverage.py
 
 verify:
 	python3 tools/verify_images.py --rom $(ROM)
