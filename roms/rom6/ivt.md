@@ -348,9 +348,13 @@ Clauses (offsets from entry, `program.be16`):
 ## Open
 
 1. Runtime IVT base per build. Resolved for R5/R6 (`0x0A00`
-   in 3310 setB, 8210 setA, 8210 setB). Open for the ROM4
-   family (5110/3210: no vector-image block in table; `0x3204`
-   and IPTR `0x0B` observations unattributed to a mechanism).
+   in 3310 setB, 8210 setA, 8210 setB). ROM4 family (5110/3210)
+   carries no vector-image block in its descriptor table, so
+   the table is loader-installed, not uploaded: leading
+   hypothesis is the mask-vector copy landing at `0x0580`
+   (single IPTR `0x0B` observation; same MVPD-copy mechanism as
+   ROM6 loader step `0x0F1A`, different IPTR). Needs one
+   confirming IPTR sighting on a ROM4 boot to close.
 2. `0x05xx` mini-kernel (`0x05DA/0x05DC/0x05E8/0x05F0/0x05F4/0x05F6`).
    Proven zero-filled in `program.be16` (verified all-zero
    `0x05C0-0x0610`): unobservable in-mask. Runtime source is the
