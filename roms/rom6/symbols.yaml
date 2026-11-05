@@ -604,3 +604,54 @@ spaces:
           STM BRC,#24 + RPTBD 0x936B loop; AR2=0x345F sink; LD *ar4 + AND #24/#31 + BITT + ROLTC + ABS + STH
           *ar2- bit-cipher kernel; lies in 0x93CE classifier stretch; 24-round shape matches 24-byte SIML
           block class; exact target buffer staged.
+      - address: 0x45F3
+        name: MSID_POSTER_74_34
+        confidence: static_branch
+        note: >-
+          AR3=#0x2F00 + AR4=#0x74 + CALLD RING_REPORT_GATE + AR5=#0x34 + RET; posts {74 34} MSID 13-byte reply
+          on MDISND {70 13} (emu docs/dct3-identity-provisioning.md, docs/gsm-buildout-plan.md:118). Confirms
+          AR5=subtype model.
+      - address: 0x4603
+        name: MSID_STAGE_COPY
+        confidence: static_branch
+        note: >-
+          RPT #2 + MVDD *ar2+0% -> *ar3+ staging 2 words into 0x2F00 window immediately after MSID poster
+          chain; CALL 0x2E2F dispatcher-adjacent.
+      - address: 0x460B
+        name: MSID_DECODE_XOR_A5A5
+        confidence: static_branch
+        note: >-
+          STM AR2,#0x4EF + STM AR3,#0x2F14 + STM BRC,#5 + RPTB 0x4612 loop LD *ar2+ XOR #0xA5A5 obfuscation-
+          decode into 0x2F14+; MSID crypto staging (emu doc: MSID handler 7f05h, keys 0b6e5/0b6f7).
+      - address: 0x44CE
+        name: POSTER_74_04_FF87
+        confidence: static_branch
+        note: >-
+          AR4=#0x74 + ST *(0xFF87) MVDP-quirk store prelude + CALLD gate + AR5=#0x04; subtype-04 poster.
+      - address: 0x44DF
+        name: POSTER_74_02
+        confidence: static_branch
+        note: >-
+          AR4=#0x74 + ST *ar3 prelude + CALLD gate + AR5=#0x02; subtype-02 poster.
+      - address: 0x44F6
+        name: POSTER_74_06
+        confidence: static_branch
+        note: >-
+          AR4=#0x74 + CALLD gate + AR5=#0x06; subtype-06 poster.
+      - address: 0x4634
+        name: POSTER_74_04B
+        confidence: static_branch
+        note: >-
+          AR4=#0x74 + CALLD gate + AR5=#0x04, then CALL 0x59E + STL *(0x2F02); second subtype-04 site.
+      - address: 0x454C
+        name: POSTER_CHAIN_TAIL_A
+        confidence: provisional
+        note: >-
+          Fall-through STM AR4,#0x74 + RET after CALLD gate at 0x454A (AR3=0x2F00 preset); chained-poster
+          link, no CALLers (reached linearly).
+      - address: 0x459D
+        name: POSTER_CHAIN_TAIL_B
+        confidence: provisional
+        note: >-
+          Fall-through STM AR4,#0x74 + RET after CALLD gate at 0x459B (AR5=#4 preset); chained-poster link, no
+          CALLers.

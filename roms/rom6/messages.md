@@ -16,7 +16,9 @@ code: `verified` | `static` | `hypothesis` (see
 | producer groups | dispatcher switch, mask `0xA7xx`, both ISRs, block `0x9C99` chain | static, caller census |
 | opcode dispatch | table-indirect via `0x2F61/0x2F62`, record-compare `0x5190+` | static, values staged |
 | `0x573` selectors | 4 values / 13 sites, group routing not per-message | static, census |
-| MSID/SIMLOCK/IMEI per-opcode | ARM opcodes listed; no DSP stamping site found (coincidences rejected) | open |
+| MSID per-opcode | `{74 34}` poster `MSID_POSTER_74_34` (`0x45F3`: `AR3=0x2F00/AR4=0x74/CALLD gate/AR5=0x34`); staged copy `0x4603` (`RPT #2 MVDD` to `0x2F00`); decode `MSID_DECODE_XOR_A5A5` (`0x460B`, `BRC=5 RPTB XOR #0xA5A5` to `0x2F14+`) | static, objdump-verified |
+| `{74 xx}` poster census | mask `0x44CE(04)+FF87-quirk / 0x44DF(02) / 0x44F6(06) / 0x4634(04B)` + chain tails `0x454C/0x459D`; blocks `08:04/3E/1A/0E(+0x1900→0x2F14)/0C`, `20:{74 36}` SIML verdict, `30:{74 10}`, `11:kind-0x9C`; `0x35` echo and `0x0D` aliveness have no `STM` prelude anywhere (dynamic `AR5`, needs run trace) | static, census |
+| downlink opcode names | `0x13` MSID → `{74 34}`; `0x16` SIML → `{74 35}` echo; `0x17` SIML-final → `{74 36}`; `0x0D` aliveness → `{74 0D}`; FAID `0x14` / IMEI `0x15` (emu `docs/gsm-buildout-plan.md:118-121`, `dct3-identity-provisioning.md`) | static (doc-grounded) |
 | SIMlock decode routine | `0x1202-0x1207` anchor absent from all static bytes; 24-round bit-cipher `MSG_CIPHER_24R` (`0x9343`, BRC=24, `ROLTC`/`BITT` kernel on `LD *ar4` to `AR2=0x345F`) inside classifier stretch is the staged-buffer candidate | open (cipher unexamined) |
 | return-PC classifier | `MSG_CLASSIFY_BY_CALLER` (`0x93CE`): return-PC lanes `0x2D5D/0x2DDB` + low-byte opcode lanes `0x05/0x4D/0x50/0x9A/0x9C` → `0x9410`; selects `MSG_HEADER_BUILDER` `0x99A4` / `MSG_PAYLOAD_COPY` `0x9A11` / `MEAS_RSSI_POSTER` `0x96BD` / `MSG_VERIFY_LOOP` `0x99E6` / `MSG_OPCODE_9A50` | static, RET-bounded |
 | header builder | `0x99A4` (from `0x9425`): ring-space math `*(0x21FD)-*(0x21FC)`, header tag bits `OR #0x1C00/#0x1E00`, `RPTB` XOR rolling-checksum copy, write-ptr to `0x21FC` | static, objdump-verified |
