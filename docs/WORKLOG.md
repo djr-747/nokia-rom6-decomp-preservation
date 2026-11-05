@@ -2,6 +2,30 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-05 — final push: 50.4% bounded (goal met)
+
+- 2 survey teams + critic on 5282-56DD (1,116w), 5823-59DB, 4F6E-50B1,
+  795D-7AE4; 18 new symbols + 3 corrections (445 total), `make test`
+  6 pass. Commit pushed; `make coverage` 27,867w = 50.4%.
+- Landed: DISPATCH_SLED_A (7 branch-entered fragments, loop-guard
+  caveat recorded), DISPATCH_P_ENTRY + 9 P-lanes (all converge 54BB;
+  P4/P7b tail-merge via 53CD), TABLE_56BD (33w data), gap1 R-chain
+  (5825/58E0 called; 5886/5905/5993/5823 callerless fragments),
+  gap2 R-chain (4F6E/4FC2 called; 4FF6/500B/505B fragments, 5009/500A
+  delays unowned), SUB_7967, SUB_797C (trimmed 797C-7A4A after
+  parent byte-check found 7A49->7AE5 early-out the team missed),
+  FRAG_7AB1 (branch-entry tail 7AB1-7ADD).
+- Corrections: 54BB note (K3 — RPTBD/RET belong to 54A4; proper body
+  is J1+J chain, first exit F073->5503 @54F6); 54A4 bound 54A4-54BA;
+  7937 owns delay tail through 7966 (all four 795D refs now
+  objdump-verified, resolving the word-only caveat).
+- Parent validation: 43 entry/exit pairs byte-checked (2-word
+  F073-exit address rule; retd bounds end on delay slots with exit
+  addr in note); all interior F073/F273 targets confirmed interior;
+  14 call sites objdump- or byte-verified.
+- Open: 7A4B-7AB0 (no entries found), 7ADE-7AE4 (post-exit tail),
+  5009/500A delays, table 56BD semantics, S1a loop-guard proof.
+
 ## 2026-11-05 — night five: 60 symbols, reproducible coverage (46.5%)
 
 - 10 teams + critic + entry-linear validation; 60 new symbols (427

@@ -176,16 +176,25 @@ spaces:
           - roms/rom6/ivt.md
       - address: 0x54BB
         name: MSG_PRODUCER_CONVERGE
-        confidence: static
+        confidence: static_branch
         backing: code
-        note: Producer-switch convergence. Zero-fill envelope, RPTBD clear loop at 0x54B5, RET at 0x54BA.
+        note: >-
+          CORRECTED per critic K3: RPTBD@54B5 + RET@54BA belong to 0x54A4 body, not 0x54BB. Proper body is the
+          J1+J convergence chain, bounds 54BB-54F7 + 54F8-5502 + 5503-55B0 + 55B1-55D6 + 55D7-55EE + 55EF-5675 +
+          5676-5682 + 5683-5699 + 569A-569D + 569E-56A1 + 56A2-56B6 + 56B7-56BC; first exit F073->5503 @54F6
+          (objdump-verified); convergence entry via 7x F073->54BB, zero F074 callers; far out-call F274 2262@54D7
+          byte-verified; 56A2 is a call-entry (caller F074@56B7 byte-verified);
+                    chain ends FC00@56BC, data table 56BD follows; J6 interior F273 bd targets 560A/564E/5634 verified
+          interior; 56A2 call-entry falls through from J10a STL plus F074 77EE@56A0; HYPOTHESIS.
         evidence:
           - roms/rom6/messages.md
       - address: 0x54A4
         name: MSG_FETCH_ROUTINE
-        confidence: static
+        confidence: static_branch
         backing: code
-        note: Called after LD *(0x3FC7/0x3FC9) on every taken producer path. Body open.
+        note: Called after LD *(0x3FC7/0x3FC9) on every taken producer path. Bound 54A4-54BA (RET FC00@54BA);
+          callers 4x F074 @53CF/53E7/5430/54A0 (53CF/53E7/5430/54A0 byte-verified F074 54A4); interior F272 RPTBD@54B5.
+          Owns the RPTBD@54B5/RET@54BA formerly misattributed to 0x54BB (critic K3). HYPOTHESIS.
         evidence:
           - roms/rom6/messages.md
       - address: 0x2C88
@@ -2826,5 +2835,129 @@ spaces:
         confidence: static_branch
         note: >-
           Entry F074 059E; bound 7937-795C (FC00@795C); callers 3x F274 @7465/74E9/74FD (7465/74E9 word-
-          verified); interior rptbd + F074@7946 + F274@7948/794D/7953 into 795D (7946/7948 objdump-verified);
+          verified); owns jumped-to delay tail through 7966 (exit FE00@7964 + delays 7965/7966; all four 795D refs
+          now objdump-verified: F074@7946 + F274@7948/794D/7953); 795D is a SUB_7937-tail fragment, not a prologue
+          routine (critic K1); HYPOTHESIS.
+      - address: 0x52C4
+        name: DISPATCH_P_ENTRY
+        confidence: static_branch
+        note: >-
+          Entry F074 059C; bound 52C4-52F6 (exit F073@52F5->5315); sole external caller F074@51FA objdump-
+          verified (call 0x52C4); leads P-lane fan; HYPOTHESIS.
+      - address: 0x5282
+        name: DISPATCH_SLED_A
+        confidence: static_branch
+        note: >-
+          Bounds 5282-52C3 + 52F7-5300 + 5301-5335 + 5336-5354 + 5355-5361 + 5362-538C + 538D-5394 (branch-
+          entered sled/merge fragments, zero F074 callers; entries via F820/F84D/F830/FA20/BACC chain); 5282
+          head reached via F820 5282@527D bc-ntc; 52AA-52BE backward loop has conditional exits
+          F842->52C0/F843->5292 then FC00@52C3 tail (loop-guard caveat recorded); 538D-5394 is 4-way F073
+          dispatch sled to 5395/53EB/5434/544A with computed entry ADD #538D@538A + BACC@538C; out-calls F074
+          580B@5356/535C + F074 06E8@5371 byte-verified; HYPOTHESIS.
+      - address: 0x5395
+        name: DISPATCH_P_LANES
+        confidence: static_branch
+        note: >-
+          Bounds 5395-53B9 + 53BA-53D8 + 53D9-53EA + 53EB-541F + 5420-5433 + 5434-5449 + 544A-546A + 546B-5488
+          + 5489-54A3 (P1-P7c dispatch lanes, all converge F073->54BB; P4/P7b tail-merge via F073->53CD into
+          P2 tail); out-calls F074 0672/06E2/06E4/B6E6/C717/9FA8/8641/864E/864D?/B4A8/D970/9FA8/54A4 per-lane
+          (byte sample 554E F074 56DE + J3 calls 56DE@554E/56FC@5550); F981 tfcall treated as branch per
+          convention (not counted as out-call); interior F272 RPTBD@543E; HYPOTHESIS.
+      - address: 0x56BD
+        name: TABLE_56BD
+        confidence: static_branch
+        note: >-
+          Bound 56BD-56DD (33w data table; zero F07x/F4Ex code words, no calls/branches/RET; LD #56xx
+          immediates in J6 are values not pointers); semantics open (candidate threshold/coeff words);
           HYPOTHESIS.
+      - address: 0x5825
+        name: SUB_5825
+        confidence: static_branch
+        note: >-
+          Entry F074 059C; bound 5825-5885 (FC00@5885); caller F074@4823 objdump-verified (call 0x5825);
+          interior uncond b@5850->5875 + b@586D->5875 joins with xc guards; residual frag 5823-5824 (ssbx+ret)
+          precedes head; HYPOTHESIS.
+      - address: 0x5886
+        name: FRAG_5886
+        confidence: static_branch
+        note: >-
+          Bound 5886-58DF (FC00@58DF); post-ret abut, zero F074/F274 callers; interior 2x calld 58E0
+          @5895/58A1 (objdump calld) + bd@58BC->58DD interior; HYPOTHESIS fragment.
+      - address: 0x58E0
+        name: SUB_58E0
+        confidence: static_branch
+        note: >-
+          Entry F074 05FC; bound 58E0-5904 (FC00@5904); 4x F274 callers @5895/58A1 (objdump calld) +
+          @593F/5954 (byte-verified F274 58E0); rptbd 5903 BK-style math (andm/or/xc), zero interior
+          F074/F274; HYPOTHESIS.
+      - address: 0x5905
+        name: FRAG_5905
+        confidence: static_branch
+        note: >-
+          Bound 5905-5992 (FC00@5992); post-ret abut, zero callers; interior 2x calld 58E0 @593F/5954 +
+          b@593B->593F + b@5950->5954 interior; cmpm/bitf lane; HYPOTHESIS fragment.
+      - address: 0x5993
+        name: FRAG_5993
+        confidence: static_branch
+        note: >-
+          Bound 5993-59DB (early cond retd@59BE + tail FE00@59D9 + delays 59DA/59DB, abuts existing SUB_59DC);
+          zero callers; calls F074 59DC@5995 byte-verified; tail via interior bc/bd joins 59C1-59D9;
+          HYPOTHESIS fragment.
+      - address: 0x5823
+        name: FRAG_5823
+        confidence: static_branch
+        note: >-
+          Bound 5823-5824 (F5BC ssbx + FC00 ret residual, precedes SUB_5825 head; existing SIEVE_580B ends
+          5822); HYPOTHESIS fragment.
+      - address: 0x4F6E
+        name: SUB_4F6E
+        confidence: static_branch
+        note: >-
+          Entry F074 059C; bound 4F6E-4FC1 (FC00@4FC1); 3x F274 callers @4C1D (objdump calld) + @4CAE/@4D64
+          (byte-verified F274 4F6E); banzd/rptb-ror leaf, interior b@4F89->4F96; HYPOTHESIS.
+      - address: 0x4FC2
+        name: SUB_4FC2
+        confidence: static_branch
+        note: >-
+          Entry F074 059C; bound 4FC2-4FF5 (exit FE00@4FF3 + stl delays 4FF4/4FF5); caller F274@4C21 objdump-
+          verified (calld 0x4fc2); rptbd squra/abs leaf; interior call F074@4FDF->4348; HYPOTHESIS.
+      - address: 0x4FF6
+        name: FRAG_4FF6
+        confidence: static_branch
+        note: >-
+          Bound 4FF6-5008 (exit bd@5007->0x1000 OUT, uncond branch-out; delay words 5009/500A unowned, not
+          claimed by R3/R4); post-retd abut, zero callers; cmpm/bitf lane; HYPOTHESIS fragment.
+      - address: 0x500B
+        name: FRAG_500B
+        confidence: static_branch
+        note: >-
+          Bound 500B-505A (FC00@505A); abuts bd-delay, zero callers; interior b@5028->505A +
+          b@5046/5050->5056; HYPOTHESIS fragment.
+      - address: 0x505B
+        name: FRAG_505B
+        confidence: static_branch
+        note: >-
+          Bound 505B-50B1 (exit FE00@50AF + delays 50B0/50B1, abuts existing FEEDER_2F61_50B2); post-ret abut,
+          zero callers and zero interior calls; straight-line flag-pack math tail; HYPOTHESIS fragment.
+      - address: 0x7967
+        name: SUB_7967
+        confidence: static_branch
+        note: >-
+          Entry F074 059E; bound 7967-797B (FC00@797B); caller F074@7726 objdump-verified (call 0x7967); rptbd
+          zero-fill leaf (dst/st/xc), zero interior calls; HYPOTHESIS.
+      - address: 0x797C
+        name: SUB_797C
+        confidence: static_branch
+        note: >-
+          Entry F074 0596; bound 797C-7A4A (exit F073@7A49->7AE5 OUT; TRIMMED past 7ADC per critic K4 + parent
+          byte-check of 7A49 early-out; words 7A4B-7AB0 dark, 7AB1-7ADD separate frag); caller F074@5D1D
+          objdump-verified (call 0x797c); long cmpm/bitf lane; interior joins b@799E/79AC/79B0->79BB,
+          b@7A15/7A22->7A25, b@7A2E->7AB1 verified interior; interior calls F074@79DA->0596 + F074@7A01->072A
+          objdump-verified, F981 fcall treated as branch; HYPOTHESIS.
+      - address: 0x7AB1
+        name: FRAG_7AB1
+        confidence: static_branch
+        note: >-
+          Bound 7AB1-7ADD (exit F073@7ADC->7AE5); branch-entry from live lane b@7A2E->7AB1 (other F073 entries
+          @7A59/7A5D/7A60/7A8E/7AA0 sit in post-7A49 dead zone; no whole-ROM F073 entries from outside;
+          conditional-branch entries not exhaustively scanned); no F074 callers; HYPOTHESIS fragment.
