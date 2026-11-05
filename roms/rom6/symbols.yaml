@@ -74,7 +74,10 @@ spaces:
         note: >-
           Match loop, not an epilogue. Every clause converges here with B 0x2E64 for re-match. Wave-7:
           referenced from uploaded code (block01 + block30 ROM-xref targets) — exterior callers exist; loop
-          never returns (no RET claimed, no bound); entry evidence recorded, mechanism unchanged.
+          never returns (no RET claimed, no bound); entry evidence recorded, mechanism unchanged. Bound
+          2E64-2E83 (wave-8: NO exit-class in-span — falls into WORKER_2E84; entries 2x call F074@2E4F/2E61
+          + 2x B F073@2EC4/2ECB + block01/30 refs; loop-back edges ARE the in-ROM B->2E64 refs; loop head,
+          not epilogue).
         evidence:
           - roms/rom6/ivt.md
       - address: 0x25DF
@@ -136,7 +139,10 @@ spaces:
         name: PORT45_POLL
         confidence: static
         backing: code
-        note: PORTR pa45 poll loop at 0x40B4 (AND #4096, BNEQ), pa44 write, RPT-14 wait. Called from PORT0_TXN phases. Bound 40A1-40BB (wave-5: exit RET FC00@40BB + post-RET head byte-verified; 6 F074 callers @4034/406F/4077/4084/4087/4093; interior join B@40B2->40B4).
+        note: >-
+          PORTR pa45 poll loop at 0x40B4 (AND 4096, BNEQ), pa44 write, RPT-14 wait. Called from PORT0_TXN
+          phases. Bound 40A1-40BB (wave-5: exit RET FC00@40BB + post-RET head byte-verified; 6 F074 callers
+          @4034/406F/4077/4084/4087/4093; interior join B@40B2->40B4).
         evidence:
           - roms/rom6/ivt.md
       - address: 0xCA69
@@ -5676,6 +5682,100 @@ spaces:
           micro-span, retd-headed); entry bc F845@DA29->DA32 byte-verified (gap-sibling span DA21-DA31
           zone, exterior to this span); fall-through continuation of FRAG_DA21 delay tail, branch-entered;
           HYPOTHESIS.
+      - address: 0x970B
+        name: FRAG_970B
+        confidence: static_branch
+        note: >-
+          Bound 970B-975F (85w; NO exit-class in-span — falls into 9760 zone; pre-word 0800 = retd delay of
+          FRAG_9700, not post-RET — entries are branch-based); entries bcd FA20@96C3->970B byte-verified
+          (from MEAS_RSSI_POSTER zone) + B F073@9706->970B (from FRAG_9700 interior); w[9737]=F4EB, not
+          TRETE — 96BD-note trete claim falsified at byte level (F4EB is non-exit per catalog: BACC is
+          exactly 0xF4E2); HYPOTHESIS.
+      - address: 0x9ABF
+        name: FRAG_9ABF
+        confidence: static_branch
+        note: >-
+          Bound 9ABF-9AD1 (19w; exit B F073@9ACB->9AD2 + operand 9AD2 — chained into FRAG_9AD2 head per
+          4C41/4CB4 precedent; exit scan otherwise clean; pre-word 9AD2 = next-head address, not post-RET);
+          entry bc F820@9AA0->9ABF byte-verified (from FRAG_9A82 [9A82-9ABE], exterior); HYPOTHESIS.
+      - address: 0xDA35
+        name: FRAG_DA35
+        confidence: static_branch
+        note: >-
+          Bound DA35-DA3F (11w; exit retd FE00@DA3D + delays DA3E-DA3F included per convention; exit scan
+          clean); entry bc F844@DA24->DA35 byte-verified (from FRAG_DA21 [DA21-DA31] interior, chained edge);
+          remainder DA40-DA47 (8w, RET@DA47, no entries) stays dark; HYPOTHESIS.
+      - address: 0x38F6
+        name: FRAG_38F6
+        confidence: static_branch
+        note: >-
+          Bound 38F6-38FA (5w; exit RET FC00@38FA byte-verified, exit scan clean; micro-span); entries bc
+          F820@38EF->38F6 byte-verified (from ROUTINE_38C9 [38C9-38F5] interior) + post-RET head (FC00@38F5);
+          abuts FRAG_38FB (starts 38FB); HYPOTHESIS.
+      - address: 0x38FB
+        name: FRAG_38FB
+        confidence: static_branch
+        note: >-
+          Bound 38FB-3904 (10w; exit retd FE00@3902 + delays 3903-3904 included per convention; exit scan
+          clean); entries cc F930@38AE->38FB byte-verified (cond call from FRAG_389C interior) + post-RET
+          head (FC00@38FA); remainder 3905-3906 (2w) dark; HYPOTHESIS.
+      - address: 0x397B
+        name: FRAG_397B
+        confidence: static_branch
+        note: >-
+          Bound 397B-3985 (11w; exit RET FC00@3985 byte-verified, exit scan clean); entries bc F820@396D->
+          397B byte-verified (from FRAG_3938 [3938-397A] interior) + post-RET head (FC00@397A); HYPOTHESIS.
+      - address: 0x691D
+        name: FRAG_691D
+        confidence: static_branch
+        note: >-
+          Bound 691D-6927 (11w; exit retd FE00@6925 + delays 6926-6927 included per convention; exit scan
+          clean); entry bc F84E@6910->691D byte-verified (from FRAG_690E [690E-691C] interior, chained edge);
+          abuts FRAG_6928 (starts 6928); HYPOTHESIS.
+      - address: 0xA8B1
+        name: FRAG_A8B1
+        confidence: static_branch
+        note: >-
+          Bound A8B1-A8B8 (8w; NO exit-class in-span — falls into FRAG_A8B9 head, no-exit micro abut per 6753
+          precedent; pre-word FC00 = FRAG_A8A5 exit, post-RET rule applies but entry is branch-based);
+          entry bc F845@A88D->A8B1 byte-verified (from FRAG_A87B zone); HYPOTHESIS.
+      - address: 0x36A1
+        name: FRAG_36A1
+        confidence: static_branch
+        note: >-
+          Bound 36A1-36AF (15w; NO exit-class in-span — falls into FRAG_36B0 head, no-exit micro abut per
+          6753 precedent; pre-word 2E64 = dispatch value, not post-RET — entry is branch-based); entry bc
+          F820@3695->36A1 byte-verified (from FRAG_3691 [3691-36A0] interior, chained edge); HYPOTHESIS.
+      - address: 0x2C88
+        name: ROUTINE_2C88
+        confidence: static_branch
+        note: >-
+          Bound 2C88-2CB4 (45w; exit RET FC00@2CB4 byte-verified, exit scan clean); entries 4x call F074@
+          2E47/36BC/372A/374F->2C88 byte-verified head-exact + post-RET head (FC00@2C87 = ROUTINE_2C75 exit);
+          HYPOTHESIS.
+      - address: 0x361C
+        name: FRAG_361C
+        confidence: static_branch
+        note: >-
+          Bound 361C-3622 (7w; exit B F073@3621->2E64 + operand 3622 — dispatch trampoline tail, like 3674
+          family; exit scan clean); post-RET head only (FC00@361B = FRAG_3616 exit, zero exterior refs —
+          thin entry per 3616 precedent); remainder 3623-363F (29w) stays dark; HYPOTHESIS.
+      - address: 0x9CCF
+        name: FRAG_9CCF
+        confidence: static_branch
+        note: >-
+          Bound 9CCF-9CE6 (24w; NO exit-class in-span — falls into 9CE7 zone; east claim F073@9CDB->9C12
+          FALSIFIED (w[9CDB]=1092, not F073); pre-word 9CE7 = next-zone value, not post-RET); entry bc F820@
+          9CB0->9CCF byte-verified (from CHAIN_HEAD_9C99 span); interior out-calls 9CD7->059E + calld@9CE1->
+          9D2F; HYPOTHESIS.
+      - address: 0xDAC9
+        name: FRAG_DAC9
+        confidence: static_branch
+        note: >-
+          Bound DAC9-DACE (6w; exit retd FE00@DACC + delays DACD-DACE (765F 0000) included per convention;
+          micro-span); entry bc F84A@DABC->DAC9 byte-verified (from FRAG_DA7E [DA7E-DAC8] interior, chained
+          edge); remainder DACF-DAFC stays dark (retd@DACF/DAFA unentered, FB45@D2A7->DAD2 is FCALLD
+          non-entry); HYPOTHESIS.
       - address: 0x2B53
         name: ROUTINE_2B53
         confidence: static_branch

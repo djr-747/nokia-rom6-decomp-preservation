@@ -392,6 +392,17 @@ plus inventoried.
   C556/C576/C660/C67F/C6B2/C736/BCBA/BCAC/B605/B634/9D16). Corroborations: DISPATCH_MATCH_LOOP
   (2E64 block01+30 refs, no bound — loop), INIT_FILTER_C717 (C736 slot interior), GAP_B634 (B634 slot;
   [B634-B6E5] already parses). 2E64 note YAML fixed (plain->folded scalar). make test 6 pass.
+- Wave-8 landed (13 new + 2 upgrades, 852 total, 94.1% = 52,022/55,296w): assessment pass over remainders.
+  FRAG_970B (85w no-exit, bcd+branch entries; F4EB-not-TRETE falsifies trete claim); FRAG_9ABF (chained into
+  9AD2); FRAG_DA35 (retd, chained); FRAG_38F6/38FB (micro chain, CC/BC entries); FRAG_397B; FRAG_691D
+  (chained); FRAG_A8B1/36A1 (no-exit micros); ROUTINE_2C88 (4 calls); FRAG_361C (post-RET thin, 3616
+  precedent); FRAG_9CCF (no-exit; east F073@9CDB claim FALSIFIED — w=1092); FRAG_DAC9 (retd micro, chained).
+  DISPATCH_MATCH_LOOP upgraded with Bound 2E64-2E83 (no-exit loop head, falls into 2E84). YAML hazard found
+  and fixed: plain-style `note:` truncates at ` #` (PORT45_POLL bound was file-visible but parser-dead);
+  audit of all 44 plain notes found this the sole casualty (folded `-` notes immune); fixed to folded style.
+  Stays dark, ruled: 8329 (rptb non-entry), E795 (entry-less), 361C-remainder, 9708-orphan, DA40-47, 38FB-
+  remainder, 3905-06, 4007-zone (checked), sub-word orphans, all zero-entry/data/weak zones per standing
+  kills. make test 6 pass.
 
 ## Goal mapping
 
