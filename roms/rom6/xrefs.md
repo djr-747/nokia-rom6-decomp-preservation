@@ -56,3 +56,19 @@ ones (`0x0A00`: IVT image then block14; `0x0F00`: loader then
 publisher; `0x0930`: code then data pages). Phase order = walk order.
 A static call graph across phases is unsound without the order;
 that order plus the overwrite map is the next static step.
+
+## Upload phase order (manifest walk order = upload order, verified)
+
+Source: `roms/rom6/blocks/3310-v5.79-manifest.json` block sequence
+(block00 → 01 → 02 → 03 → 04 → 05 → 06 → 08 → 09 → 0B → 0C → 0D →
+0F(IVT `0x0A00`) → 14(overwrites `0x0A00`) → 15/16/17(HPI `0x0800`,
+same payload ×3) → 18/1A(HPI `0x0800-0x0943` ×2) → 1B(publisher,
+overwrites `0x0F00` loader)). Overwrite points: `0x0930` (code then
+data pages), `0x0A00` (IVT image then block14), `0x0F00` (loader1
+then publisher). The `0x0590` mini-kernel is a vector table (live
+`B`-slots to TARG-space targets plus safe-RET `FC00 F495` filler),
+not code bodies: mask ROM calls vectors directly, filler callees
+are intentional no-ops. UNCONFIRMED: slot contents below the
+`0x2800` listing floor (no BE16 image in workspace); slot
+`0x061E` has 3 verified `F074` callers inside routine `0xA12B-0xA248`
+(counter-exhaustion retry and post-MAC-loop reseed).

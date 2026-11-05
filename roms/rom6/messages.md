@@ -26,6 +26,34 @@ code: `verified` | `static` | `hypothesis` (see
 | IMEI-check / FAID compare | no `CMPM/SUB #0x030A` in mask; decode outside static bytes like the validation verdict | open (negative result) |
 | LEAD pin mapping | service manual confirms API/vectors-RAM/boot only | open (schematics) |
 
+## Dark-region survey (overnight static pass, objdump-verified)
+
+Branch-shared tails, not hubs: `0x676A` (27 branch refs, zero true
+CALLs; pa3/pa48/pa12/pa0/pa14 PORT signature, RET `0x6870`),
+`0x62F2` (7 bc refs; calls `0x63DA`, RET `0x643D`), `0x613F`
+(branch tail of ~`0x5FF0` routine, calls `0x0598`), `0x6809`
+(PA3 poll, RETs `0x6870/0x687E`). True-called leaves:
+`0x697F` (7 callers, DARAM `0x053C↔0x2614` save/restore, RET
+`0x6986`), `0x712D` (6 callers, `0x05B4` + flag gates, RET
+`0x713F`), `0x7FC0` (8 callers, RET `0x7FC5`). Mid-routine labels:
+`0x78B6` (MAC/staged-window, RET `0x7936`), `0x7AE5` (PA5/7/8 +
+PA33 programmer, RET `0x7B71`), `0x6AF9` (provisional, no RET in
+1K window). Opcode dispatch: `0x2F00` splitter → `0x5170`
+4-bit gate → `0x5190`/`0x51AD` record-compare lanes → `0x51D4`
+miss sink (body `ORM #256,*AR4 + LD *AR4,B + RET`, RET `0x51D7`);
+`0x14/0x15` have no lane (4-bit mask). Span `0x9F35-0xC851`:
+`0x9F19` copy engine, `0x9F28/0x9F35` stagers (callers verified),
+`0x9F42` audio engine, `0x9C99` chain head, `0xA249/0xA2B9/0xA2C3/
+0xA3A3/0xA3F0` message workers, `0xA109/0xA06B` audio helpers,
+`0xA12B` message setup (slow-path `0x061E` ×3 inside). Identity
+extensions: `0x938C` COBBA-read preamble (entry `F074 05BA`;
+`PORTR pa0` interior at `0x93A4`), `0x9414` measure dispatch,
+`0x942E` COBBA-verify loop (`PORTR pa12` at `0x94BD`),
+`0xB5E6` first `0x0857` tune-cell reader. Roles stay hypotheses;
+bounds are first-RET unless stated. Open: all-paths bounds,
+`0x0590` slot contents, `0x938C` entry mechanism, boot-time
+`0x85C/0x857` uploader, pa48/49/50 mapping.
+
 ## D→M (DSP reports)
 
 | code | layout | status | evidence |

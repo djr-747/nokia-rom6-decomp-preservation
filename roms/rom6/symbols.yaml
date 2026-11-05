@@ -217,14 +217,14 @@ spaces:
         name: MSG_STAGE_9F28
         confidence: static
         backing: code
-        note: Copy 0x093A to 0x1100 (BRC 139) via engine 0x9F19, RET at 0x9F34.
+        note: Copy 0x093A to 0x1100 (BRC 139) via engine 0x9F19, RET at 0x9F34. Entry words 4A12 4A13 7712 1100 7713 093A F274 9F19 771A 008B; callers F074 at 0xB51A/0xB51E verified.
         evidence:
           - roms/rom6/messages.md
       - address: 0x9F35
         name: MSG_STAGE_9F35
         confidence: static
         backing: code
-        note: Copy 0x093A to 0x1000 (BRC 119) via engine 0x9F19, RET at 0x9F41.
+        note: Copy 0x093A to 0x1000 (BRC 119) via engine 0x9F19, RET at 0x9F41. Variant of 0x9F28 (AR2 0x1100 vs 0x1000, BRC 139 vs 119); callers F074 9F35 at 0x9CB2/0x9CBA/0xB527/0xB52B, plus chain-head 0x9C99 lanes.
         evidence:
           - roms/rom6/messages.md
         evidence:
@@ -548,7 +548,9 @@ spaces:
           Entry CALL 0x5BC; MVMM SP,AR3 + LD *ar3+ reads caller stacked regs; CMPM lanes vs dispatcher return-
           PCs 0x2D5D/0x2DDB and AND #255 low-byte lanes vs 0x4D/0x9A/0x05/0x50/0x9C; 8 CALL sites incl
           0x2CB1/0x2D5B/0x2D7B/0x2DD9/0x2E1D (AR2=0x2F00/0x2FC8 staged window, AR0=244) plus
-          0x363A/0x385E/block-0x9D11; BK=250 + *(0x20FF) flag lanes select builder callees.
+          0x363A/0x385E/block-0x9D11; BK=250 + *(0x20FF) flag lanes select builder callees. Overnight
+          re-census: 12 refs total -- 7xF074 at 0x2CB1/0x2D5B/0x2D7B/0x2DD9/0x2E1D/0x385E/0xA211 (all
+          verified) + 3xF274 CALLD at 0x363A/0x9D11/0x9F14 + FB20 at 0x3532 + FB30 at 0x354A (all verified).
       - address: 0x93F4
         name: MSG_OPCODE_VOCAB_05_4D_50_9A_9C
         confidence: static_branch
@@ -592,11 +594,6 @@ spaces:
         note: >-
           Called from 0x942B/0x94A5/0x995C; STM AR2,#96 + PORTR PA2 measurement read gated by *(0x20FF) BITF
           lanes; LDU *(0x20FB) - *(0x587) threshold compare with BC 0x9700 ALT; posts measurement/rssi class.
-      - address: 0x9A50
-        name: MSG_OPCODE_9A50
-        confidence: provisional
-        note: >-
-          CALLD target from 0x944B classifier lane; body unexamined.
       - address: 0x9343
         name: MSG_CIPHER_24R
         confidence: provisional
@@ -669,3 +666,211 @@ spaces:
         note: >-
           Write sink of MSG_CIPHER_24R loop (AR2 preset at 0x9348); sole static reference is the cipher loop
           itself, buffer is staged allocation.
+      - address: 0x676A
+        name: BRANCH_TAIL_676A
+        confidence: static_branch
+        note: >-
+          Entry F074 0598 call; 27 branch-only refs (7xF073/18xF8xx/2xF273: 0x6420/0x6499/0x64A7/0x6508/0x6511
+          /0x6516/0x651B/0x6524/0x652C/0x65EA/0x65F6/0x6669/0x6688/0x66CD/0x66F6/0x66FC/0x6715/0x6746/0x6756/0
+          x6762 + F073/F273 forms), zero F074/F274/FBxx full-range; PORT sig PORTR/PORTW
+          pa3/pa48/pa12/pa0/pa14 (0x67B2/0x67B8/0x67C1/0x67CC/0x6803/0x6867) + BITF polls + RPT #20; staged
+          refs 0x2FDE/0x2FCF; first RET FC00 @0x6870 (prev 69F8 263A 0080); mid-routine label, role hypothesis
+          only.
+      - address: 0x62F2
+        name: BRANCH_TAIL_62F2
+        confidence: static_branch
+        note: >-
+          Entry 60F8 2614 0003 CMPM *(0x2614),#3 + F830 62F9 + F073 6320; 7 bc refs
+          (0x62A2/0x62A6/0x62CB/0x62CF/0x62E0/0x62E3/0x62EC), zero true CALLs; cluster CALLs 0x63DA via F074
+          @0x634F (entry 0x4481 ld *ar1,16,a); dual RPTBD memcmp loops (STM #3 BRC + LD/SUB/ADD/BC aeq + ORM
+          #64 *AR0); BITF *(0x2628)/0x051E/0x054F; CMPM *AR6 #80/#82; first RET FC00 @0x643D; no PORTR/PORTW
+          in 0x62F2-0x643D; role hypothesis only.
+      - address: 0x613F
+        name: BRANCH_TAIL_613F
+        confidence: static_branch
+        note: >-
+          Zero true CALLs (F073@0x6031 objdump b + 3xF273 bd + 6xF820/F830 bc); entry 7711 2629; tail
+          0x613F-0x61C2 exits via B 0x636A; tretd FC20 FE00 @0x614B/0x6151; calls mini-kernel 0x0598 via F074
+          @0x6155; AR setup AR1-AR7; 4x BRC#3 RPTBD loops + ORM flag bits into *AR0; ports
+          0x232/0x55C/0x563/0x564/0x2512; downstream calld 0x628C + call 0x63DA; parent entry ~0x5FF0
+          unbounded.
+      - address: 0x697F
+        name: DARAM_SAVE_RESTORE
+        confidence: static
+        note: >-
+          7 true CALLs (6xF074 @0x6431/0x6448/0x666C/0x668B/0x6748/0x6764 + F274 calld @0x66DC, objdump
+          call/calld verified); 8-word leaf 7713 053C 7712 2614 E510 7683 0000 FC00 (STM AR3 #1340, STM AR2
+          #9748, MVDD *AR3->*AR2, ST #0 *AR3); RET 0x6986.
+      - address: 0x6987
+        name: SIBLING_LEAF_6987
+        confidence: static_branch
+        note: >-
+          Mirror leaf 0x6987-0x698A (MVDD *AR2->*AR3 + RET); 4 words, RET FC00 @0x698A (corrected from
+          0x698E); no caller census claimed.
+      - address: 0x712D
+        name: FLAG_GATE_712D
+        confidence: static
+        note: >-
+          6xF074 true CALLs @0x6B22/0x6B86/0x6B93/0x6C1A/0x6ECE/0x6FE1 (call 0x712d @0x6B22 objdump); body
+          F074 05B4 + CMPM *(0x34BF) + RC + BITF *(0x3490); RET FC00 @0x713F; downstream call 0x05B4 @0x7143;
+          T-loop correlator (STM T, TMPYU/SFTA/SUB) + zeroing *(0x533)/(0x37F6/0x37F7).
+      - address: 0x78B6
+        name: MAC_STAGED_WINDOW
+        confidence: static_branch
+        note: >-
+          Entry 10F8 2F06 confirmed; 7 branch refs (2xF820/4xF830/1xF073: count 6 falsified to 7), zero true
+          CALLs; staged reads 0x2F06 + writes 0x2F01; rptbd @0x78CE squra/squrs MAC block; no PA-port op in
+          body; first RET FC00 @0x7936 (ctx 9BB5 FC00 F074 059E); mid-routine label, role hypothesis only.
+      - address: 0x7AE5
+        name: PORT_PROGRAMMER_7AE5
+        confidence: static_branch
+        note: >-
+          Entry 60F8 0010 0000 + F920 3D3B confirmed; 8 branch refs (2xF073/3xF820/2xF830/1xF845: count 6
+          falsified to 8), zero true CALLs; portw PA5/PA7/PA8 @0x7AF8/0x7AFE/0x7B05 + PA33 @0x7B52-6D; NOT
+          PA48/49/50, PA2, PA0, PA12; 2F01 ref @0x7B96; first RET FC00 @0x7B71; mid-routine label.
+      - address: 0x7FC0
+        name: TINY_LEAF_7FC0
+        confidence: static
+        note: >-
+          8xF074 true CALLs @0x7F34/0x7F3C/0x7F44/0x7F4C/0x835D/0x837C/0x83C0/0x83DA; leaf F120 5555 F074 7FB7
+          E721 FC00; RET 0x7FC5.
+      - address: 0x6809
+        name: BRANCH_TAIL_6809
+        confidence: static_branch
+        note: >-
+          6 branch sites (4xF830/1xF844/1xF820: 0x67DF/0x67F3/0x67F8/0x67FD + self-loop 0x6817/0x6824), zero
+          F074; entry F6BB F020 0ED8 F074 3986; RETs FC00 @0x6870/0x687E; polls BITF *(0x552)#2048 + PORTR PA3
+          @0x6867 + PORTW @0x684B; staged refs 0x2FDE/0x2FCF/0x2FD7/0x2FD9.
+      - address: 0x6AF9
+        name: BRANCH_LABEL_6AF9
+        confidence: provisional
+        note: >-
+          Entry F074 05A2 + 60F8 250F 0022 + F820 6B26 confirmed; 7 branch refs
+          (F84D/F830x2/F820/F845/F84A/F073: count 6 falsified to 7), zero true CALLs; bound entry->0x6B13 F073
+          (->0x6B22); staged ref 0x2F00 @0x6BAA, no port ops; no RET within 0x6AF9-0x72F9 window.
+      - address: 0x2F00
+        name: BUILD_OPCODE_SPLIT
+        confidence: static_branch
+        note: >-
+          Entry 6FF8 036F stl a,-8,*(0x36F) / F030 00FF and#255 / 80F8 0375 stl *(0x0375); AR2+% streams to
+          0x0370-0x0373; 0x2F17 stm #886 ar4 + rpt mvdd *ar2->*ar4+; CALLs 0x2E2F @0x2F3D/0x2F4D then F073
+          0x2E64; zero true CALLs into 0x2F00 (60 next-word hits all STM/LD immediates); first B
+          0x2F3F->0x2E64, first FC00 @0x311E.
+      - address: 0x5170
+        name: DISPATCH_MASK15
+        confidence: provisional
+        note: >-
+          Gate bytes F830 51D4 F030 000F F110 000F F84D 51D4 F110 0008 F84D 51CC (and#15/sub#15->0x51D4 miss,
+          sub#8->0x51CC, bitf *(0x054F)->0x51CC, bceq 0x5190); no own RET, exits via 0x51D4 RET 0x51D7 /
+          0x51D9 RET; 4-bit mask cannot carry 0x14/0x15 downlink opcodes.
+      - address: 0x5190
+        name: LANE_36F
+        confidence: provisional
+        note: >-
+          Entry 10F8 036F ld *(0x036F); F845 51AD miss lane; AR2=#880(0x370) loop banz 0x519C vs *(0x2F62) low
+          byte, hit falls F073 51D4; zero true CALLs (1 F845 branch hit); no own RET, exits via miss sink
+          0x51D4.
+      - address: 0x51AD
+        name: LANE_375
+        confidence: provisional
+        note: >-
+          Entry 10F8 0375 ld *(0x0375); AR1=*(0x0375) AR2=#886(0x376); key hi(*(0x2F61))<<8|lo(*(0x2F62))
+          (BE16 0x2F61=0x00FF 0x2F62=0x8095) vs *ar2+ loop banz 0x51C2; miss 0x51D4; no own RET.
+      - address: 0x51D4
+        name: MISS_SINK_51D4
+        confidence: static_branch
+        note: >-
+          CORRECTED body: 0x51D4 6984 0100 = ORM #256,*AR4; 0x51D6 1184 = LD *AR4,B; RET FC00 @0x51D7 (second
+          RET @0x51D9); reached by lane-miss branches 0x5176/0x517F/0x51AB/0x51CA + F073 51D4 hits; synthesis
+          ld-#0 claim falsified by objdump.
+      - address: 0x938C
+        name: COBBA_READ_PREAMBLE
+        confidence: static_branch
+        note: >-
+          CORRECTED entry F074 05BA (no 74xx at 0x938C); PORTR pa0 74 82 00 00 @0x93A4 after STM AR2,#96
+          @0x93A2 is interior, not entry; sisters pa2 @0x93B4, pa0 @0x93BF; RET FC00 @0x93CD; zero in-image
+          callers in any F074/F274/FBxx/F073/F8xx form; entry mechanism unknown.
+      - address: 0x9414
+        name: MEAS_DISPATCH_9414
+        confidence: static_branch
+        note: >-
+          Branch-reached from 0x93CE cluster (F820 @0x93D3/0x93D9/0x93E1, F073 @0x940E); calls
+          0x99A4/0x9A11/0x96BD; RET FC00 @0x942D.
+      - address: 0x942E
+        name: COBBA_VERIFY_LOOP
+        confidence: static_branch
+        note: >-
+          Branch-reached (F073 @0x9449, F846 @0x944F/0x9457); PORTR pa12 74 82 00 0c @0x94BD; dual bc-bneq
+          verdict ->0x94D0 @0x9464-74 + ldu/xor/bcd verdict @0x94A9-0x94B8; call 0x97A2 @0x948D; RET FC00
+          @0x94EF.
+      - address: 0x9F19
+        name: COPY_ENGINE_9F19
+        confidence: static
+        note: >-
+          PSHM AL/AH/AG/ST1, LD *AR2, RPTB->0x9F22, MVDD *AR3,*AR2+, ST A,*AR3+, POPM x4; RET 0x9F27; called
+          by stagers 0x9F28/0x9F35 (F274 9F19).
+      - address: 0x9F42
+        name: AUDIO_ENGINE_9F42
+        confidence: static
+        note: >-
+          Entry F074 0614 + 61F8 0577 0400 BITF + F820 9F50 + MAC block F471/F485; RET FC00 @0x9FA7; callers
+          F274 9F42 @0xA785/0xA90F/0xA98D (0xA785 verified).
+      - address: 0x9C99
+        name: CHAIN_HEAD_9C99
+        confidence: static_branch
+        note: >-
+          Words F074 06D4 F074 06BE + RPTBD mpy loop + 2x F074 9F35 @0x9CB2/0x9CBA (both verified); tail
+          9CCF->9CE7->9D0B; RET FC00 @0x9D15.
+      - address: 0xA249
+        name: MSG_DISPATCH_A249
+        confidence: static_branch
+        note: >-
+          Entry F074 068E; READA+BACC table A25A/A25F/A264/A269/A2AC + F274 A2B9 @0xA25A; 10-word tail; RET
+          FC00 @0xA25E.
+      - address: 0xA2B9
+        name: MSG_PRIMITIVE_A2B9
+        confidence: static
+        note: >-
+          10-word shared tail 1095 4A15 F4E3 8A15 F495 6085 00FF F820 A2B9; RET FC00 @0xA2C2; ~20 F274/F074
+          callers incl A2A9/AF6F-B355 range (count reported, first-FC00 verified).
+      - address: 0xA2C3
+        name: MSG_WORKER_A2C3
+        confidence: static
+        note: >-
+          F074 0654 class; RET FC00 @0xA360; callers F074 @0xA269/0xA2AC (0xA269 verified).
+      - address: 0xA3A3
+        name: MSG_WORKER2_A3A3
+        confidence: static
+        note: >-
+          F074 0654 class; RET FC00 @0xA3BD; callers 0xA26B/0xA2AE (reported).
+      - address: 0xA3F0
+        name: MEASUREMENT_A3F0
+        confidence: static_branch
+        note: >-
+          F074 0656 class; RET FC00 @0xA481; caller F074 @0xA271 (verified).
+      - address: 0xA109
+        name: AUDIO_SELECT_A109
+        confidence: static_branch
+        note: >-
+          Entry F074 061C + 61F8 0577 0420 + F820 A12A + 11F8 2AEE loads; RET FC00 @0xA12A; callers F074
+          @0xA6DF/0xA8F7/0xAA13 (0xA6DF verified).
+      - address: 0xA12B
+        name: MESSAGE_SETUP_A12B
+        confidence: static
+        note: >-
+          Entry F074 061E + AR0-6 STM block to 0x288A+; slow-path 0x061E calls @entry 0xA12B + @0xA17A
+          (counter-exhaustion retry) + @0xA1DD (post-MAC-loop reseed), all F074 verified; routine
+          0xA12B-0xA248 dual-MAC correlation loop over *(0x288A/0x288E/0x3F1C/0x3F1D) with call 0x93CE
+          downstream; epilogue call 0x2C88 @0xA245 + popm st1; RET @0xA248.
+      - address: 0xA06B
+        name: SUB_A06B
+        confidence: static_branch
+        note: >-
+          Entry F074 061A + F272 A08B loop; called at 0x9F68 (F074 verified) and 0x9F42+2 chain; RET FC00
+          @0xA108.
+      - address: 0xB5E6
+        name: TUNE857_READER
+        confidence: static
+        note: >-
+          First 0x0857 reader: entry 7714 0857 STM #2135 AR4 (verified) + TMPYU *AR4+ SFTA -12 streams to
+          0x04CD-0x04D1; CALL 0xB461; RET FC00 @0xB5FE (gap 24).
