@@ -286,6 +286,18 @@ bytes as constants.) No branch in the image targets `0x3025`,
 `0x119C`, `0x1100`, or `0x093A` — fill targets are parsed as
 data, never executed; code-relocation read excluded.
 
+Worker mode word `*(0x85D)` is never mask-written: all 18
+in-mask references are reads (`LD`/`BITF`; 15 in block code
+`0x9Cxx-0x9Exx`, 2 in the worker, 1 at `0x67A9`). The
+MSID-vs-COBBA-ID validation that sets it therefore runs
+outside mask ROM — uploaded block code or direct HPI/MCU
+write. The DSP mask side only consumes the verdict. AF57
+block paths (`0x9DFB` → `CALLD 0x9D9A`) consume the STATE
+`0x29C9` buffer with 159/160-scale loops, not 24-byte
+echoes: the SIML echo assembly lives elsewhere (unstaged
+`0x9Fxx` counts are 139/119; no 24-count loop found in
+mask — echo likely built word-wise in staged code).
+
 Stage-exit `0x77EE` zeroes report staging (`RPTZ` clears at
 `0x3AD0/0x3AD8/0x3AE0/0x37E0` after `CMPM *(0x250F),#34`),
 then `MVDK *(0x265D)→0x34BC/0x34BD`, `ST #9312→*(0x264A)`
