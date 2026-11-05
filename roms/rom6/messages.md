@@ -270,6 +270,14 @@ F7FF F495 75F8`; `0xB37B`+16 overlaps the same run from
 bytes as constants.) No branch in the image targets `0x3025`,
 `0x119C`, `0x1100`, or `0x093A` — fill targets are parsed as
 data, never executed; code-relocation read excluded.
+
+Stage-exit `0x77EE` zeroes report staging (`RPTZ` clears at
+`0x3AD0/0x3AD8/0x3AE0/0x37E0` after `CMPM *(0x250F),#34`),
+then `MVDK *(0x265D)→0x34BC/0x34BD`, `ST #9312→*(0x264A)`
+(or `#9304` on the other leg), `RETD`. The enqueue slow
+path `CALL 0x61E` lands inside the zero-filled mini-kernel
+window (`0x0580-0x0600` in-mask zeros) — the D→M slow path
+runs uploaded code, not analyzable from mask bytes.
 Sources below `0xB000` are staged DARAM: `0x093A`+8 reads
 zero in-mask (filled at runtime from upload/HPI); dests
 `0x3025/0x119C/0x1100/0x1000` likewise.
