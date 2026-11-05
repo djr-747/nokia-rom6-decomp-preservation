@@ -323,11 +323,15 @@ Family-`0x74` invoke census (block `STM AR4` + `STM AR5`
 pairs, static): block08 (runtime `0x926` scheduler) invokes
 `AR4=0x74` with `AR5 = 0x04 / 0x3E / 0x1A / 0x0C` (4 sites);
 block30 (runtime `0x0A00` image block) `0x74/0x10`; block20
-`0x74/0x36` (SIML validation, attributed). Whether AR5 is a
-length or the subtype byte is unresolved — the combined
-header word carries it either way, and only `0x36` is tied
-to a named ARM message. The `0x04/0x3E/0x1A/0x0C/0x10`
-invokes are unattributed `0x74`-family traffic.
+`0x74/0x36` (SIML validation). AR5 reads as LENGTH, not
+subtype: `0x1A` = 26 = 24-byte echo + 2 header bytes (fits
+the `0x74/0x35` SIML echo exactly); `0x0C` = 12 fits the
+12-byte identity record; `0x04/0x10/0x3E/0x36` = 4/16/62/54.
+The subtype byte travels separately (stamped into payload,
+cf. `ST #53` candidate at `0x78FB` — consistent with a
+26-length echo carrying subtype `0x35`, still unproven).
+Only `0x36` is tied to a named ARM message; the length
+model reframes the rest as sized, not yet named, traffic.
 
 Stage-exit `0x77EE` zeroes report staging (`RPTZ` clears at
 `0x3AD0/0x3AD8/0x3AE0/0x37E0` after `CMPM *(0x250F),#34`),
