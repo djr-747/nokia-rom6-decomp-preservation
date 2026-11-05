@@ -16,7 +16,7 @@ code: `verified` | `static` | `hypothesis` (see
 | producer groups | dispatcher switch, mask `0xA7xx`, both ISRs, block `0x9C99` chain | static, caller census |
 | opcode dispatch | table-indirect via `0x2F61/0x2F62`, record-compare `0x5190+` | static, values staged |
 | `0x573` selectors | 4 values / 13 sites, group routing not per-message | static, census |
-| MSID/SIMLOCK/IMEI per-opcode | needs staged tables or ARM MDISND constants | open |
+| MSID/SIMLOCK/IMEI per-opcode | ARM opcodes listed; no DSP stamping site found (coincidences rejected) | open |
 | SIMlock decode routine | `0x1202-0x1207` anchor absent from all static bytes | open (negative result) |
 | LEAD pin mapping | service manual confirms API/vectors-RAM/boot only | open (schematics) |
 
@@ -278,6 +278,25 @@ then `MVDK *(0x265D)→0x34BC/0x34BD`, `ST #9312→*(0x264A)`
 path `CALL 0x61E` lands inside the zero-filled mini-kernel
 window (`0x0580-0x0600` in-mask zeros) — the D→M slow path
 runs uploaded code, not analyzable from mask bytes.
+
+## ARM opcode reference (no DSP stamp found yet)
+
+ARM-verified MDI opcodes (emulator `docs/gsm-buildout-plan.md`,
+`docs/nhm5-register-gsm-reference.md`): MSID setup `{70 13}` →
+`0x74/0x34`; SIML 24-byte block `{70 16}` → `0x74/0x35` (exact
+echo + block index); SIML validation `{70 17}` → `0x74/0x36`
+pass value 0; aliveness `{70 0D}` → `0x74/0x0D`; identity
+reports opcode `0x52`. DSP-side numerical coincidences checked
+and rejected as links: `STM #116,AR4` ×7 (`0x44CE` …) and
+`STM #116,AR2` (`0xCDF1`) load POINTERS (`*ar2+` MAC loop at
+`0xCDF1`), not the `0x74` family byte; `ST #53,*ar4` at
+`0x78FB` reads equally as count-cap 53 or subtype `0x35`
+(`SUB *ar4,16,b`, `BGT` taken) — candidate, not proof. No DSP
+site is yet tied to stamping `0x34/0x35/0x36/0x0D/0x52` into a
+payload buffer: per-opcode SIMLOCK/MSID/IMEI naming stays
+open. The opcodes arrive in staged record bytes (via
+MDISND ring → unpack zone) and are compared against staged
+patterns — both sides of the match are runtime data.
 Sources below `0xB000` are staged DARAM: `0x093A`+8 reads
 zero in-mask (filled at runtime from upload/HPI); dests
 `0x3025/0x119C/0x1100/0x1000` likewise.
