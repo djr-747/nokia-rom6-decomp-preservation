@@ -16,9 +16,363 @@ spaces:
           - docs/plan-rssi-native-20261013.md
           - docs/evidence/rf-rssi-220b-20261015/manifest.md
           - docs/evidence/rf-rssi-220b-20261015/static-writer-audit.md
+      - address: 0x0F00
+        name: LOADER1_ENTRY
+        confidence: static
+        note: >-
+          Phase 1 of run address 0x0F00 (block00 tail, 119 words to
+          0x0F76). Superseded in place by BOOT_PUBLISH_ENTRY. Length
+          excludes WAIT_ACK_SUB.
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x27CD
+        name: FRAME_ISR_ENTRY
+        confidence: static
+        note: >-
+          V17/V18/V24 frame ISR. Sample combine ~(port2)&(port1),
+          bit-cascade dispatch, echo fall-through, FRETE. Body
+          0x27CD through FRETE; cascade targets listed in ivt.md.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x22DA
+        name: SAMPLE_ISR_ENTRY
+        confidence: static
+        note: >-
+          V16 RX signal-processing ISR. FIR kernel on port-39 samples
+          (coeffs 0x3EBD, BK=16, BRC=7), SQDST branch metrics, kind
+          dispatch on *(0x22C). Feeds the Viterbi decoder.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x2B53
+        name: COBBA_CMD_ISR_ENTRY
+        confidence: static
+        note: >-
+          V25 HPI-word request ISR. Gates on *(0x870) (HPI word 0x70,
+          MCU 0x100E0 Cobba slot) and *(0x4C2)<4. CALL 0xB4F8, clears
+          the word, FRETE.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x2E2F
+        name: DISPATCHER_ENTRY
+        confidence: static
+        note: >-
+          Multi-clause shared dispatcher. Flag-gated CALLs 0x05A0,
+          0x2C88, 0x2E64, 0x37D8, 0x942E, 0x2D8F; opcode match on
+          *(0x54D); port I/O under INTM lock. Tail closed: opcode-range
+          check 88-112 to 0x43BA, recursive self-call plus 0x4590,
+          BACC computed jump, flag-shaping and unpack cases, all
+          converging on the 0x2E64 match loop.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x2E64
+        name: DISPATCH_MATCH_LOOP
+        confidence: static
+        backing: code
+        note: Match loop, not an epilogue. Every clause converges here with B 0x2E64 for re-match.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x25DF
+        name: STATE_ISR_ENTRY
+        confidence: static
+        note: >-
+          V20 state-machine ISR. Mailbox copy, flag gates, CALL 0xC851
+          and CALL 0x05F0, McBSP DRR0 scaling block with SAT,
+          conditional calls. Tail closed: round-robin stores with
+          13013 wrap, pa54 poll loop, coefficient MAC chain, DXR0
+          transmit write, FRETE at 0x27CC.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x3986
+        name: CMD_DISPATCH_PORT15
+        confidence: static
+        note: >-
+          INTM-gated pa15 strobe (CALL 0x62E head, 0x263A clear,
+          0x2639 bit-9 check, PORTW pa15, RPT-6 wait, IDLE 1,
+          0x263A bit-1 check), RET at 0x399D.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x399E
+        name: PA60_PA57_STREAM
+        confidence: static
+        backing: code
+        note: >-
+          pa60 select strobes (3, 5, then -4, 2) around a BRC-3 RPTB
+          pa57 streaming loop with SFTA shift-add lane math; then a
+          pa0 RMW (OR 96) under INTM and a PORTR pa56 poll. Entry by
+          RET boundary; callers open.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x3EE1
+        name: PORT13_STABLE_READ
+        confidence: static
+        note: Read-twice-compare on pa13, then pa2 RMW under INTM.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x4007
+        name: PORT0_TXN
+        confidence: static
+        note: >-
+          Port-0 transaction in two pa0-strobe phases (OR 12, RPT-22
+          wait), each gated on *(0x3EB5) bit 1. Phase one: SUB #7
+          check, PORTW pa40, CALL 0x40A1 worker, pa45 poll
+          (AND #4096), PORTW pa45/pa44, RC, RET at 0x40A0. Single
+          routine; 0x4055 is the phase-two label inside it.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x4055
+        name: PORT0_TXN_PHASE2
+        confidence: static
+        backing: code
+        note: Label inside PORT0_TXN, not an entry. Second pa0 strobe, 0x3EB5 retest, CALL 0x40A1 pairs, pa44 write, RC/RET.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x40A1
+        name: PORT45_POLL
+        confidence: static
+        backing: code
+        note: PORTR pa45 poll loop at 0x40B4 (AND #4096, BNEQ), pa44 write, RPT-14 wait. Called from PORT0_TXN phases.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0xCA69
+        name: DSP_KERNEL_CA69
+        confidence: static
+        backing: code
+        note: Called from 0xC910 into the 0xCA00-0xCDFF kernel stretch. Body open.
+        evidence:
+          - roms/rom6/drom.md
+      - address: 0x2BA1
+        name: PA1_PA56_HANDSHAKE
+        confidence: static
+        note: >-
+          Post-FRETE neighbor of 0x2B53 and frame-cascade target
+          (bit 14). PORTW pa1 sequences, PORTR pa56 poll, B 0x283D
+          gate. Boundary open past the 0x3490 read.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x3EBD
+        name: FIR_COEFF_TABLE
+        confidence: static
+        note: >-
+          Matched-filter coefficients for SAMPLE_ISR_ENTRY. Length
+          open (8 taps implied, unconfirmed).
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x0F77
+        name: WAIT_ACK_SUB
+        confidence: static
+        note: 7-word MCU-ack spin. Ends the block with RET.
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x0F00
+        name: BOOT_PUBLISH_ENTRY
+        confidence: static
+        note: >-
+          Phase 2 of run address 0x0F00 (block48, 223 words). Re-inits,
+          publishes the mask version, runs the upload loop. Same
+          address as LOADER1_ENTRY by phased overwrite, not by alias.
+        evidence:
+          - roms/rom6/loader.md
   data_word:
     description: C54x CPU data-space address; use data_read routing
     symbols:
+      - address: 0x0802
+        name: VERSION_WORD
+        confidence: static
+        backing: data
+        note: >-
+          HPI word 2. Block48 publishes mask 0xFF87 here. MCU polls it
+          as [0x10004] for the DSP version (6 ROM6, 4 ROM4).
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x0803
+        name: HPI_WORD3_STATUS
+        confidence: static
+        backing: data
+        note: Block48 stores 6 here before the MVDP quirk. Role open.
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x0871
+        name: UPLOADREQUEST
+        confidence: static
+        backing: data
+        note: Loader sets 0x14 then 1. MCU side mirrors at HPI 0x100F6 region.
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x0872
+        name: UPLOADREPLY
+        confidence: static
+        backing: data
+        note: Handshake flag. Loader clears, MCU acks nonzero. Polled at 0x0F4B.
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x087B
+        name: UPLOADHEADER_TARGET
+        confidence: static
+        backing: data
+        note: "Five-word header 0x87B-0x87F: target, AR3, count B, spare, len A."
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x0020
+        name: RX_MAILBOX_WORD
+        confidence: static
+        backing: data
+        note: Copied to 0x0021 on the V20 path.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x0021
+        name: RX_MAILBOX_COPY
+        confidence: static
+        backing: data
+        note: Receives *(0x20) on the V20 path.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x0060
+        name: VITERBI_STATE
+        confidence: static
+        backing: data
+        note: Two words 0x60-0x61, saved and restored by every ISR.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x0011
+        name: RPT_COUNT_MIRROR
+        confidence: static
+        backing: data
+        note: Data-space mirror of AR1. Loader RPT counts read it.
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x0029
+        name: CONTROL_TOGGLE
+        confidence: static
+        backing: data
+        note: ORM 8 then ANDM -9 around upload waits. Exact line open.
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x04C2
+        name: HPI_REQ_STATE
+        confidence: static
+        backing: data
+        note: V25 gate. Takes the ISR only below 4.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x04F7
+        name: SAVED_PERIPH_A
+        confidence: static
+        backing: data
+        note: Loader saves to AR4 and restores after IPTR set.
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x04F8
+        name: SAVED_PERIPH_B
+        confidence: static
+        backing: data
+        note: Loader saves to AR5 and restores after IPTR set.
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0x021E
+        name: SAMPLE_STAGE
+        confidence: static
+        backing: data
+        note: Frame-ISR sample combine cell. Ports 1 and 2 land here.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x051F
+        name: FLAG_51F
+        confidence: static
+        backing: data
+        note: V20 gate, bit 13 tested.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x051C
+        name: FLAG_51C
+        confidence: static
+        backing: data
+        note: V20 gates, bits 11 and 10-11 tested.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x0577
+        name: FLAG_577
+        confidence: static
+        backing: data
+        note: V20 gates, bits 6, 13, 8 tested. Conditional calls key off it.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x054D
+        name: OPCODE_KIND
+        confidence: static
+        backing: data
+        note: Dispatcher opcode match stores the kind here (mask 0xFF).
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x0549
+        name: CTRL_FLAG_A
+        confidence: static
+        backing: data
+        note: Dispatcher gate bit 5, cleared after take.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x0866
+        name: HPI_STATUS_FLAG
+        confidence: static
+        backing: data
+        note: Bit 1 set on V25 entry, bit 0 on frame fall-through.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x2A69
+        name: STATE_RR_PTR
+        confidence: static
+        backing: data
+        note: Round-robin store pointer in STATE_ISR. Wrap at 13013 resets to 0x3236 with a 160-word copy to 0x29C9.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x057E
+        name: STATE_RR_PTR_B
+        confidence: static
+        backing: data
+        note: Second round-robin pointer, same 13013 wrap to 0x3236. Sets bit 14 of 0x57C at wrap.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x2967
+        name: STATE_FRAME_COUNTER
+        confidence: static
+        backing: data
+        note: Incremented each STATE_ISR pass. Compared against 80 with 0x2966 vs 2 gate.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x01F3
+        name: STATE_CIRC_PTR
+        confidence: static
+        backing: data
+        note: Circular accumulate pointer (BK 632, MAR *ar3-%), reloads after use. Written back on exit.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x20F9
+        name: PORT54_COUNT
+        confidence: static
+        backing: data
+        note: Down-counter for the pa54 poll loop. 1/2 select the STL lane on refill.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x085D
+        name: STATE_MODE_WORD
+        confidence: static
+        backing: data
+        note: Tested masks 20, 4, 2, 16, 256 across the tail. Selects store and accumulate paths.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x058F
+        name: STATE_GATE_58F
+        confidence: static
+        backing: data
+        note: Mask 15 tested at two tail points, both converge to 0x26BC/0x273E skips.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x057C
+        name: STATE_FLAG_57C
+        confidence: static
+        backing: data
+        note: Bit 13 set on block copy, bit 14 at RR_B wrap, bit 12 cleared at 0x2760. Bit 12 retest selects the fill path.
+        evidence:
+          - roms/rom6/ivt.md
       - address: 0x022A
         name: RX_INITIAL_RAW_FILL_BLOCK_COUNT
         confidence: static_branch
@@ -30,13 +384,14 @@ spaces:
         evidence:
           - docs/evidence/rom6-timed-transfer-e2-20261016/request-probe/readout.md
       - address: 0x022C
-        name: RX_REQUEST_KIND_FLAGS
-        confidence: static_branch
+        name: RX_REQUEST_KIND
+        confidence: static
         backing: data
         note: >-
-          Incoming A.low stored by3D9C. Selects post-fill processing paths;
-          diagnostic observations include1/9. No physical descriptor mapping.
+          SAMPLE_ISR kind dispatch: 1 to 0x2468, 2 to 0x257D, BITF #8 retest
+          after the fill loop. Producer 3D9C stores incoming A.low here.
         evidence:
+          - roms/rom6/ivt.md
           - docs/evidence/rom6-timed-transfer-e2-20261016/request-probe/readout.md
       - address: 0x022D
         name: RX_REQUEST_PARAMETER
@@ -46,13 +401,15 @@ spaces:
         evidence:
           - docs/evidence/rom6-timed-transfer-e2-20261016/request-probe/readout.md
       - address: 0x022F
-        name: RX_OPAQUE_PROCESSING_WORK
-        confidence: static_branch
+        name: RX_LOOP_COUNTER
+        confidence: static
         backing: data
         note: >-
-          Post-fill2451 branch initializes work, later decremented25B4..25B9.
-          FE29/FFFE observed before usable state. Nonzero alone is not valid.
+          BCD down-counter in SAMPLE_ISR after the SQDST block
+          (stm #559,ar3; ld #1; sub *ar3; bcd). Post-fill work init and
+          decrement observed in diagnostics; FE29/FFFE seen before usable state.
         evidence:
+          - roms/rom6/ivt.md
           - docs/evidence/rom6-timed-transfer-e2-20261016/request-probe/readout.md
       - address: 0x2627
         name: RSSI_SELECTOR_FLAGS

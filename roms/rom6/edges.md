@@ -89,6 +89,29 @@ at boot stays open (candidate: channel-configure family around
 `0x02→0x89`; trace the boot-time builders, not the traffic path).
 Tune values come from the per-model store (I2C vs in-flash, above).
 
+## Hardware line and shared cells (3310 v5.79, emulator static RE)
+
+| cell | width | role |
+|---|---|---|
+| `0x100DC` | u16 | m2d doorbell, busy-gate (`==0` writable) |
+| `0x30000` / `0x20008` | wr | DSP kick / raise, after word write |
+| `0x100E4` / `0x100E0` | — | m2d ch1/ch2, dead (sole caller passes `r0=3`) |
+| `0x10000` | ring | shared APIRAM ring storage |
+| `0x101C8` / `0x101CA` | u16 | d2m head (DSP-advanced) / tail (MCU-advanced) |
+| `0x100A4` / `0x100A6` | u16 | m2d ring head / tail, 82 slots |
+| `0x2000C` | u8 | IRQ mask (saved/restored in crit section) |
+| `0x2000A` | u8 | DSP set/ack flag, drain clears bit1 |
+| `0x2006D` | u8 | ASIC serial-bus status, busy-poll `bits[1:0]==3` |
+| `0x20011` | u8 | HW id/status, folded into anti-tamper checksum |
+| `0x111861` | u8 | operational latch (0=BOOT, 1=OPERATIONAL) |
+| `0x111862` | u16 | DSP-liveness counter |
+| `0x111390` | u8 | DSP_STATE, bit0 = DSP up |
+| `0x110F96` | u8 | run-state enum `{16..24,26,80,81,82}` — WEAK, semantics open |
+| `0x11FF94` | u32 | reboot reason latch |
+
+`0x9E` joins the operational fan-out (`0x8D/0x8E/0x95`, `0x70`-family);
+no separate handler found.
+
 ## MCU side (3310 v5.79 symbols, static)
 
 D→M opcodes with named handlers: `0x83` RSSI, `0x84` RA_INFO,

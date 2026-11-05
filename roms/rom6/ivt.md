@@ -64,6 +64,181 @@ MCU poll `[0x10004]` = HPI word 2 = `*(0x802)`. Full version path:
 silicon constant → HPI word → version word → set gate (doc 08).
 Predicts `5`/`3` on R5/R3 silicon. Untested: no images.
 
+## FRAME_ISR_ENTRY `0x27CD` (V17/V18/V24, mask)
+
+Prologue: `CALL 0x05F4`, full PSHM incl. `PSHD *(0x60/0x61)`,
+RSA/REA zero, `ST1 = (ST1 & 0x2000) | 0x4900` (FRCT-class mode set).
+
+Sample combine: `AR2=0x021E`; `A = ~(port2) & (port1)`.
+`BITF *(0x20FF),#0x400` reads a mask-ROM status word (DROM face).
+
+Dispatch cascade on A (bit → target):
+
+| bit(s) | target | note |
+|---|---|---|
+| 12 | `0x296A` | local |
+| `0x1C` | `0x2875` | local |
+| DROM `#0x400` | `0x2811` | mask |
+| 8 | `0x952E` | drom-band code |
+| 9 | `0x953C` | drom-band code |
+| else | `0x2819` | mask fall-through |
+| 8 | `0xC806` | mask |
+| 9 | `0xC7B1` | mask |
+| 10 | `0x94F0` | drom-band code |
+| 7 | `0x2AFC` | local |
+| 1 | `0x2867` | local |
+| 0 | `0x2873` | local |
+| 5,6 | `0x2B45` | local (shared) |
+| 14 | `0x2BA1` | local |
+| 11 | `0x2BAA` | local |
+| 15 | `0x2C03` | local |
+
+Fall-through (no bits): re-read port2, echo the sample back
+(`PORTW pa2`), full POPM restore incl. `*(0x60/0x61)`, `FRETE`.
+Code after `FRETE` is the next mask routine, not the ISR.
+
+## SAMPLE_ISR_ENTRY `0x22DA` (V16, mask)
+
+RX signal-processing ISR. Entry pre-calls `0x05DA`, then the same
+ST1 mode prologue as the frame ISR.
+
+Handshake: `PORTR pa33→*(0x8)`, OR `#0x0C00`, `PORTW pa33` back.
+Dispatch on request kind `*(0x22C)`: `==1 → 0x2468`,
+`==2 → 0x257D` (matches the `RX_REQUEST_KIND_FLAGS` values).
+
+Filter kernel: `BK=16` circular, `ASM=0`, `BRC=7`, coeffs at
+`AR5=0x3EBD`, input `AR4=0x204`, output `AR6=0x200`. Dual-MAC FIR
+(`TMPY/MAC/MACR` on A and B), sample stream in via
+`PORTR pa39,*AR6+%`. Tail computes squared distance (`SQDST`,
+`DST`) = Viterbi branch metrics, then `CALL 0x05DC` and a BCD loop
+over `*(0x22F)`.
+
+This ISR feeds the Viterbi decoder. Coeff table `0x3EBD` length
+open (8 taps implied by `BRC=7`; confirm against consumer reads).
+`0x05DC` body open (mini-kernel, same source question as
+`0x05DA/0x05E8/0x05F4`).
+
+## COBBA_CMD_ISR_ENTRY `0x2B53` (V25, mask)
+
+HPI-word request ISR. Entry saves ST1/AL/AH/AG/BL/BH/BG, sets
+`*(0x866)` bit 1, then gates: `*(0x870)==0` → skip;
+`*(0x4C2)>=4` → skip. `*(0x870)` is HPI word `0x70` = MCU
+`0x100E0`, the Cobba-command slot. The DSP honors it here even
+though 3310's MDISND task never writes channels 1/2.
+
+On take: full save incl. `*(0x60/0x61)`, RSA/REA zero,
+`CALL 0xB4F8` (mask-zone worker), toggle `*(0x29)`,
+`ST #0,*(0x870)` (consume the request), full restore, `FRETE`.
+
+Post-`FRETE` neighbor at `0x2BA1` (also a frame-cascade target,
+bit 14): `ST/PORTW pa1` sequences with delays, `PORTR pa56`
+status poll, `B 0x283D` gate. pa1/pa56 handshake routine.
+
+## STATE_ISR_ENTRY `0x25DF` (V20, mask)
+
+State-machine ISR, no ports in the head stretch. `BITF *(0x51F)`
+gate → `0x2603`; copy `*(0x20)→*(0x21)`; `BITF *(0x51C)` gate →
+`0x2610`; counter `*(0x20FA)-5`, skip if below; `CALL 0xC851`
+(drom-band code) then `CALL 0x05F0` (mini-kernel).
+
+McBSP path: `LDM DRR0` (serial receive), shift/scale block with
+`SAT` saturation, conditional calls `CC 0x6A0/0x69A` on
+`*(0x577)` flags, then `CALL 0x6CC` and a nested save. AGC/gain
+scaling shape with saturating arithmetic.
+
+Tail (objdump-verified, `program.be16`): `BITF *(0x4C2),#4` →
+`0x2679`; `LD *(0x85D)`, `AND #20`, BEQ → `0x2679`; round-robin
+store through `AR3=*(0x2A69)` with `CC 0x69A` on
+`*(0x577)` bit 8; wrap check `*(0x2A69)` vs 13013 (`0x32D5`):
+at wrap, `ST #12854` (`0x3236`) to `*(0x2A69)` and RPT-160
+`MVDD 0x3236→0x29C9`, `ORM #8192,*(0x57C)`; restore, `CALL 0x714`;
+`BITF *(0x58F),#15` → `0x26BC`.
+
+Second half: save, `ADDM #1,*(0x2967)` frame counter, compare vs
+80 with `*(0x2966)` vs 2 gate → `0x26B5`; BK=320 block loop over
+`AR2=*(0x296A)` vs `*(0x2969)` vs 320 → `0x26AD`, `ADDM #1,*(0x2968)`
+else per-lane `STL` to `*AR2+%` and `*(0x2977)`, `ADDM #1,*(0x2969)`;
+`AR3=*(0x1F3)`, BK=632; `BITF *(0x51C),#1024` → `0x26D2`;
+`BITF *(0x4C2),#4` → `0x2702`; `CALL 0x724`, store to `*AR3+%`,
+`BD 0x2702`.
+
+Port-54 poll loop (`AR2=0x20F7`): `PORTR pa54`, `AND #8192`,
+BEQ → `0x26EB`; `LD *(0x20F9)`, BEQ → `0x26ED`; `LD *AR2+1`,
+`PORTW pa52`, `DELAY *AR2`, `ADDM #-1,*(0x20F9)`, `B 0x26F3`;
+else `PORTW *(0x8),pa52`, `B 0x2702`. Then `LD *(0x20F9)`,
+BNEQ → `0x26FE` else `STL` to `*AR2+1`, `ST #1,*(0x20F9)`;
+else `STL` to `*AR2`, `ST #2,*(0x20F9)`. `CALL 0x5F2`.
+
+Coefficient block on `*(0x220B)` bit 0 → `0x271E`: T-load from
+`*(0x521)`, `LD/MAC/TMPY` chain (`#-25457`, `#-12930`, `#28193`,
+`#14097`) with `DELAY`, `SFTA 3`, `SAT`; `CALL 0x6CE`.
+
+Exit: `BITF *(0x4C2),#4` → `0x2769`; `BITF *(0x85D),#4` and
+`BITF *(0x58F),#15` → `0x273E`; `LD *(0x85D)`, `AND #2`,
+`AR3=*(0x57E)` round-robin vs 13013 → `0x2769`; at wrap
+`ST #12854,*(0x57E)`, `ORM #16384,*(0x57C)`, `LD *(0x57C)`,
+`AND #4096` → `0x2765` else `AR3=0x32D6`, `AR2=0x3236`,
+RPT-160 fill, then `0x2765`: `ANDM #-4097,*(0x57C)`, `B 0x2769`.
+
+Convergence `0x2769`: RPT-160 `STL b,*AR2+` (`AR2=0x3236`),
+restore, `CALL 0x716`, `BITF *(0x58F),#15` → `0x2775`;
+`XOR a`, `BITF *(0x577),#516` → `CC 0x69C`, `MVMD ar3,0x54B`;
+`BITF *(0x4D1),#1` → `0x27B2`; save AL/AH/AG, `CALL 0xB634`,
+`SFTA a,-16`, `AR3=*(0x1F3)` BK=632 circular accumulate
+(`MAR *ar3-%`, `LD *ar3`, `ADD`, `STL`), restore, `ADD b,a`,
+`CALL 0x6D0`; `BITF *(0x4C2),#4` → `0x27B2`;
+`LD *(0x85D)`, `AND #16`, `AR3=*(0x2A69)` round-robin store vs
+`#12854` → `0x27B2`; `BITF *(0x577),#64` → `0x27BC`;
+save AR6, `CALL 0x6B8`, restore, `SFTA a,3` / `SFTA a,-3`,
+`STLM a,DXR0` (McBSP0 transmit register write). Full restore,
+`FRETE` at `0x27CC`. `FRAME_ISR_ENTRY` follows at `0x27CD`.
+
+## DISPATCHER_ENTRY `0x2E2F` (mask, shared spine head)
+
+Multi-clause dispatcher, called by 3+ blocks and the resident ISR.
+Clauses (offsets from entry, `program.be16`):
+
+- `+0x00`: `CALL 0x05A0`; `BITF *(0x54D),#4`, RC; `MVKD *(0x54C)→*(0x853)` (MDIRCV-side word move); RET.
+- `+0x0A`: `BITF *(0x549),#32` gate; `ANDM #-33,*(0x549)`; `CALL 0x2C88`; `BITF *(0x54D)` gate; `CALL 0x2E64`; RET.
+- `+0x23`: `CALL 0x37D8`; `BITF *(0x866),#3` gate; `BITF *(0x2628),#0x4000` gate; `BITF *(0x250F),#0xD0` gate; `CALL 0x2E64`; RET.
+- `+0x35`: `CALL 0x05A0`; `BITF *(0x54D)` gate; `CALL 0x942E` (drom-band); opcode match (`AND #255; XOR #0xF4`, shift, `XOR #5`); store kind `*(0x54D)`; RET.
+- `+0x60`: `BITF *(0x866),#1` gate; `CALL 0x2D8F`; crit section (`SSBX INTM`): `PORTW pa1`, clear `*(0x866)` bit 1, `PORTR pa2`, mask, `PORTW pa2`; `RSBX INTM`. Direct port I/O under lock.
+- `+0x7E` (`0x2EAD`): `BITF *(0x866),#2` → RC; `ANDM #-3,*(0x866)`; `CALL 0x2DE4`; RC aeq; `CALL 0x620`; `STLM b,ar4`; opcode-range check (`SUB #87` → `0x2ECD` bleq; `SUB #112` → `0x2EC6` bneq): in-range 88-112 → `CALL 0x43BA`; then `B 0x2E64`. Out-of-range high path: `LD #9,b`, recursive `CALL 0x2E2F`, `CALL 0x4590`, `B 0x2E64`.
+- Computed jump: `ADD #-20415,a`, `LD *ar1,a` through saved AR1, `BACC a`. Landing zone shapes flags (`AR3=0x51E`/`AR4=0x54F` BITF/XC/ANDM/ORM from `*ar2` bits 10/9/8; `LD #0/1 → *(0x374)`), then a 6-field byte unpack (`*AR2+%`, `AND #255` lanes) to `0x36B/0x36D-0x36F/0x375/0x370-0x372` plus `MVDD/MVDK` moves to `0x2477/0x2544/0x2546`.
+- Block-move cases: `TMPYU`, RPT-34/4 `MVDD *ar3+→*ar4+`, `BITF *(0x3EC8),#64` select, `ORM *(0x2627)`, recursive `CALL 0x2E2F`, `B 0x2E64`; flag-set cases (`ORM *(0x54F)` bits 10/7, `ST #0,*(0x545)`, zero-fill at `0x38B`, RPT-3 `MVDD`), each re-entering `CALL 0x2E2F` and converging `B 0x2E64`.
+- `0x2E64` is the match loop, not an epilogue: `CALL 0x05A0`, `BITF *(0x54D),#4` gate, `CALL 0x942E` (drom-band), opcode match (`AND #255; XOR #0xF4`, shift, `XOR #5`), kind store `*(0x54D)`. Clause exits are RC/RET; every `B 0x2E64` re-enters matching.
+
+## Shared spine: port-transaction routines (mask)
+
+- `0x3986` command dispatch: `CALL 0x62E`; `SSBX INTM`;
+  `ANDM #-3,*(0x263A)`; `BITF *(0x2639),#512` → skip strobe;
+  `PORTW pa15` (RPT #6 delay); `RSBX INTM`; `IDLE 1`; relock,
+  `BITF *(0x263A),#2` → recheck; unlock, clear, `RET` at
+  `0x399D`.
+- `0x399E` stream writer (follows the RET): `CALL 0x630`;
+  `PORTW pa60` selects 3 then 5; BRC-3 `RPTB` loop over
+  `PORTW *ar3+,pa57` with `LD/SFTA/ADD` lane math; `PORTW pa60`
+  selects -4 then 2; `BITF *(0x7),#0x800`; `SSBX INTM`;
+  `PORTR pa0`, `OR #96`, `PORTW pa0` (RPT #21); `XC`;
+  `PORTR pa56` poll.
+- `0x3EE1` stable-read: `CALL 0x63E`; double `PORTR pa13`
+  masked `0x3FFF`, `SUB`, loop until equal (two matching reads);
+  `CALL 0x640`; `SSBX INTM`; `PORTR pa2` + `ANDM/ORM` on `*AR2`.
+- `0x4007` port-0 transaction (single routine, `RET` at `0x40A0`;
+  `0x4055` is its phase-two label): `CALL 0x652`; save regs;
+  `BITF *(0x7),#0x800`; `SSBX INTM`; `PORTR pa0`, `OR #12`,
+  `PORTW pa0` (RPT #22 delay); `*(0x3EB5)` bit-1 check
+  (table-zone flag next to `FIR_COEFF_TABLE`). Phase one:
+  `SUB #7` select, `PORTW pa40`, `LD #13,b` + `CALL 0x40A1`,
+  `AND #3` select, `PORTR pa45` poll (`AND #4096`),
+  `PORTW pa45/pa44`, RC. Phase two (`0x4055`): second pa0
+  strobe, `0x3EB5` retest, `CALL 0x40A1` pairs with
+  `AND #12/SUB #12` select and `AND #2048` check, `RC`/`RET`.
+- `0x40A1` port-45 poll: `CALL 0x652`; `PORTR pa45`,
+  `AND #4096` → skip; `OR #16,b`, `PORTW pa44` (RPT #14),
+  `B 0x40B4` wait loop (`PORTR pa45`, `AND #4096`, `BNEQ`);
+  `RET`.
+
 ## Open
 
 1. Runtime IVT base per build. 3310 image runs the table at `0x0A00`.

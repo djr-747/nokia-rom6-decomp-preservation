@@ -20,9 +20,34 @@ code: `verified` | `static` | `hypothesis` (see
 
 ## M→D (MCU commands)
 
+Two channels (emulator static RE, MDISND task `0x2E9F6C`, 3310 v5.79):
+
+- Word doorbell: staged 16-bit words → `[0x100DC]`, busy-gated
+  (DSP zeroes to unblock), then kick `[0x30000]=4`, raise
+  `[0x20008]=2`. Channels 1/2 (`0x100E4`/`0x100E0`) are dead:
+  sole caller passes `r0=3` always.
+- Payload ring: 82 halfword slots at `0x10000`, head `[0x100A4]`,
+  tail `[0x100A6]`. Free-space `>= [msg+2]+2` to publish.
+
 | code | layout | status | evidence |
 |------|--------|--------|----------|
-| *unmapped* | — | — | block01 (`TARG 13D2–1F7C`, "main code / runtime MDI handler") is the dispatch site to annotate first |
+| subtype 2 | full message → 25-slot batch → ring | static | MDISND `0x2EA066` |
+| subtype 3 | 16-bit word → 10-slot ring → doorbell | static | MDISND `0x2EA022` |
+| subtype 5 | free batch queue (teardown) | static | MDISND `0x2E9FF4` |
+| per-opcode builders | unmapped to opcodes | open | producers outside MDISND zone |
+
+## D→M dispatch (operational, latch `[0x111861]!=0`)
+
+| opcode | route | evidence |
+|---|---|---|
+| `0x8D/0x8E/0x95` | task8 | MDIRCV `0x2EDBE6` |
+| `(id&0xF0)==0x70` | local `0x2EDC0E` (incl. SIML `0x74`) | MDIRCV `0x2EDBFA` |
+| `0x80` | OP_80 | MDIRCV `0x2EDB2A` |
+| `0x8F/0x99` | run-state gate (WEAK: state-enum open) | MDIRCV `0x2EDB38` |
+| `0xE4` | keep-alive tick (not SIM timeout) | MDIRCV `0x2EDC4C` |
+
+Boot dispatch (latch `==0`): jump table `0x2EDB48`, sub-ids
+`0x80, 0x83-0x8F`.
 
 ## Block01 dispatch first
 

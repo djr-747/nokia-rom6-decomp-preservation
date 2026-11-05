@@ -43,6 +43,30 @@ transfers a behavior hypothesis to ROM6. Grade = source confidence
 | `3986` | `407c` | command dispatch | HIGH |
 | `ac4c` | `a15f` | port init (7 sites) | HIGH |
 
+## Span deltas (rigid blocks, emulator `rom6-lowrom-shim-spec`)
+
+| block | ROM4 span | ROM6 span | delta |
+|---|---|---|---|
+| Viterbi cluster | `8a3a-8db3` | `9042-93bb` | +0x608 |
+| self-test trio | `7f22-8022` | `851e-861e` | +0x5FC |
+| port-txn trio | `45b5-4676` | `3ffa-40bb` | -0x5BB |
+| 3ffb cluster | `3ffb-407b` | `388c-390c` | -0x76F |
+| 4282 leaf run | `4282-42f5` | `3c00-3c73` | -0x682 |
+| clock/idle | `7eb7` | `84af` | +0x5F8 |
+| mode dispatch | `8db4` | `93ce` | +0x61A (DEAD: BROM dep) |
+| buffer init | `94b5` | `9ddd` | +0x928 |
+| port init | `a15f` | `ac4c` | +0xAED |
+| gated service | `7b0a` | `807f` | +0x575 (gated: deps missing) |
+
+Rules: apply a delta only inside its proven span. Closure moves
+with its unit (`9009→938c` makes `938c` viable). `93ce` stays dead
+(BROM dependency; ROM6 `B3D1` holds filter coeffs — do not port
+table bytes). CRC moved to uploaded block1B (`0xFC4/0xFCC`),
+instruction-identical. `FC00` = bare RET (block00 filler confirmed).
+Flywheel: a transplanted-then-confirmed routine becomes a new
+anchor. Tool rules for future scans: multi-exit (first-ret
+truncates), join-aware skip-b.
+
 ## Use rule
 
 Port the ROM4 behavior as hypothesis, then confirm against the ROM6

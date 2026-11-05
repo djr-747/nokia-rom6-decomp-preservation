@@ -79,3 +79,31 @@ assumes an unannotated early stage is unsound.
   `roms/romN/src/`), chunked by region, with a `map.md` cross-index.
 - Register/memory effects go in comments at the exact instruction, not
   in a paragraph above the function.
+
+## Recompilation discipline (byte-identical is the end goal)
+
+Every annotation below must keep a future matching build possible.
+Apply from the first routine, not after.
+
+- Symbol names are future C identifiers: `UPPER_SNAKE`, no clash
+  with C keywords, one name per address ever. Record in
+  `symbols.yaml` with space (`program_word` / `data_word`), length in
+  words, and evidence. Never reuse a name for two addresses.
+- Routine boundaries are exact: first word to last word inclusive,
+  fall-throughs and shared tails named once and referenced, never
+  duplicated. Padding (`NOP`, `RET`-stub filler `FC00`) belongs to no
+  routine; tag it `pad`.
+- Code and data never share a symbol. A word is one or the other.
+  Tables get element width, count, and signedness at discovery time,
+  even if the consumer is open.
+- Record the link space of every address: TARG (block link) vs DSP
+  (run). The skew is per block (manifest `dest` vs run range).
+  A C port compiles to DSP space; TARG addresses convert first.
+- Preserve observable quirks verbatim: delay-slot NOPs, dead stores
+  that touch hardware (e.g. the `0xFF87` write path), redundant
+  inits. A "cleaned" port that drops them is a different binary.
+- Widths are explicit: C54x `int` is 16-bit, `long`/`acc` is 32-bit
+  with guard bits. Saturation and rounding modes (`SSBX FRCT`,
+  `SST` flags) are part of the function contract, not comments.
+- Unknowns keep their shape: `unk_<addr>[<len>]` reserves the exact
+  word count so layout never shifts while meaning is open.

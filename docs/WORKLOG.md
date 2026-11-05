@@ -75,6 +75,17 @@ plus inventoried.
   messages.md). DSP producer mapping open (AR-indirect writes).
 - Tuning consumer side mapped (block08 structs + AR2 streams to
   pa48/49/50); boot-time tune opcode open.
+- Cosim worklog mining (plan, all static): hardware/RAM cell table +
+  MDIRCV routes in edges.md; flash seeds (nibble gains + 1dB curve,
+  byte-side source) in drom.md; span deltas + closure/flywheel/tool
+  rules in homology.md; MT-call sequence (PAGE→TCH ASSIGNMENT) noted
+  for stages 6-7. 5110 call worklog is runtime E2E (no routine pins);
+  registration worklog likewise (timings only). 12/12 tests pass.
+- Cosim worklogs mined: MDISND two-channel contract (doorbell
+  `0x100DC` + 82-slot ring, subtypes 2/3/5, ch1/2 dead) and MDIRCV
+  dispatch (boot table `0x2EDB48`, operational routes, `0xE4`
+  keep-alive) folded into messages.md. Latch `[0x111861]`,
+  DSP_STATE `[0x111390]`, liveness `[0x111862]` noted.
 - Payload identity resolved (build idx → manifest → run range);
   upload is phased with overwrites (`0x0A00`, `0x0F00`, `0x0930`).
   Cross-phase static call graph needs the phase order (xrefs.md).
