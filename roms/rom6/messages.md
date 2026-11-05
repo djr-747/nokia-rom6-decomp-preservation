@@ -88,6 +88,20 @@ cross-boundary closes (`0x5EF7/0x9459/0x978F/0xA6E2/0xA74C/
 widths open); all-paths upgrades on 14 routines (7 shrunk, 5
 head-rc, 2 confirmed).
 
+## Night-four survey (rulings + fill-ins, objdump-verified)
+
+Cap-overflow D-span (7 caller-bearing + 4 provisionals);
+leftover 7Cxx heads (14 + 12 gap-followup zero-caller);
+branch-only labels (`0x643E/0x644B` provisional) + post-6867
+heads (`0x6871/0x687F/0x688D`); 95A9 computed bacc dispatch +
+AF57 6-way selector CONFIRMED; 96BD RETE ruling (bound
+96BD-96FF; 96FD = call 97DD); C7A4 callerless falsified (C721
+cc); mask-level 2F61/2F62 writers (0x4BD7, 0xB750) +
+DP-avenue bounded negative; span interiors (5F4B/6155/A-block);
+all-paths on night-three 12 (7F95/644B shrinks noted).
+Open: staged VMA, E9EE width, AED9 consumer, rc/cc + fcall
+conventions, 952E/953C/A815/61C4/283D.
+
 ## D→M (DSP reports)
 
 | code | layout | status | evidence |

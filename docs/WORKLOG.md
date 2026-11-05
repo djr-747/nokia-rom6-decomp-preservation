@@ -2,6 +2,32 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-05 — night four: 50 symbols, RETE + callerless rulings
+
+- 8 teams + critic + follow-up + gap-followup (whole-image linear
+  sweep closed the caller-alignment caveat for 34/34 7Cxx callers:
+  1272/1274 F074 + 549/549 F274 sweep-recognized, only 2
+  non-call F074 are immediates). 50 new symbols (367 total), all
+  entry/exit pairs re-verified, YAML valid, `make test` 6 pass.
+- 96BD RETE RULING: first fall-through exit is trete @96FF, not
+  TRETE @96FD (0x96FD is F074 call 0x97DD -- stale identity-chain
+  note corrected); bound 96BD-96FF unless rete counts as exit.
+- C7A4 callerless FALSIFIED: C721 F930 cc 0xC7A4,tc is the sole
+  image-wide static transfer in (full 64K operand scan, one hit).
+- 95A9 = computed table-dispatch via bacc (no table at 95AA);
+  AF57 = 6-way selector dispatch CONFIRMED (AF64-AF69 tables,
+  handler heads verified, calld 0xa2b9 lanes).
+- 2F61/2F62 CLOSED at ROM level too: mask writers 0x4BD7
+  (staged fill 2F5D-2F68) and 0xB750 (120-iter RPTBD walk
+  2F18-2F8F); DP-relative avenue bounded-negative (DP
+  setter/closure audit: DP=0/20/22 airtight, no 0x5E evidence).
+- Corrections applied: 97DD has FOUR callers (9530/96FD/9735/
+  9747); 95A8 is 4813 ldm ar3,a; A74C is 14 calls (ccd @A794 is
+  FB20 to BAC2); B767 elided stms restored; 4BD5 b is pre-entry.
+- Open: 952E/953C/A815 bounds, 61C4 label, 283D semantics,
+  staged VMA, E9EE 8-vs-16 width, AED9 consumer, 56BD role,
+  fcall-form caller convention, rc/cc exit-rule convention.
+
 ## 2026-11-05 — night-three leftovers: 2F61 writer found, 7 bounds shrunk
 
 - 8 teams + critic + follow-up + synthesis; 53 new symbols (317

@@ -597,6 +597,10 @@ spaces:
         note: >-
           Called from 0x942B/0x94A5/0x995C; STM AR2,#96 + PORTR PA2 measurement read gated by *(0x20FF) BITF
           lanes; LDU *(0x20FB) - *(0x587) threshold compare with BC 0x9700 ALT; posts measurement/rssi class.
+          RETE RULING (night-four, entry-linear 0x96BD-0x978E): first fall-through exit is trete F4EB @0x96FF,
+          NOT the claimed TRETE @0x96FD -- 0x96FD is F074 call 0x97DD (objdump-verified), stale note corrected;
+          0x9737 trete belongs downstream (970B-lane terminator). Bound 96BD-96FF unless rete counts as routine
+          exit (convention open).
       - address: 0x9343
         name: MSG_CIPHER_24R
         confidence: provisional
@@ -2013,9 +2017,11 @@ spaces:
         confidence: static_branch
         note: >-
           Post-ret-ret head (FC00 @C7A2/C7A3 precede); entry F074 0694 then zero-fill stm/rptz/mvkd lanes;
-          first exit ret FC00 @C7B0 entry-linear; zero static F074/F274 callers image-wide (callerless
-          boundable routine); C7B1-C850 ruled BOUNDED NEGATIVE (zero FC00/FE00, multi-entered noreturn worker,
-          exits to C878/C8F8/C8FE/283D, C84F b blocks fall into C851); HYPOTHESIS.
+          first exit ret FC00 @C7B0 entry-linear; zero F074/F274 callers image-wide; CALLERLESS CLAIM FALSIFIED:
+          C721 F930 is objdump-verified cc 0xc7a4,tc, the sole image-wide static transfer in (indirect
+          bacc/fbacc not statically excludable); C7B1-C850 ruled BOUNDED NEGATIVE (zero FC00/FE00,
+          multi-entered noreturn worker, exits to C878/C8F8/C8FE/283D, C84F b blocks fall into C851);
+          HYPOTHESIS.
       - address: 0xD3BE
         name: D3BE_CLAMP_STORE_SUB
         confidence: static_branch
@@ -2127,3 +2133,325 @@ spaces:
           F074/F274/FC00/FE00 words inside; mixed signed curves + unsigned ramps (FAA0 32w ramp, FB60 hump
           peak FD72/FD6D per weaken, FBA8 13w 0.05-step ramp from FBA9 per off-by-one weaken); sub-row widths
           unconfirmed.
+      - address: 0x7F75
+        name: SUB_7F75
+        confidence: static_branch
+        note: >-
+          Entry F074 7FB5 7715 0006 E900 7196 (call 7FB5); callers 2x F274 calld @83B7/@83D1 objdump-verified
+          (F273 bd @7F1E/7F24/7F2A/7F30 NOT counted); interior uncond b 7F54 @7F93; shrunk bound 7F75-7F94
+          incl operand (linear first exit ret 7FBF crosses existing 7F95, no re-emit); HYPOTHESIS. Whole-image
+          linear sweep closed caller-alignment caveat (34/34 7Cxx callers).
+      - address: 0x8413
+        name: SUB_8413
+        confidence: static_branch
+        note: >-
+          Entry F074 05A0 4915 F310 0003 F77F; callers 2x F074 @3551/@3802 verified; interior uncond b 843A
+          @8431; shrunk bound 8413-8432 incl operand (linear exit ret 8448); HYPOTHESIS.
+      - address: 0x8534
+        name: SUB_8534
+        confidence: static_branch
+        note: >-
+          Entry 7715 B743 7716 B76D F074 853B; caller F274 calld @4616 verified; interior call 853B @8538
+          (target existing 853B); first exit ret @853A; bound 8534-853A; HYPOTHESIS.
+      - address: 0x85F6
+        name: SUB_85F6
+        confidence: static_branch
+        note: >-
+          Post-RET (ret 85F5 before); entry 108A F493 1A8B 6D8C 1C84 8084 (ALU lane, no calls); caller F074
+          @85F3 verified; first exit ret @85FC; bound 85F6-85FC; HYPOTHESIS.
+      - address: 0x8627
+        name: SUB_8627
+        confidence: static_branch
+        note: >-
+          Entry 4593 F793 771A 000F F072 8636 (rptb 0x8636 loop, banz self @8637); caller F074 @8622 verified;
+          first exit ret @8639; bound 8627-8639; HYPOTHESIS.
+      - address: 0x7CA5
+        name: SUB_7CA5
+        confidence: static_branch
+        note: >-
+          Entry F074 059E 7713 2A87 1084 F010; zero F074/F274 callers full-image; first exit retd FE00 @7CB3
+          +delays 7CB4-7CB5 entry-linear; bound 7CA5-7CB5; HYPOTHESIS.
+      - address: 0x7D31
+        name: SUB_7D31
+        confidence: static_branch
+        note: >-
+          Entry 76F8 058C 0004 E800 80F8 264F; zero callers (bc @7C6A NOT counted); conditionals only (rc ntc
+          @7D56 passed per ret/retd-only exit rule -- convention accepted, not independently adjudicated);
+          first exit ret @7D5F; bound 7D31-7D5F; HYPOTHESIS.
+      - address: 0x7D60
+        name: SUB_7D60
+        confidence: static_branch
+        note: >-
+          Entry 10F8 0914 08F8 2EF8 7717 264F; zero callers; xc-conditionals only; first exit ret @7D73 (abuts
+          0x7D74); bound 7D60-7D73; HYPOTHESIS.
+      - address: 0x7D74
+        name: SUB_7D74
+        confidence: static_branch
+        note: >-
+          Entry F074 059E 10F8 264F F844 7E02; zero callers (bc @7C6A NOT counted); interior uncond b
+          7DB1->7DB5 + 7DB9->7E02; shrunk bound 7D74-7DB2 incl operand (linear ret 7E4C abuts existing 7E4D);
+          HYPOTHESIS.
+      - address: 0x7FF4
+        name: SUB_7FF4
+        confidence: static_branch
+        note: >-
+          Entry F074 059E 10F8 2650 F844 805A; zero callers (bc @7C8A NOT counted); interior uncond b
+          802B->802F; shrunk bound 7FF4-802C incl operand (linear ret 807E abuts 807F); HYPOTHESIS.
+      - address: 0x80FC
+        name: SUB_80FC
+        confidence: static_branch
+        note: >-
+          Entry F074 059E 8815 F274 2282 7712; zero callers (4x bc NOT counted); interior calld existing
+          0x7C9E @8105; first exit ret @8109 (abuts 810A); bound 80FC-8109; HYPOTHESIS.
+      - address: 0x82CB
+        name: SUB_82CB
+        confidence: static_branch
+        note: >-
+          Entry F274 82D4 7716 DD33 F274 82FF (calld pair to existing 82D4/82FF); zero callers; first exit ret
+          @82D3; bound 82CB-82D3; HYPOTHESIS.
+      - address: 0x836D
+        name: SUB_836D
+        confidence: static_branch
+        note: >-
+          Entry 4917 F84C 837C F274 82D4 7716; zero callers; interior uncond b 0x8384 @837A; shrunk bound
+          836D-837B incl operand (exit ret 838B abuts 838C); HYPOTHESIS.
+      - address: 0x838C
+        name: SUB_838C
+        confidence: static_branch
+        note: >-
+          Entry 7716 B184 F274 7F55 770E FFFD; zero callers; first exit ret @839F (abuts 83A0); bound
+          838C-839F; HYPOTHESIS.
+      - address: 0xDB4A
+        name: MAC_RPTBD_DB4A
+        confidence: static_branch
+        note: >-
+          Entry 770E 1249 771A 0009 2092 F272 DB5B; caller F274 calld @D670 verified; first exit ret FC00
+          @DB5C; bound DB4A-DB5C (task-parenthetical retd DBC0 rejected: crosses ret DB5C + existing
+          DB5D/DB76; DBC0 belongs to DB8C); FB30 ccd @DDB4 flagged fcall-wording tension, not counted;
+          HYPOTHESIS.
+      - address: 0xDB8C
+        name: EXP_NORM_DB8C
+        confidence: static_branch
+        note: >-
+          Entry E721 770E 0010 771A 0027 F4B9; caller F274 @D23F verified; first exit retd FE00 @DBC0 +delays
+          F495/F48F abutting existing DBC3; interior bd DB9C->DB92 loopback; HYPOTHESIS.
+      - address: 0xDC77
+        name: ENERGY_MATCH_DC77
+        confidence: static_branch
+        note: >-
+          Entry 8062 7663 8000 61F8 0A5A 0001 FA20; callers F074 @D1D6/@D24E verified; first exit retd FE00
+          @DCE5 +delays abutting DCE8; interior bcd cond + calld E56D/E583 + call DB76; HYPOTHESIS.
+      - address: 0xDD3A
+        name: CLAMP_SCAN_DD3A
+        confidence: static_branch
+        note: >-
+          Entry E903 8362 890E 7712 0EC5 7713 0062; caller F274 calld @D164 verified; first exit ret FC00
+          @DD6C; interior bcd bneq DD43->DD6D cond over-exit lane (retd DD74); HYPOTHESIS.
+      - address: 0xDD77
+        name: ABS_ACCUM_DD77
+        confidence: static_branch
+        note: >-
+          Entry 7712 0062 7713 FBA6 (FBA6 = stm -1114 immediate, not branch -- operand trap avoided); caller
+          F074 @D183 verified; first exit retd FE00 @DD98 +delays abutting DD9B; branch-free; HYPOTHESIS.
+      - address: 0xDD9B
+        name: VEC_CHAIN_DD9B
+        confidence: static_branch
+        note: >-
+          Entry 10F8 0A5A 8062 7712 0F9B F274 E50B; caller F274 calld @CF7E verified; first exit retd FE00
+          @DEC5 +delays abutting DEC8; interior F073 b DDF0->DDFC + DE22->DE36 + F273 bd DE90->DEA0 all
+          interior joins; HYPOTHESIS.
+      - address: 0xDFCF
+        name: PORT_DISPATCH_DFCF
+        confidence: static_branch
+        note: >-
+          Entry F074 0682 4A06 4A07 4A16; caller F074 @AA2A verified; first exit ret FC00 @DFFD; interior bc
+          beq DFDC->DFE6 cond + calld DC43/DC2E/DFFE; HYPOTHESIS.
+      - address: 0x83A0
+        name: SUB_83A0
+        confidence: static_branch
+        note: >-
+          Entry 7716 B18C F274 7F55 770E FFFE, prev FC00; zero F074/F274 callers full-image; first exit ret
+          @83B3 len 20 entry-linear; interior calld 7F55/7F95/7FC6 chain; gap-followup verified; HYPOTHESIS.
+      - address: 0x83B4
+        name: SUB_83B4
+        confidence: static_branch
+        note: >-
+          Entry 4A17 7716 B194 F274 7F75 770E FFFF, prev FC00; zero callers; first exit ret @83CD len 26;
+          interior calld 7F75 + call 7FC0 + calld 82FF/7FC6 + bc 83C6 cond; OVERLAP crosses existing 83C0 F074
+          call word mid-span (no re-emit); HYPOTHESIS.
+      - address: 0x83CE
+        name: SUB_83CE
+        confidence: static_branch
+        note: >-
+          Entry 4A17 7716 B163 F274 7F75 770E 0000, prev FC00; zero callers; first exit ret @83E7 len 26;
+          interior calld 7F75 + call 7FC0 + calld 82FF/7FC6 + bc 83E0 cond; OVERLAP crosses existing 83DA (no
+          re-emit); HYPOTHESIS.
+      - address: 0x83E8
+        name: SUB_83E8
+        confidence: static_branch
+        note: >-
+          Entry 7716 B194 F274 7F55 770E FFFF, prev FC00; zero callers; first exit ret @83FE len 23; interior
+          calld 7F55/7F95/7FC6 chain; HYPOTHESIS.
+      - address: 0x83FF
+        name: SUB_83FF
+        confidence: static_branch
+        note: >-
+          Entry 7716 B163 F274 7F55 770E 0000, prev FC00; zero callers; first exit ret @8412 len 20; interior
+          calld 7F55/7F95/7FC6 chain; HYPOTHESIS.
+      - address: 0x8449
+        name: SUB_8449
+        confidence: static_branch
+        note: >-
+          Entry 7713 2FC8 7716 2FCA 7717 2FCC, prev FC00; zero F074/F274 callers (cc @369B/@535E into 84CF
+          only, not here); first exit ret @84AE len 102; interior 2x uncond b joins 847A->846D + 8497->84AC,
+          no shrink; HYPOTHESIS.
+      - address: 0x84AF
+        name: SUB_84AF
+        confidence: static_branch
+        note: >-
+          Entry F074 05A0 69F8 0029 0004 7758, prev FC00; zero callers; first exit ret @84CE len 32; interior
+          call 05A0 + bc pair 84B9->84B6/84C7->84C4 cond; HYPOTHESIS.
+      - address: 0x84CF
+        name: SUB_84CF
+        confidence: static_branch
+        note: >-
+          Entry F074 0648 61F8 058F 000F FC30, prev FC00; zero F074/F274 callers (cc-forms only); first exit
+          ret @8500 len 50; interior call 0648 + calld 2262, branch-free; HYPOTHESIS.
+      - address: 0x8501
+        name: SUB_8501
+        confidence: static_branch
+        note: >-
+          Entry 7715 B75B 7716 B76D F074 853B, prev FC00; zero callers; first exit ret @8507 len 7; interior
+          call 853B; HYPOTHESIS.
+      - address: 0x6871
+        name: SUB14_6871
+        confidence: static_branch
+        note: >-
+          Entry E900 10F8 2FD7 F010 0002 F843 687E 0886 F010 0003 F846 687E E901 FC00; first exit ret @687E
+          len 14 entry-linear, interior bc cond only; callers F074 @6497/@6522 objdump-verified; HYPOTHESIS.
+      - address: 0x687F
+        name: SUB14_687F
+        confidence: static_branch
+        note: >-
+          Entry E900 10F8 2FD9 F010 009F F843 688C 0886 F010 0003 F846 688C E901 FC00; first exit ret @688C
+          len 14; callers F074 @64A5/@652A verified; HYPOTHESIS.
+      - address: 0x688D
+        name: SUB21_688D
+        confidence: static_branch
+        note: >-
+          Entry 61F8 051E 0800 11F8 2FD7 FF20 11F8 0915 F784 F300 0002 F495 F495 FF4B F300 0033 FC30 0986;
+          first exit retd @689F +delays 68A0/68A1, bound 688D-68A1, xc/rc cond only; callers F074 @649B/@66F8
+          verified; HYPOTHESIS.
+      - address: 0x95A9
+        name: BACC_DISPATCH_B
+        confidence: static_branch
+        note: >-
+          F5E2 objdump bacc b; selector B via 95A2 F000 B406 add #-19450,a / 8811 stlm / mvdm / 1181 ld *ar1,b
+          / 95A8 4813 ldm ar3,a (corrected from 4812); followers 76F8 20FA 0000 decode st #0,*(0x20fa) = code
+          not table; computed table-dispatch, no table at 95AA; HYPOTHESIS.
+      - address: 0xAF57
+        name: SELECTOR_DISPATCH_6WAY
+        confidence: static_branch
+        note: >-
+          Post-RET head (ret AF56); entry F074 0690 + F074 AF92 (selector helper, AR2 out, ret AFAA);
+          A=AR2-20636, reada *(0xb), first exit bacc b @AF63; bound AF57-AF63; 6-way table dispatch CONFIRMED
+          via AF64-AF69; HYPOTHESIS.
+      - address: 0xAF64
+        name: JTAB_AF57_6WAY
+        confidence: static
+        note: >-
+          6 words AF6A/AF74/AF79/AF7E/AF83/AF88 @AF64-AF69 (bytes verified); each handler head with ret exit
+          (calld 0xa2b9 lanes objdump-verified); consumer is AF57 bacc dispatch.
+      - address: 0xC721
+        name: CC_CALLER_OF_C7A4
+        confidence: static_branch
+        note: >-
+          F930 C7A4 objdump cc 0xc7a4,tc; sole image-wide static transfer into C7A4-C7B0 (full 64K operand
+          scan, exactly one hit); upholds F074/F274-zero, falsifies C7A4 callerless claim; HYPOTHESIS.
+      - address: 0x4BD7
+        name: FILL_2F5D_4BD7
+        confidence: static_branch
+        note: >-
+          Branch-entered block (0x4BB0 F84C bc 0x4BD7; 0x4BD5 b is PRE-entry not interior, interior exit-
+          branch is 0x4C27); staged fill 4C0D:7712 2F5C + 7692 0000 (stm AR2/st #0,*ar2+) + 7713 09C8 + EC0B
+          rpt 11 + E598 mvdd x12 writes 2F5D-2F68 incl 2F61/2F62; twin 4C89 rpt 6; bound 4BD7->ret 4D9C; DP-
+          independent static store mechanism; runtime VMA unmapped; HYPOTHESIS.
+      - address: 0xB750
+        name: FILL112_RPTBD_B750
+        confidence: static_branch
+        note: >-
+          Entry after FE00 @B74D; 4x F074 callers A6A8/A6CF/A8E7/A9E6; EA5E DP=0x5E @B75C; stm #2F18,AR2
+          (+elided stm AR3/AR4 per drom.lst: 7713 2FAE ar3, 7714 2799 ar4) / BRC=119 / rptbd / mvdd walks
+          2F18-2F8F over 120 iters incl 2F61(k73)/2F62(k74); conditional twin B7E5-B7EC (BRC=*(0x2AF1),
+          reaches iff BRC>=~73); bound B750->ret B808; DP-independent; HYPOTHESIS.
+      - address: 0x5F4B
+        name: SUB_5F4B
+        confidence: static_branch
+        note: >-
+          Entry F074 0598; bound 5F4B-614E (first exit retd FE00 @614C +delays 614D-614E: st #80,*ar2);
+          interior call 070A @612F, calld 2C88 @613B; b/bd to 613F x4 (6031/6046/6091/60AB) + bd/b to 636A x5
+          (616F/6184/6194/61B3/61C2) objdump-verified; post-RET 5F48; OVERLAP crosses existing 613F branch-
+          label (no re-emit); inbound cc @5D8C NOT counted; HYPOTHESIS.
+      - address: 0x614F
+        name: FRAG_614F
+        confidence: static_branch
+        note: >-
+          Entry 6181 0001 (bitf *ar1,#1); bound 614F-6154 (first exit retd @6152 +delays); zero interior
+          calls; inbound bc @60B2 (F830 tc) + post-retd 614C+2; HYPOTHESIS.
+      - address: 0x6155
+        name: SUB_6155
+        confidence: static_branch
+        note: >-
+          Entry F074 0598; bound 6155-629F ret FC00; interior call 63DA @620C, calld 628C @623E/6249; inbound
+          calld x3 @5DC3/5DDF/5DEB + post-retd 6152+2; OVERLAP crosses existing 628C loop (no re-emit);
+          HYPOTHESIS.
+      - address: 0xA5F2
+        name: SUB_A5F2
+        confidence: static_branch
+        note: >-
+          Entry 61F8 3EB5 0040; bound A5F2-A614 ret; interior bc A60A @A5F5 + bc A606 @A600 + calld ABD2
+          @A610; inbound call @292E + post-RET A5F1; HYPOTHESIS.
+      - address: 0xA615
+        name: SUB_A615
+        confidence: static_branch
+        note: >-
+          Entry F074 065A; bound A615-A638; interior call 3D79 @A633; inbound call @2932 + post-RET A614;
+          HYPOTHESIS.
+      - address: 0xA639
+        name: SUB_A639
+        confidence: static_branch
+        note: >-
+          Entry F074 065C; bound A639-A653; interior call 3D79 @A64B; inbound call @2934 + post-RET A638;
+          HYPOTHESIS.
+      - address: 0xA654
+        name: SUB_A654
+        confidence: static_branch
+        note: >-
+          Entry F074 065C; bound A654-A678; interior call 4BA8 @A66D + calld 2282 @A66F; inbound call @B3D4 +
+          post-RET A653; HYPOTHESIS.
+      - address: 0xA687
+        name: SUB_A687
+        confidence: static_branch
+        note: >-
+          Entry F074 065E; bound A687-A6AD; interior AB2C @A692 + BA56 @A69F + B750 @A6A8 (ccd @A6DB STRUCK
+          per critic: belongs to A6AE only); zero inbound + post-retd A684+2; OVERLAP interior retd A684 in
+          claimed A679 span noted; HYPOTHESIS.
+      - address: 0xA6AE
+        name: SUB_A6AE
+        confidence: static_branch
+        note: >-
+          Entry F074 065E; bound A6AE-A6E1 ret; interior BA56 @A6BF + B750 @A6CF + 9FCF @A6D1 + C5F9 @A6D6 +
+          A109 @A6DF + ccd @A6DB (FB20 to BAC2 per correction, not counted) + rc @A6B3; zero inbound + post-
+          RET A6AD; HYPOTHESIS.
+      - address: 0xA7A0
+        name: SUB_A7A0
+        confidence: static_branch
+        note: >-
+          Entry 7714 09C8 (stm #2504,ar4); bound A7A0-A7B6 ret; interior calld 86FB @A7A2 + rc @A7AE; inbound
+          bc @A759 + post-retd-delays A79F; HYPOTHESIS.
+      - address: 0xA806
+        name: LEAF_A806
+        confidence: static_branch
+        note: >-
+          Entry F074 0660; bound A806-A814 ret (rc @A810 passed per ret/retd-only rule); zero interior calls;
+          zero inbound + post-RET A805; HYPOTHESIS.
