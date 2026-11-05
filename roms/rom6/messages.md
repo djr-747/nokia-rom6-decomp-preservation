@@ -127,6 +127,18 @@ payload the stage handlers move — the state values only order
 the stages. `0xB16C` has no `CMPM` site: a write-only stage
 (or compared through another form).
 
+B11C-stage params and spine handoff (`0x55B1/0x5683`,
+objdump-verified): taken path writes length/param block
+`*(0x2652)=25/12`, `*(0x2653)=12`, `*(0x2651)=0`,
+`*(0x2640)=12`, `B 0x5683`; fall-through picks 12/25 by
+`*(0x250F)` bit 0 via `*(0x2EF8)` and `XC`. Exit shapes
+`*(0x264E)` mode bits from `*(0x2476)` (6→`OR 16`, 7→`OR 4+32`
+after `OR 1`/`AND -5`), `CALL 0x77EE`, then `CALLD 0x2D5E`
+with `AR2 = 137` or `(*(0x589) & 0x8000)>>7`; `AR3=0x86D`,
+`RET`. The identity stages hand a count in AR2 to the
+`0x2Dxx` spine — same spine family as the dispatcher
+(`0x2D8F/0x2DE4`).
+
 | value | sites | taken-path behavior |
 |---|---|---|
 | `0xA249` (-23991) | `0x53BC`, `0x540B`, `0x5436`, `0x546D`, `0xC8C2` | switch: `ANDM`, `ST #0,*(0xB68)`, `CALL 0xD970`, `LD #1→*(0xC4C)`, `ST #3,*(0xA5A)` …; worker site `0xC8C2` (`STATE_DISPATCH_WORKER`) |
