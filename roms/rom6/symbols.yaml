@@ -540,3 +540,67 @@ spaces:
           - docs/plan-rssi-native-20261013.md
           - docs/evidence/rf-rssi-220b-20261015/README.md
           - docs/evidence/rf-rssi-220b-20261015/static-writer-audit.md
+
+      - address: 0x93CE
+        name: MSG_CLASSIFY_BY_CALLER
+        confidence: static_branch
+        note: >-
+          Entry CALL 0x5BC; MVMM SP,AR3 + LD *ar3+ reads caller stacked regs; CMPM lanes vs dispatcher return-
+          PCs 0x2D5D/0x2DDB and AND #255 low-byte lanes vs 0x4D/0x9A/0x05/0x50/0x9C; 8 CALL sites incl
+          0x2CB1/0x2D5B/0x2D7B/0x2DD9/0x2E1D (AR2=0x2F00/0x2FC8 staged window, AR0=244) plus
+          0x363A/0x385E/block-0x9D11; BK=250 + *(0x20FF) flag lanes select builder callees.
+      - address: 0x93F4
+        name: MSG_OPCODE_VOCAB_05_4D_50_9A_9C
+        confidence: static_branch
+        note: >-
+          CMPM *ar3 lanes #77/#154/#5/#80/#156 all BC 0x9410 common-return; match = early RET, mismatch falls
+          to builder lanes CALL 0x99A4/0x9A11/0x96BD (0x9425/0x9429/0x942B) and verify/calld lane
+          0x99E6/0x9A50 (0x9446/0x944B). Value-to-name (MSID/SIML/IMEI/tune) needs ARM MDISND pairing.
+      - address: 0x9410
+        name: MSG_COMMON_RETURN
+        confidence: static
+        note: >-
+          POPM AG/AH/AL + RET; shared sink of all five opcode-match lanes.
+      - address: 0x999D
+        name: RING_POST_SUBTYPE_9A
+        confidence: provisional
+        note: >-
+          STM AR4,#154 + STM AR5,#0 prelude then CALL RING_REPORT_GATE at 0x99A1; AR4=subtype model (cf SIML
+          echo AR4=0x74) => uplink subtype 0x9A poster; entry tentative.
+      - address: 0x99A4
+        name: MSG_HEADER_BUILDER
+        confidence: static_branch
+        note: >-
+          Called from 0x9425; LD *(0x21FD) - *(0x21FC) ring-space math; header OR #0x1C00/#0x1E00 tag bits;
+          RPTB XOR rolling-checksum copy *ar2+ -> *ar3+% with byte-lane AND #1/#-256; MVMD AR3->0x21FC write-
+          ptr update; CALL 0x5CE.
+      - address: 0x99E6
+        name: MSG_VERIFY_LOOP
+        confidence: static_branch
+        note: >-
+          Called from 0x9446; XOR-scan memcmp *ar2+% vs A with RPT *(0x0B); BCD 0x99FF AEQ; MVMD AR2->0x21FB
+          snapshot; ST #1 *(0x21FE) match flag.
+      - address: 0x9A11
+        name: MSG_PAYLOAD_COPY
+        confidence: static_branch
+        note: >-
+          Called from 0x9429; CALL 0x5D0 guard; LD #250 - *(0x2200) space check; RPT *(0x08) block move *ar2+
+          -> *ar3+0%; ORM #0x1000 *(0x20FF) done flag.
+      - address: 0x96BD
+        name: MEAS_RSSI_POSTER
+        confidence: static_branch
+        note: >-
+          Called from 0x942B/0x94A5/0x995C; STM AR2,#96 + PORTR PA2 measurement read gated by *(0x20FF) BITF
+          lanes; LDU *(0x20FB) - *(0x587) threshold compare with BC 0x9700 ALT; posts measurement/rssi class.
+      - address: 0x9A50
+        name: MSG_OPCODE_9A50
+        confidence: provisional
+        note: >-
+          CALLD target from 0x944B classifier lane; body unexamined.
+      - address: 0x9343
+        name: MSG_CIPHER_24R
+        confidence: provisional
+        note: >-
+          STM BRC,#24 + RPTBD 0x936B loop; AR2=0x345F sink; LD *ar4 + AND #24/#31 + BITT + ROLTC + ABS + STH
+          *ar2- bit-cipher kernel; lies in 0x93CE classifier stretch; 24-round shape matches 24-byte SIML
+          block class; exact target buffer staged.

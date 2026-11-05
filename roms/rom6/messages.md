@@ -17,7 +17,10 @@ code: `verified` | `static` | `hypothesis` (see
 | opcode dispatch | table-indirect via `0x2F61/0x2F62`, record-compare `0x5190+` | static, values staged |
 | `0x573` selectors | 4 values / 13 sites, group routing not per-message | static, census |
 | MSID/SIMLOCK/IMEI per-opcode | ARM opcodes listed; no DSP stamping site found (coincidences rejected) | open |
-| SIMlock decode routine | `0x1202-0x1207` anchor absent from all static bytes | open (negative result) |
+| SIMlock decode routine | `0x1202-0x1207` anchor absent from all static bytes; 24-round bit-cipher `MSG_CIPHER_24R` (`0x9343`, BRC=24, `ROLTC`/`BITT` kernel on `LD *ar4` to `AR2=0x345F`) inside classifier stretch is the staged-buffer candidate | open (cipher unexamined) |
+| return-PC classifier | `MSG_CLASSIFY_BY_CALLER` (`0x93CE`): return-PC lanes `0x2D5D/0x2DDB` + low-byte opcode lanes `0x05/0x4D/0x50/0x9A/0x9C` → `0x9410`; selects `MSG_HEADER_BUILDER` `0x99A4` / `MSG_PAYLOAD_COPY` `0x9A11` / `MEAS_RSSI_POSTER` `0x96BD` / `MSG_VERIFY_LOOP` `0x99E6` / `MSG_OPCODE_9A50` | static, RET-bounded |
+| header builder | `0x99A4` (from `0x9425`): ring-space math `*(0x21FD)-*(0x21FC)`, header tag bits `OR #0x1C00/#0x1E00`, `RPTB` XOR rolling-checksum copy, write-ptr to `0x21FC` | static, objdump-verified |
+| subtype poster | `RING_POST_SUBTYPE_9A` (`0x999D`, tentative): `AR4=#154/AR5=#0` prelude → `CALL RING_REPORT_GATE` at `0x99A1` | static, gate-call verified |
 | IMEI-check / FAID compare | no `CMPM/SUB #0x030A` in mask; decode outside static bytes like the validation verdict | open (negative result) |
 | LEAD pin mapping | service manual confirms API/vectors-RAM/boot only | open (schematics) |
 
