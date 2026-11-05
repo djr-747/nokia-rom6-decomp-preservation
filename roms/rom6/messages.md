@@ -102,3 +102,30 @@ Block sites (`0x9Dxx-0xABxx`) sit in uploaded block code
 identity opcode yet: the `0x573` values select producer
 groups, not individual MSID/SIMLOCK/IMEI messages. The
 per-opcode builders of doc-04 §M→D remain the next hop.
+
+## Builder bodies (objdump-verified, `program.be16`)
+
+Message construction is table-driven fill + staged copy.
+All `MVDK` sources are *data-space* addresses: their runtime
+content is staged, not visible in-mask (program-space at the
+same numbers holds unrelated mask code — do not conflate).
+
+- `0x8641-0x864D` (`MSG_BUILDER_8641`): sub-call chain
+  `0x592 → 0x8BD5 → 0x8F97 → 0x8813 → 0x8653 → 0x8675`,
+  `RET`.
+- `0x864E-0x8652` (`MSG_BUILDER_864E`): `CALL 0x592`,
+  `CALL 0x8A45`, `RET`.
+- `0x8653-0x8674` (`MSG_FILL_8653`): `CALL 0x592`,
+  `ANDM #-8,*(0x51E)`; `AR2=0x3025`, RPT-24
+  `MVDK 0xB373→*ar2+`; BRC-2 `RPTB 0x8663` over RPT-16
+  `MVDK 0xB37B→*ar2+`; `AR2=0x119C`, RPT-7 `MVDK 0xB373`;
+  `RPTZ`, `STL → *ar2+`, `*(0x55A)`; `AR3=0x3025`,
+  `CALLD 0x86E3`; `AR4=0x118B`, `RET`.
+- `0x9F28-0x9F34` (`MSG_STAGE_9F28`): `AR2=0x1100`,
+  `AR3=0x093A`, `CALLD 0x9F19` copy engine, BRC=139, `RET`.
+- `0x9F35-0x9F41` (`MSG_STAGE_9F35`): same engine,
+  `AR2=0x1000`, `AR3=0x093A`, BRC=119, `RET`.
+- Copy engine `0x9F19` serves both stagers (body open).
+- Follower `0x9F42`: `CALL 0x614`, FRCT set,
+  `BITF *(0x577),#1024` → `0x9F50`, `BITF *(0x2B08),#2` …
+  (tail open).

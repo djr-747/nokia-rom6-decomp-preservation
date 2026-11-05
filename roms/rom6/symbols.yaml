@@ -185,6 +185,41 @@ spaces:
         note: Called after LD *(0x3FC7/0x3FC9) on every taken producer path. Body open.
         evidence:
           - roms/rom6/messages.md
+      - address: 0x8641
+        name: MSG_BUILDER_8641
+        confidence: static
+        backing: code
+        note: Sub-call chain to 0x8675, RET at 0x864D. Called from dispatcher switch, mask 0xA7xx, COBBA_WORKER.
+        evidence:
+          - roms/rom6/messages.md
+      - address: 0x864E
+        name: MSG_BUILDER_864E
+        confidence: static
+        backing: code
+        note: CALL 0x592, CALL 0x8A45, RET at 0x8652. Same three caller groups.
+        evidence:
+          - roms/rom6/messages.md
+      - address: 0x8653
+        name: MSG_FILL_8653
+        confidence: static
+        backing: code
+        note: MVDK table fills from data-space 0xB373/0xB37B into 0x3025/0x119C staging, CALLD 0x86E3, RET at 0x8674. Sources staged, not in-mask.
+        evidence:
+          - roms/rom6/messages.md
+      - address: 0x9F28
+        name: MSG_STAGE_9F28
+        confidence: static
+        backing: code
+        note: Copy 0x093A to 0x1100 (BRC 139) via engine 0x9F19, RET at 0x9F34.
+        evidence:
+          - roms/rom6/messages.md
+      - address: 0x9F35
+        name: MSG_STAGE_9F35
+        confidence: static
+        backing: code
+        note: Copy 0x093A to 0x1000 (BRC 119) via engine 0x9F19, RET at 0x9F41.
+        evidence:
+          - roms/rom6/messages.md
         evidence:
           - roms/rom6/ivt.md
       - address: 0x2BA1
