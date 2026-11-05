@@ -103,6 +103,21 @@ identity opcode yet: the `0x573` values select producer
 groups, not individual MSID/SIMLOCK/IMEI messages. The
 per-opcode builders of doc-04 §M→D remain the next hop.
 
+## Opcode dispatch is record-compare (`0x5190+`, objdump-verified)
+
+Upstream of the producer switch, a clause compares the unpacked
+6-byte record (`*(0x36B-0x375)`, the dispatcher unpack zone)
+against expected patterns: `LD *(0x36F/0x375/0x374)`, loop with
+`MAR *ar1-`, expected bytes scaled from `*(0x2F61/0x2F62)` tables
+(`LD …,-8,a` / `LD …,8,b`, `AND #255`, `SUB`, `BC aeq`), `BANZ`
+over the field count, `B 0x51D4` on full match into the gated
+producer-call sequence (`CALLD 0x425F`, `CALL 0x57FE`,
+`CALL 0x52C4`, `CALL 0x573B`, `CALL 0x520C`, then `LD *(0x250F)`
+post-check). So opcodes reach builders by record match, not by a
+jump table — the VALUES in the `0x2F61/0x2F62` pattern tables are
+the opcode→identity map and are still unread (data-space tables,
+staged at runtime).
+
 ## Builder bodies (objdump-verified, `program.be16`)
 
 Message construction is table-driven fill + staged copy.
