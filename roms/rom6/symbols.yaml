@@ -655,3 +655,17 @@ spaces:
         note: >-
           Fall-through STM AR4,#0x74 + RET after CALLD gate at 0x459B (AR5=#4 preset); chained-poster link, no
           CALLers.
+      - address: 0x9A50
+        name: MSG_SEND_GUARD_9A50
+        confidence: static_branch
+        note: >-
+          CALLD target from 0x944B; CALL 0x5D2 then multi-gate send predicate: LD *(0x20FE) RC AEQ, LD
+          *(0x2202) queue depth BC 0x9A82 ANEQ, BITF *(0x20FF)#512/#32 lanes, LD *AR3-#95 age gate, LDU
+          *(0x20FB)-#3 freshness gate, 0x9A70 mode-nibble LD *(0x2510) AND #0xF0 - #0xD0; all fail lanes sink
+          0x9A82.
+      - address: 0x345F
+        name: CIPHER24_SINK
+        confidence: provisional
+        note: >-
+          Write sink of MSG_CIPHER_24R loop (AR2 preset at 0x9348); sole static reference is the cipher loop
+          itself, buffer is staged allocation.
