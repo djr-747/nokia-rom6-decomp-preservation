@@ -37,12 +37,16 @@ textbook 6+n). V18-V20 follow by +n; V24/V25 names stay
 conventional. LEAD pin wiring (which physical line each INTn is)
 still unconfirmed.
 
-Run base per build, open: candidates are `0x0A00` (3310/R6 prior
-claim, installer untraced), `0x0580` (emulator IPTR `0x0B`
-observation, build unattributed), and the 5110/R4 `0x3204`
-observation which reads as a handler address, not a vector
-(`0x3204-0x40` is not a valid IPTR base, so it cannot be
-INT0/vector-16).
+Run base per build, resolved for R5/R6: the vector image runs
+at `0x0A00` (`0x0800 + dest`, dest `0x200`) in 3310/R6 setB
+(block23), 8210/R6 setB (block21), and 8210/R5 setA (block21).
+SetA/setB images share the slot layout; R5 handlers sit 5 words
+lower (`0x22D5/0x27AF/0x25DA/0x2B35` vs
+`0x22DA/0x27CD/0x25DF/0x2B53`). 5110/R4 and 3210 carry no
+vector-image block in their descriptor tables (different
+scheme — consistent with the 5110 `0x3204` handler-address
+observation and the unattributed IPTR `0x0B`/`0x0580` sighting,
+both still open as ROM4-family behavior).
 
 ## Handler prologues (from `program.be16`, BE words)
 
@@ -343,11 +347,10 @@ Clauses (offsets from entry, `program.be16`):
 
 ## Open
 
-1. Runtime IVT base per build. 3310/R6 resolved: block23 dest
-   `0x200` runs at `0x0A00` (`0x0800 + dest` rule). Open for other
-   builds: IPTR `0x0B` (base `0x0580`, build unattributed);
-   5110/R4 `0x3204` reads as a handler address, not a vector.
-   Needs the same dest-rule check on their tables.
+1. Runtime IVT base per build. Resolved for R5/R6 (`0x0A00`
+   in 3310 setB, 8210 setA, 8210 setB). Open for the ROM4
+   family (5110/3210: no vector-image block in table; `0x3204`
+   and IPTR `0x0B` observations unattributed to a mechanism).
 2. `0x05xx` mini-kernel (`0x05DA/0x05DC/0x05E8/0x05F0/0x05F4/0x05F6`).
    Proven zero-filled in `program.be16` (verified all-zero
    `0x05C0-0x0610`): unobservable in-mask. Runtime source is the
