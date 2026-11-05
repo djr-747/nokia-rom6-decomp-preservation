@@ -2,6 +2,40 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-05 — second half wave-2: 65.8% bounded (was 60.4%)
+
+- 6 teams + critic + parent adjudication; 90 new symbols (605 total),
+  A249 note corrected, table use-evidence appended, `make test` 6 pass.
+  Commit pushed; `make coverage` 36,364w = 65.8%. 18,932w remain.
+- Mesh-rule ruling (inside/outside targets, WORKER_3199 precedent):
+  interior unconditional branches to interior targets are joins
+  (kept); to outside targets are early-outs (trim/split). OVERRIDES
+  of critic kills with byte evidence: FRAG_303F stands (3 interior
+  joins + single outside exit @3113; bound corrected 303F-3114, FC00@
+  311E is 311F boundary ret), FRAG_9C13 stands (single interior join
+  9C2B->9C35). Kills upheld: 2983-2B52 (no entry, BACC-reach
+  hypothesis), 2EC6-3027 (2F00 overlap), A3/A5/A10, AFD3-AFF8
+  (zero external entries re-confirmed), 65AA-old, 2BED-zone splits
+  recorded dark with reasons.
+- Trims: 2875-28A4 (48w, outs at 28A3/294B), 2BAA multi-segment
+  (2BAA-2BEC + 2BED-2C02 via interior 2BE2 join), 2C03 (relabel FRAG,
+  2C03-2C74; 2C75-2C87 dark), 3267-3272 (12w), 9BC3-9BF4 (50w),
+  6993 split (SUB_6993 698B-69A8, mid-entry 4x ext F274),
+  8B9D->ROUTINE (4x F274 entries).
+- Landed: 19 T6 88xx-9Dxx/A3xx (incl A3BE/A3C5/A3D5/A3E1 chain,
+  89EB/9D0B/33CE frags), 12 T4 57xx-87xx, 7 deferred (incl 6666 lane,
+  6973 split-off, 6954), 12 T5 mid posters, 12 B-lanes (F820-fall-
+  through paradigm), 13 B-frags (table-arm entries), 8 mesh frags.
+- F84C/F84D catalog question recorded (mask arithmetic suggests FB
+  far-branch; binutils renders bc + behavioral fall-through evidence
+  wins; wave-3 item: run F84C through ti-c54x decoder test).
+- Open (wave-3 BACC/dispatcher sweep): all no-entry dark lanes
+  (2983-2B52, 28A5-2969, 3273-32ED, 33E8-345A, AFD3-AFF8, 3044-zone
+  decider via 0x0B92 audit, A25F-A2B8 arms, 2C75-2C87, B0E8, A91C,
+  A815, 670D/6657/372E/3662/3802/351D, 7A4B dead confirmed); pre-
+  existing double-claims STUB_A361/A3A3 + A2C3 over-claim (flagged,
+  not changed); F981/FB81 far-call review (keep-as-non-call upheld).
+
 ## 2026-11-05 — second half wave-1: 60.4% bounded (was 50.4%)
 
 - 6 teams + critic + parent validation; 70 new symbols (515 total),
