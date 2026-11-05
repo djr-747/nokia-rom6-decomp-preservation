@@ -1,0 +1,96 @@
+# DSP ROM6 word-address symbols. This is an analysis overlay, not an emulator
+# image catalog or a runtime source of RF behavior. Keep statistical and
+# physical interpretations provisional until their causality is demonstrated.
+schema_version: 1
+rom_family: rom6
+address_unit: c54x_16_bit_word
+program_be16_sha256: b450413a3b29a83f691533584f5c923f475e0a720c85acc1ec50097c63eee4cf
+spaces:
+  program_word:
+    description: C54x instruction address; ROM6 program image
+    symbols:
+      - address: 0x220B
+        name: RSSI_SELECTOR_BIT_TEST
+        confidence: static_branch
+        evidence:
+          - docs/plan-rssi-native-20261013.md
+          - docs/evidence/rf-rssi-220b-20261015/manifest.md
+          - docs/evidence/rf-rssi-220b-20261015/static-writer-audit.md
+  data_word:
+    description: C54x CPU data-space address; use data_read routing
+    symbols:
+      - address: 0x022A
+        name: RX_INITIAL_RAW_FILL_BLOCK_COUNT
+        confidence: static_branch
+        backing: data
+        note: >-
+          Loaded at program22FE, selects the32-P27-read primitive at2439 via
+          2305, decremented in AR2 and stored at244F. Producer3DFD writes1;
+          separate paths also write2/5. Not a measured physical air length.
+        evidence:
+          - docs/evidence/rom6-timed-transfer-e2-20261016/request-probe/readout.md
+      - address: 0x022C
+        name: RX_REQUEST_KIND_FLAGS
+        confidence: static_branch
+        backing: data
+        note: >-
+          Incoming A.low stored by3D9C. Selects post-fill processing paths;
+          diagnostic observations include1/9. No physical descriptor mapping.
+        evidence:
+          - docs/evidence/rom6-timed-transfer-e2-20261016/request-probe/readout.md
+      - address: 0x022D
+        name: RX_REQUEST_PARAMETER
+        confidence: static_branch
+        backing: data
+        note: Observed parameter1 with kind1 and parameter4 with kind9; units unknown.
+        evidence:
+          - docs/evidence/rom6-timed-transfer-e2-20261016/request-probe/readout.md
+      - address: 0x022F
+        name: RX_OPAQUE_PROCESSING_WORK
+        confidence: static_branch
+        backing: data
+        note: >-
+          Post-fill2451 branch initializes work, later decremented25B4..25B9.
+          FE29/FFFE observed before usable state. Nonzero alone is not valid.
+        evidence:
+          - docs/evidence/rom6-timed-transfer-e2-20261016/request-probe/readout.md
+      - address: 0x2627
+        name: RSSI_SELECTOR_FLAGS
+        confidence: static_branch
+        backing: api_ram
+        note: >-
+          Bit 7 is tested at program word 0x220B and branches to 0x221F when
+          set. A corrected same-run data-write trace observed PC 0x0D5D write
+          0000->0080 twice; the following 0x220B rows read 0080, joined by
+          instruction count and host cycle. This confirms that writer for the
+          captured transitions, not exclusive writer coverage, sample
+          causality, or physical RF meaning/timing.
+        evidence:
+          - docs/plan-rssi-native-20261013.md
+          - docs/evidence/rf-rssi-220b-20261015/README.md
+          - docs/evidence/rf-rssi-220b-20261015/static-writer-audit.md
+          - docs/evidence/rf-rssi-220b-20261015/writer-capture-manifest.md
+          - docs/evidence/rf-rssi-220b-20261015/writer-capture-focused-rows.txt
+      - address: 0x3044
+        name: RSSI_THRESHOLD_HIT_COUNT_CANDIDATE
+        confidence: provisional
+        backing: data
+        note: >-
+          In the 0x0B92 loop, initialized to zero and incremented when the call
+          result exceeds data word 0x3EAF; broader RSSI and selector causality
+          remain unproved.
+        evidence:
+          - docs/plan-rssi-native-20261013.md
+          - docs/evidence/rf-rssi-220b-20261015/README.md
+          - docs/evidence/rf-rssi-220b-20261015/static-writer-audit.md
+      - address: 0x3EAF
+        name: RSSI_THRESHOLD_CANDIDATE
+        confidence: provisional
+        backing: data
+        note: >-
+          Compared with the call result in the 0x0B92 loop; physical measurement
+          meaning and selector causality remain unproved.
+        evidence:
+          - docs/plan-rssi-native-20261013.md
+          - docs/evidence/rf-rssi-220b-20261015/README.md
+          - docs/evidence/rf-rssi-220b-20261015/static-writer-audit.md

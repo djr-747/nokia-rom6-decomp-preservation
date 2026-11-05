@@ -1,0 +1,13 @@
+# Build artefacts, local ROM bytes, and anything machine-regenerated.
+build/
+asm/*/full/
+*.pyc
+__pycache__/
+
+# Copyrighted ROM / firmware bytes are NEVER committed.
+# Bring your own dumps; see docs/03-image-catalog.md.
+*.be16
+*.bin
+*.fls
+*.img
+!tools/**/*.hex
