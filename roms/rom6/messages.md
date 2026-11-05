@@ -169,6 +169,25 @@ per-opcode builder constants (doc-04) against the DSP
 record-compare pattern tables (`0x2F61/0x2F62`) and the
 `0x36B-0x375` unpack zone at runtime.
 
+## Tune-config flow: staged keys, worker application
+
+Transform key material is never mask-written: `0x85C` appears
+only as `STM AR3/AR4` address loads at five block-code sites
+(`0x9CA3/0x9CA9/0x9D39/0x9D86/0x9D94`); `0x857` once
+(`AR4=0x857` in the worker). Both are read-only pointers into
+staged DARAM — the MCU-uploaded tune config (NVRAM/eeprom
+records → MCU → upload, per the identity description). The
+`0x9C99` chain applies them: mode from `*(0x860)`, 160-tap
+`TMPY` transform against the `0x85C` key over the `0x29C8`
+worker buffer, `MPYU` scaling from `0x857` into `0x4CD`,
+bitfield extracts into tune cells `0x4C3/0x4C4`. Lane cell
+`0x572` is worker-read, worker-written (`ST t`), block-read at
+`0xA0C7/0xA0DB/0xC624`. Mode/counter cell `0x2B08` is tested
+21× (`BITF`) across block code `0x9F4C-0xA117` and
+compared/subtracted in the worker — the most-polled identity
+state cell in the image. Tune path closed at the mechanism
+level; key VALUES are staged, not in mask.
+
 ## Builder bodies (objdump-verified, `program.be16`)
 
 Message construction is table-driven fill + staged copy.
