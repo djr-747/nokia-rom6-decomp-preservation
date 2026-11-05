@@ -46,8 +46,16 @@ block with `RET`.
 | `0x0F17` | upload engine (mirrors phase 1 from `LD *(0x87F)`) | same loop, same exit to `0x0A00` |
 
 Version path, closed: mask `0xFF87` → `*(0x802)` = HPI word 2 =
-MCU `[0x10004]` → version word → set gate (doc 08). The
-`MVDP→0xFF87` quirk mechanism stays open.
+MCU `[0x10004]` → version word → set gate (doc 08).
+`MVDP→0xFF87` quirk, closed: the C54x has no data→data HPI
+move. `MVDP Smem,PMST` (data→program) plus `MVPD PMST,Smem`
+(program→data) is the only copy path from HPI word 3 to word
+2, so the word parks in program-far scratch `0xFF87`. Same
+write-then-read-back idiom appears in the uploaded selftest
+builder (`mvdp [0x60]→0xff87`, `mvpd 0xff87→staging`,
+emulator `docs/research/selftest-DEEP-…§2.2`). Keep the two
+instructions verbatim on recompile: the scratch address is
+load-bearing.
 
 ## VITERBI_SEED_SUB `0x0F67-0x0F6D` (block48)
 

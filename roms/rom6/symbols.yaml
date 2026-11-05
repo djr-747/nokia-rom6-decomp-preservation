@@ -105,7 +105,7 @@ spaces:
       - address: 0x3EE1
         name: PORT13_STABLE_READ
         confidence: static
-        note: Read-twice-compare on pa13, then pa2 RMW under INTM.
+        note: RF-program sweep, RET at 0x3FC3. Stable pa13 read, INTM-locked pa2 RMW, sequenced pa14/15/4/9/5/7/10/47/13/11/8/0/1/32/33/42/48/3/43 writes, two CALL 0x4007.
         evidence:
           - roms/rom6/ivt.md
       - address: 0x4007

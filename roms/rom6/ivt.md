@@ -254,9 +254,19 @@ Clauses (offsets from entry, `program.be16`):
   selects -4 then 2; `BITF *(0x7),#0x800`; `SSBX INTM`;
   `PORTR pa0`, `OR #96`, `PORTW pa0` (RPT #21); `XC`;
   `PORTR pa56` poll.
-- `0x3EE1` stable-read: `CALL 0x63E`; double `PORTR pa13`
-  masked `0x3FFF`, `SUB`, loop until equal (two matching reads);
-  `CALL 0x640`; `SSBX INTM`; `PORTR pa2` + `ANDM/ORM` on `*AR2`.
+- `0x3EE1` RF-program sweep, `RET` at `0x3FC3`: `CALL 0x63E`;
+  double `PORTR pa13` masked `0x3FFF`, `SUB`, loop until equal
+  (two matching reads); `CALL 0x640`; `SSBX INTM`; `PORTR pa2`
+  with `ANDM #-25` / `ORM #6148` on `*AR2` (`AR2=0x60` staging);
+  sequenced writes `pa14←4999`, `MVDK *ar2→*(0x36A)`,
+  `pa15←15000`, `pa4/9/5/7/10/47`, `pa13←0`, `pa11`, `pa8`,
+  `pa0` (`ORM #13`, `ANDM #-481`), `pa1←-1796`; `RSBX INTM`;
+  `pa32←0`; `pa33` triple-write (`ST #1154,*ar2+`, `ST #5250`,
+  `PORTW *ar2` / `*ar2-`); `AR3=0x3E91`, `pa42←*ar3`;
+  `pa48←187`; `pa3←0`; `BITF *(0x3EC8),#32` → `0x3FC4`;
+  `CMPM *(0x3E7E),#2`; XC-selected `pa43←640/1696`;
+  `BITF *(0x3EB5),#1024`; two `CALL 0x4007`
+  (`LD #1696`; `LD #0` + `LD #13,b`); `RET`.
 - `0x4007` port-0 transaction (single routine, `RET` at `0x40A0`;
   `0x4055` is its phase-two label): `CALL 0x652`; save regs;
   `BITF *(0x7),#0x800`; `SSBX INTM`; `PORTR pa0`, `OR #12`,
