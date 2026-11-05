@@ -134,6 +134,39 @@ Post-`FRETE` neighbor at `0x2BA1` (also a frame-cascade target,
 bit 14): `ST/PORTW pa1` sequences with delays, `PORTR pa56`
 status poll, `B 0x283D` gate. pa1/pa56 handshake routine.
 
+## COBBA_WORKER `0xB4F8` (mask, called from V25)
+
+`CALL 0x6CA`, full save. `LD *(0x85D)`, `AND #255`,
+`LD #2,b`, `BC 0xB534,aeq`; `BITF *(0x4C2),#2` →
+`0xB530`; `CALL 0xC717`; `BITF *(0x860),#144` →
+`0xB530`. Bit-1 path (`0xB522`): `BITF *(0x85D),#2`
+→ `0xB522`; `CALL 0x9F28`, `CALL 0x864E`, `CALL 0x9F28`,
+`B 0xB52D`. Bit-2 path: `CALL 0x9F35`, `CALL 0x8641`,
+`CALL 0x9F35`, `ANDM #-873,*(0x537)`, `LD #2,b`,
+`CALL 0xB461`, `LD #1,a`, `CC 0xB4A8,aeq`. Restore,
+`CALL 0x6D2`, `CALL 0x6B2`, `LD *(0x4C2),b`,
+`CC 0xB461,bneq`. Then `AR4=0x85E`, `MVDK *ar4+→*(0x577)`
+(byte move), lane split (`AND #255`, `SFTL -8`, `STLM b,t`),
+`SUB *(0x572),b` → `0xB55B` else `ST t,*(0x572)`,
+`ST #3277,*(0x2AFE)`, `ST #10,*(0x2AFD)`, `STLM a,t`,
+`SUB *(0x2B08),a,b` → `0xB56F`, `LD *(0x2510)`,
+`AND #240`, `SUB #192` → `0xB56F` else `ST t,*(0x2B08)`,
+`CALL 0xB6E6`, `CALL 0xC717`, `BITF *(0x7),#0x800`,
+`SSBX INTM`, `ANDM #-8193,*(0x51E)` … (tail open past
+`0xB57B`).
+
+## STATE_WORKER `0xC851` (mask, called from V20)
+
+`CALL 0x5EA` (mini-kernel window — zeros in-mask, live at
+runtime via loader copy). `ANDM #-3073,*(0x51C)`,
+`ANDM #-1792,*(0x20F4)`, `ORM #2,*(0x20F4)`, zero
+`*(0x20F5/0x20F6/0x20F9)`, `ST #0,*(0x20FA)`,
+`ST #-1,*(0x2203)`; `PORTR pa0`, `OR #28`, `PORTW pa0`
+(RPT #20); `LD #8,b`, `CALL 0xB461`, `RET`. Sibling entry
+at `0xC86C`: `CALL 0x5EA`, `*(0x51C)` flag RMW
+(`ANDM #-8989`, `ORM #4`, `ANDM #-65`), `LD #768,b` …
+(tail open).
+
 ## STATE_ISR_ENTRY `0x25DF` (V20, mask)
 
 State-machine ISR, no ports in the head stretch. `BITF *(0x51F)`
@@ -244,10 +277,15 @@ Clauses (offsets from entry, `program.be16`):
 1. Runtime IVT base per build. 3310 image runs the table at `0x0A00`.
    The emulator observed IPTR `0x0B` (base `0x0580`) on another
    build. Both cannot hold for one image. Needs per-build check.
-2. `0x05xx` mini-kernel (`0x05DA/0x05E8/0x05F4`, maybe `0x05FA`).
-   No 3310 payload covers `0x0580-0x0600`. Only referrer of `0x05FA`
-   is the vector image itself. Hypothesis: pre-manifest bootcode
-   (HPI ping-pong phase, bytes in FLS) installs it. Recover from FLS.
+2. `0x05xx` mini-kernel (`0x05DA/0x05DC/0x05E8/0x05F0/0x05F4/0x05F6`).
+   Proven zero-filled in `program.be16` (verified all-zero
+   `0x05C0-0x0610`): unobservable in-mask, not analyzable
+   statically from the ROM image. Runtime source is the loader's
+   `MVDP *AR2+(0x0D00)→0x590` ×421-word copy (loader.md `0x0F2B`);
+   no extracted DSP block has dest `0x590`, so the ultimate FLS
+   source is still untraced. Masked callers into the window are
+   real: `0xC851` head is `CALL 0x5EA`. Only referrer of `0x05FA`
+   is the vector image itself.
 3. Vector-to-line wiring (INT0-5, TINT, BRINT/BXINT) against LEAD.
 4. `0x2B53` continuation past the HPI prologue (RF vs audio edge).
 5. Callee bodies `0x05DA/0x05E8/0x05F4` (need `0x05xx` source first).

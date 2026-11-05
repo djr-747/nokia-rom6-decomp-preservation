@@ -140,6 +140,27 @@ spaces:
         note: Called from 0xC910 into the 0xCA00-0xCDFF kernel stretch. Body open.
         evidence:
           - roms/rom6/drom.md
+      - address: 0x0F67
+        name: VITERBI_SEED_SUB
+        confidence: static
+        backing: code
+        note: Seeds 0x60/0x61 with 0x7B2D5A19 via DST, then RET. Called from BOOT_PUBLISH_ENTRY 0x0F15.
+        evidence:
+          - roms/rom6/loader.md
+      - address: 0xB4F8
+        name: COBBA_WORKER
+        confidence: static
+        backing: code
+        note: 0x85D mode dispatch to 0x9F28/0x864E/0x9F35/0x8641 paths, lane split into 0x572/0x2AFE/0x2AFD/0x2B08 cells, INTM-locked 0x51E update. Tail open past 0xB57B.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0xC851
+        name: STATE_WORKER
+        confidence: static
+        backing: code
+        note: Mini-kernel call, 0x20F4/0x51C flag setup, pa0 strobe, worker call, RET. Sibling entry at 0xC86C.
+        evidence:
+          - roms/rom6/ivt.md
       - address: 0x2BA1
         name: PA1_PA56_HANDSHAKE
         confidence: static

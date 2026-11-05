@@ -42,10 +42,19 @@ block with `RET`.
 | `0x0F0C` | `ST #6,*(0x803)` | HPI word 3 = 6 |
 | `0x0F0F` | `MVDP *(0x803)→0xFF87` | word to program space (quirk, keep verbatim) |
 | `0x0F12` | `MVPD 0xFF87→*(0x802)` | mask version constant → HPI word 2. `0xFF87` = 6 on ROM6, 4 on ROM4 |
-| `0x0F15` | `CALL 0x0F67` | local subroutine (body open) |
+| `0x0F15` | `CALL 0x0F67` | seeds `*(0x60/0x61)` (see below) |
 | `0x0F17` | upload engine (mirrors phase 1 from `LD *(0x87F)`) | same loop, same exit to `0x0A00` |
 
 Version path, closed: mask `0xFF87` → `*(0x802)` = HPI word 2 =
-MCU `[0x10004]` → version word → set gate (doc 08). The `0x0F67`
-body and the `MVDP→0xFF87` quirk mechanism stay open. Both are
-required before this unit is port-complete.
+MCU `[0x10004]` → version word → set gate (doc 08). The
+`MVDP→0xFF87` quirk mechanism stays open.
+
+## VITERBI_SEED_SUB `0x0F67-0x0F6D` (block48)
+
+`LD #23065,16,a; OR #31533,a; DST a,*(0x60); RET`.
+Seeds the Viterbi save cells with `0x7B2D5A19`. Confirms
+`VITERBI_STATE` (`symbols.yaml`) is a 32-bit cell pair.
+Follower at `0x0F70`: `DLD *(0x60),a; AR3=0x0F6E; AR2=1;
+CALL 0xFCC; RET` (compare stub, callee body open), then NOP
+sled, `STM #-96,PMST`, `B 0x0F00` reset loop, and the
+`PORTW pa0` upload-engine head (`LD #13,a`, RPT #22).
