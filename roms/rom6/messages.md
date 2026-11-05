@@ -101,9 +101,31 @@ values are the next attribution target.
 
 ## `*(0x573)` selector census (image-wide, exact `60F8 0573` scan)
 
-Four values, 13 sites. Routing shape everywhere: `CMPM`,
-`BC ...,ntc` — the ntc-taken (non-equal) path does the work,
-the equal path joins convergence `0x54BB`.
+Four compared values, 13 sites. Routing shape everywhere:
+`CMPM`, `BC ...,ntc` — the ntc-taken (non-equal) path does
+the work, the equal path joins convergence `0x54BB`.
+
+## `*(0x573)` is a sequenced state (`0x5569+`, objdump-verified)
+
+The switch WRITES its own selector (6 `ST` sites, all in-region:
+`0x5388`, `0x5569/0x5575/0x5581/0x5589/0x5591`). After the
+`LD *(0x250F), AND #240, SUB #32` gate, the sequencer advances:
+
+| write | next test | branch |
+|---|---|---|
+| `ST -23991` (`0xA249`) | `CALL 0x6E6`, `CMPM *(0x250F),#47` | → `0x5577` |
+| `ST -20649` (`0xAF57`) | `LD *(0x250F)`, `AND #254`, `CMPM *(0x8),#32` | → `0x5583` |
+| `ST -20565` (`0xAFAB`) | `CMPM *(0x250F),#34` | → `0x558B` |
+| `ST -20116` (`0xB16C`, fifth value) | `CMPM *(0x2547),#195` | → `0x5596` |
+| `ST -20196` (`0xB11C`) | `ST #193,*(0x2510)`, `ST #176,*(0x56F)`, `ORM #128,*(0x2512)`, `CMPM *(0x250F),#34` | → `0x55B1` |
+
+So `0x573` is message-passing state, not an opcode: each value
+is a processing stage, transitions keyed on dispatcher state
+`*(0x250F)` (47/34) and `*(0x8)==32` / `*(0x2547)==195`.
+The per-message identity (SIMLOCK vs MSID vs IMEI) is whatever
+payload the stage handlers move — the state values only order
+the stages. `0xB16C` has no `CMPM` site: a write-only stage
+(or compared through another form).
 
 | value | sites | taken-path behavior |
 |---|---|---|
