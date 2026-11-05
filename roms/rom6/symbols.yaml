@@ -774,7 +774,9 @@ spaces:
           Entry 6FF8 036F stl a,-8,*(0x36F) / F030 00FF and#255 / 80F8 0375 stl *(0x0375); AR2+% streams to
           0x0370-0x0373; 0x2F17 stm #886 ar4 + rpt mvdd *ar2->*ar4+; CALLs 0x2E2F @0x2F3D/0x2F4D then F073
           0x2E64; zero true CALLs into 0x2F00 (60 next-word hits all STM/LD immediates); first B
-          0x2F3F->0x2E64, first FC00 @0x311E.
+          0x2F3F->0x2E64. Reach CAPPED at retd@3025 (+delays 3026/3027): POST_RETD_3028 owns
+          3028-303E past the retd, and 3028 branches out to 0x2000, so the noted first-FC00 @0x311E
+          is not linearly reachable from 0x2F00 (continuation is dispatcher re-entry only).
       - address: 0x5170
         name: DISPATCH_MASK15
         confidence: provisional
@@ -2961,3 +2963,470 @@ spaces:
           Bound 7AB1-7ADD (exit F073@7ADC->7AE5); branch-entry from live lane b@7A2E->7AB1 (other F073 entries
           @7A59/7A5D/7A60/7A8E/7AA0 sit in post-7A49 dead zone; no whole-ROM F073 entries from outside;
           conditional-branch entries not exhaustively scanned); no F074 callers; HYPOTHESIS fragment.
+      - address: 0x9B5C
+        name: MSG_LEAF_9B5C
+        confidence: static_branch
+        note: >-
+          Entry 6D95 6C83 9B63 6D93 FE00 6F81; bound 9B5C-9B62 (exit FE00 retd@9B60 + slots 9B61-9B62); 5x
+          F074 callers @9B34/9B39/9B4C/9B51/9B54 (all objdump-verified call 0x9b5c); interior banz@9B63 tail;
+          zero interior calls; HYPOTHESIS banz-gated copy/compare micro-leaf.
+      - address: 0x9C4D
+        name: WRAP_9C4D
+        confidence: static_branch
+        note: >-
+          Entry 7312 21FB 4914 68F8 20FF 7FFF; bound 9C4D-9C60 (FC00@9C60); callers F074 @9BBC/9BC9/9C21
+          (objdump-verified); interior bc@9C58 beq; zero interior calls; HYPOTHESIS small flag-gated worker.
+      - address: 0x9C61
+        name: WRAP_9C61
+        confidence: static_branch
+        note: >-
+          Entry 4916 F77F F310 0001 8912 E800; bound 9C61-9C8E (exit FE00@9C8C + slots to 9C8E); callers
+          F074@9B02 + F274@9C37 (objdump-verified); interior call F074 9C8F@9C89 (raw+objdump verified; 9C8F
+          has no external caller, folded in, not a separate symbol); interior bc@9C82 blt + bc@9C8B ntc;
+          HYPOTHESIS compare-branch worker.
+      - address: 0xA87F
+        name: WRAP_A87F
+        confidence: static_branch
+        note: >-
+          Entry F074 067C 69F8 051E 0100 7712; bound A87F-A89A (FC00@A89A); callers F074 @B030/B09D/B0E4
+          (objdump-verified, outside-gap audio region); interior call 067C; cond bc A8B1/A89B/A8B9; HYPOTHESIS
+          audio-adjacent worker.
+      - address: 0xA8BF
+        name: WRAP_A8BF
+        confidence: static_branch
+        note: >-
+          Entry F074 067C 10F8 2EFD FC45 60F8; bound A8BF-A8D3 (FC00@A8D3); callers F074 @B01B/B088/B0CF
+          (objdump-verified); interior calls 067C + 4BA8@A8CE; HYPOTHESIS audio-adjacent worker.
+      - address: 0xA8D4
+        name: DISPATCH_A8D4
+        confidence: static_branch
+        note: >-
+          Entry F074 0666 61F8 051C 0040 F830; bound A8D4-A8FD (FC00@A8FD, adjacent A8FE); caller F074@AFEC
+          (objdump-verified call 0xa8d4); interior calls 0666/B750/9FCF/C5F9/A109/AB78 (all verified); cond bc
+          A8FD tc / A8F9 ntc; HYPOTHESIS setup dispatcher.
+      - address: 0xA8FE
+        name: DISPATCH_A8FE
+        confidence: static_branch
+        note: >-
+          Entry F074 0666 61F8 051C 0040 F830; bound A8FE-A91B (FC00@A91B); caller F074@A86C (objdump-verified
+          call 0xa8fe); interior calls 0666/BBEF/9FCF/A12B/9F42/06A2/BADB (all verified); HYPOTHESIS setup
+          dispatcher, sibling of A8D4 (same 0666 head).
+      - address: 0xAA7C
+        name: SEQ_AA7C
+        confidence: static_branch
+        note: >-
+          Entry F074 06A4 F074 3EE1 11F8 057B; bound AA7C-AAC6 (exit FE00@AAC4 + slots to AAC6); caller
+          F074@AB43 (objdump-verified); interior calls 06A4/3EE1 (PORT13_STABLE_READ); zero cond branches;
+          HYPOTHESIS RF/port programming sequence.
+      - address: 0xAAC7
+        name: SEQ_AAC7
+        confidence: static_branch
+        note: >-
+          Entry F074 06A4 61F8 051C 0C00 45F8; bound AAC7-AB24 (exit FE00@AB22 + slots to AB24, largest of
+          gap); caller F074@AB4C (objdump-verified); interior calls 06A4/3EE1; cond bc AAF0 alt / AB1B ntc /
+          AB25 alt; HYPOTHESIS RF/port programming sequence, sibling of AA7C.
+      - address: 0xAB2C
+        name: FANOUT_AB2C
+        confidence: static_branch
+        note: >-
+          Entry F074 068C 7712 051C 6182 0080; bound AB2C-AB55 (FC00@AB55); callers F074 @A692/A9B5
+          (verified); interior calls 068C/AA7C/AB56 x2 (@AB48/AB51 F274)/AAC7; interior bcd@AB40 ntc;
+          HYPOTHESIS dispatcher over AA7C/AAC7/AB56.
+      - address: 0xAB56
+        name: PRED_AB56
+        confidence: static_branch
+        note: >-
+          Entry F3F0 F820 AB76 8914 1083 8812 (branch-entered); bound AB56-AB77 (FC00@AB77, adjacent AB78);
+          callers F274 @AB48/AB51 (interior to AB2C); zero interior calls; cond bc AB76 ntc / AB67 alt;
+          HYPOTHESIS branch-only predicate leaf.
+      - address: 0xAB78
+        name: LEAF_AB78
+        confidence: static_branch
+        note: >-
+          Entry F074 06A4 61F8 0577 0001 FC20; bound AB78-AB81 (FC00@AB81, exact gap end); callers F274
+          @A724/A8F9/AA17 (verified); interior call 06A4; cond bitf *(0x577)#1; HYPOTHESIS tiny flag-gated
+          leaf.
+      - address: 0xE9A1
+        name: SUB_E9A1
+        confidence: static_branch
+        note: >-
+          Entry F074 071C; bound E9A1-E9C7 (39w code, FC00@E9C7); caller F074@E6AA (byte-verified call
+          0xe9a1); straight-line sth-clears + banz loop; out-call 071C only; abuts E9C8 ZEROFILL_STUB_2RANGE;
+          HYPOTHESIS.
+      - address: 0xEB9E
+        name: TABLE_EB9E
+        confidence: static_branch
+        note: >-
+          Bound EB9E-EFFF (1090w data table; full-span scan: zero F074/F274/F073/F820/F980/F981/FC00/FE00/F4xx
+          words; samples 0568 081D 0D5C small-ints, EFE0/F7F0 mixed); abuts E9EE-table (ends EB9D, see
+          PAIREDWORD_TABLE_432) and F000-table; precedes TABLE_FC00; HYPOTHESIS table, semantics open.
+      - address: 0xFC00
+        name: TABLE_FC00
+        confidence: static_branch
+        note: >-
+          Bound FC00-FF3F (64w data table, same zero-scan as EB9E; samples E926 0C3A F98C 02F4; FBFF=396D
+          continuity); follows TABLE_EB9E, precedes FF40 run; HYPOTHESIS table.
+      - address: 0xFF40
+        name: RUN_FF40
+        confidence: static_branch
+        note: >-
+          Bound FF40-FF77 (56w run, F073/F820-free); entries: post-table fall-through head FF40 (7719...) +
+          interior call-entries FF5E (head EC06, 2x F074 @FF54/FF5B)/FF61 (head E724, 3x @FF6D/71/75)/FF69
+          (head 7713, 2x @FF44/FF4A), all objdump-verified; exits FC00@FF60/FF68/FF77; HYPOTHESIS.
+      - address: 0xFF61
+        name: SUB_FF61
+        confidence: static_branch
+        note: >-
+          Entry E724 (interior call-entry of RUN_FF40); bound FF61-FF68 (exit FC00@FF68); 3x F074 callers
+          @FF6D/71/75 objdump-verified; HYPOTHESIS.
+      - address: 0xFF69
+        name: SUB_FF69
+        confidence: static_branch
+        note: >-
+          Entry 7713 (interior call-entry of RUN_FF40); bound FF69-FF77 (exit FC00@FF77, run end); 2x F074
+          callers @FF44/FF4A objdump-verified; HYPOTHESIS.
+      - address: 0xFF78
+        name: TRAPS_FF78
+        confidence: static_branch
+        note: >-
+          Bound FF78-FFBF (72w: 8w data head 0000 0000 5800 F741 5412 B3E6 4F26 00E3 + trap stubs F073
+          FF85@FF82 / F073 0F00@FF85 boot target + retf + F49B/F495 fill FF90-FFBF fully read); zero
+          F074/F274/FC00/FE00; HYPOTHESIS trap/fill segment.
+      - address: 0xFFC0
+        name: VECTORS_FFC0
+        confidence: static_branch
+        note: >-
+          Bound FFC0-FFFF (64w vectors + pad); 4-word BD slots 4A1E 4A06 F880 <addr> (byte-verified FFC0 slot:
+          F880 22DA): FFC0->0x22DA SAMPLE_ISR, FFC4/C8/E0->0x27CD FRAME_ISR, FFE4->0x2B53 COBBA_ISR; FFE8-FFFF
+          24w zeros; HYPOTHESIS (BD-slot reading; targets exactly match ISR symbols).
+      - address: 0xAF6A
+        name: LEAF_AF6A
+        confidence: static_branch
+        note: >-
+          Entry AF6A (AF64-AF69 jtab of SELECTOR_DISPATCH_AF57, consumer bacc; AF64-AF69 bytes verified,
+          untouched); bound AF6A-AF73 (exit FC00@AF73); JTAB_AF57_6WAY leaf; shared leaf idiom (call A2C3 +
+          mvdk *(0x22D)->0x265B + A3C5/A3E1/A4DE calls + calld A2B9 + stm + ret); HYPOTHESIS.
+      - address: 0xAF74
+        name: LEAF_AF74
+        confidence: static_branch
+        note: >-
+          Bound AF74-AF78 (exit FC00@AF78); JTAB_AF57_6WAY leaf, same idiom as AF6A; HYPOTHESIS.
+      - address: 0xAF79
+        name: LEAF_AF79
+        confidence: static_branch
+        note: >-
+          Bound AF79-AF7D (exit FC00@AF7D); JTAB_AF57_6WAY leaf; HYPOTHESIS.
+      - address: 0xAF7E
+        name: LEAF_AF7E
+        confidence: static_branch
+        note: >-
+          Bound AF7E-AF82 (exit FC00@AF82); JTAB_AF57_6WAY leaf; HYPOTHESIS.
+      - address: 0xAF83
+        name: LEAF_AF83
+        confidence: static_branch
+        note: >-
+          Bound AF83-AF87 (exit FC00@AF87); JTAB_AF57_6WAY leaf; HYPOTHESIS.
+      - address: 0xAF88
+        name: LEAF_AF88
+        confidence: static_branch
+        note: >-
+          Bound AF88-AF91 (exit FC00@AF91); JTAB_AF57_6WAY leaf; HYPOTHESIS.
+      - address: 0xAF92
+        name: HELPER_AF92
+        confidence: static_branch
+        note: >-
+          Entry 10F8 0914 (called entry); bound AF92-AFAA (exit FC00@AFAA); 3x F074 callers @AF59/B11E/B16C
+          (survey-verified); cond bc/bd only; out-calls into B11C/B16C runs; HYPOTHESIS.
+      - address: 0xAFAB
+        name: DISPATCH_AFAB
+        confidence: static_branch
+        note: >-
+          Entry F074 B0F5 (byte-verified); bound AFAB-AFB4 (exit bacc F5E2@AFB4); 10-word jtab AFB5-AFBE
+          follows (AFBF AFF3 AFF9 B017 B04B B050 B062 B080 B0BD B0C2); third bacc dispatch (shared AR2/reada
+          *(0xb) selector idiom with AF57/B11C); HYPOTHESIS.
+      - address: 0xAFBF
+        name: HEAD_AFBF
+        confidence: static_branch
+        note: >-
+          Entry F074 0678; bound AFBF-AFD2 (20w, exit FC00@AFD2 objdump-verified); interior calls
+          0678/A2C3/A3C5/A3E1/A4DE + F94D cc A815,beq (conditional call per catalog CC F900/FF80) + calld
+          A2B9; post-ret AFD3-AFF8 NOT claimed (zero external entries whole-ROM scan; decoded structure
+          recorded in WORKLOG for BACC-sweep wave-2); HYPOTHESIS.
+      - address: 0x8E88
+        name: WORKER_8E88
+        confidence: static_branch
+        note: >-
+          Entry 7710 FFF7 7713 B3E2; bound 8E88-8F1B (exit F273 bd@8F18->8F20 + delays 8F19-8F1B; F273
+          unconditional-delayed per catalog exact 0xF273); 4x F274 callers @8DAE/8DB6/8DBE/8DC6 (all objdump-
+          verified calld); 7x FB81 excluded per fcall convention (catalog FCALLD, targets implausible —
+          convention deviation recorded); abuts DARAM_WORKER_8E05 (ends 8E87); HYPOTHESIS.
+      - address: 0x8B30
+        name: FANOUT_8B30
+        confidence: static_branch
+        note: >-
+          Entry 7710 FFFE 7719 0009; bound 8B30-8B9C (FC00@8B9C); caller F074@8A85 (objdump-verified, inside
+          HELPER_GROUP_8A54 confirming its fanout note); interior 4x calld 8F7A @8B4B/62/7C/91 + calld
+          8B9D@8B51 + 3x calld 8B9E @8B69/83/98 (all objdump-verified); HYPOTHESIS fan-out dispatch.
+      - address: 0x8F20
+        name: LEAF_8F20
+        confidence: static_branch
+        note: >-
+          Bound 8F20-8F79 (FC00@8F79); entry is bd-target of F273@8F18 (inside WORKER_8E88 span); head 4543
+          4321 8343 F020; zero calls; HYPOTHESIS bd-target leaf.
+      - address: 0x8FAE
+        name: WORKER_8FAE
+        confidence: static_branch
+        note: >-
+          Entry F074 0668 4A11 E800; bound 8FAE-9003 (FC00@9003); caller F274@8C92 (objdump-verified calld);
+          interior F074 0668; HYPOTHESIS.
+      - address: 0x5BF1
+        name: HUB_5BF1
+        confidence: static_branch
+        note: >-
+          Entry F074 0674 F6BE EA00; bound 5BF1-5C33 (FC00@5C33); caller F074@4CD3 (objdump-verified);
+          interior F074 0674 + 8x F274 calld 5C34 @5C00/05/0D/1C/21/29/2E (verified); HYPOTHESIS caller-hub.
+      - address: 0x8854
+        name: HEAD_8854
+        confidence: static_branch
+        note: >-
+          Entry 7714 09C8 F274 86FB; bound 8854-8893 (exit F073@8892->889B); fall-through after F4E2 bacc end
+          of TABLE_ENGINE_8821 (ends 8853, no overlap); interior calld 86FB@8856; join F84C bc-beq->888D;
+          HYPOTHESIS table-engine head.
+      - address: 0x94F0
+        name: HEAD_94F0
+        confidence: static_branch
+        note: >-
+          Entry F074 05D4 7712 021E; bound 94F0-952D (exit F273 bd@952A->283D OUT + delays 952B-952D; F273
+          unconditional per catalog); fall-through after FC00@94EF (COBBA_VERIFY_LOOP end); interior F074 05D4
+          only (952E/9530 calls lie past exit); HYPOTHESIS.
+      - address: 0x8AC9
+        name: BLOCK_8AC9
+        confidence: static_branch
+        note: >-
+          Entry 802C 762C FFFC 762D; bound 8AC9-8B02 (FC00@8B02); fall-through after F273 bd slots @8AC6 (F273
+          8ACE); zero calls; HYPOTHESIS.
+      - address: 0x5B26
+        name: SEG_5B26
+        confidence: static_branch
+        note: >-
+          Entry F074 0674 10F8 264D; bound 5B26-5B5B (exit F073@5B5A->5BC6); fall-through after FC00@5B25;
+          interior F074 0674 + F274 5BD9 @5B4D/56; incoming join bd@5B9A->5B48; HYPOTHESIS.
+      - address: 0x9682
+        name: ROUTINE_9682
+        confidence: static_branch
+        note: >-
+          Entry F074 05C4 F7BB F020; bound 9682-96B5 (exit FE00@96B3 + slots 96B4/96B5); callers F074
+          @93A0/979E/97B5/993E (all verified); interior F074 05C4; 96B6-96BC retd sliver belongs to 96BD lane;
+          HYPOTHESIS.
+      - address: 0x5AC8
+        name: SEG_5AC8
+        confidence: static_branch
+        note: >-
+          Entry F002 2B1C F47E E910 (fall-through); bound 5AC8-5AFA (exit F073@5AF9->5AFD); alt entry 5ACA
+          (same exit, len49, not separately symbolized); join F820@5AC1->5AC8 (conditional, not an exit per
+          catalog BC); zero calls; HYPOTHESIS.
+      - address: 0x8A08
+        name: HELPER_8A08
+        confidence: static_branch
+        note: >-
+          Entry F074 0592 7714 0008; bound 8A08-8A39 (FC00@8A39); caller F074@A752 (objdump-verified);
+          interior F074 0592 + 4x F274 calld 8A3A @8A14/1C/22/28 (verified); HYPOTHESIS.
+      - address: 0x4883
+        name: FRAG_4883
+        confidence: static_branch
+        note: >-
+          Entry F074 059E (post-legacy head, abuts SUM_RPTB_4858 ends 4882); bound 4883-4943 (exit FE00@4941 +
+          delays 4942/4943); zero F074/F274 callers whole-ROM (gap-internal references only); HYPOTHESIS
+          fragment.
+      - address: 0x4944
+        name: SUB_4944
+        confidence: static_branch
+        note: >-
+          Entry F074 059C; bound 4944-4985 (exit F073@4984->4996 + operand 4985); caller F074@A4DB (byte-
+          verified F074 4944); interior bc joins (image-wide sweep: bc->4925 etc.); HYPOTHESIS.
+      - address: 0x4AF3
+        name: SUB_4AF3
+        confidence: static_branch
+        note: >-
+          Entry F074; bound 4AF3-4B05 (exit F073@4B04 self-loop + operand 4B05); caller F274@4ABA (byte-
+          verified calld 0x4af3, gap-internal); cond cc->4AF3@4AA7 documented by survey; HYPOTHESIS
+          self-loop worker.
+      - address: 0x4B2C
+        name: SUB_4B2C
+        confidence: static_branch
+        note: >-
+          Entry F074; bound 4B2C-4B66 (FC00@4B66); callers 2x F274 @4AC0/4AC6 (byte-verified, gap-internal);
+          zero inbound static branches; HYPOTHESIS.
+      - address: 0x4B81
+        name: SUB_4B81
+        confidence: static_branch
+        note: >-
+          Entry F6B8 (post-ret head, FC00@4B80); bound 4B81-4B99 (exit F073@4B98->4BA6 + operand); caller
+          F074@4AD4 (byte-verified call 0x4b81, gap-internal); HYPOTHESIS.
+      - address: 0x4BA8
+        name: SUB_4BA8
+        confidence: static_branch
+        note: >-
+          Entry F074; bound 4BA8-4BD6 (exit F073@4BD5->4D9C + operand); 4x ext callers (survey objdump-
+          verified); interior calld 4D9D (SUB_4D9D coexists as callee); ends adjacent FILL_2F5D_4BD7@4BD7;
+          HYPOTHESIS.
+      - address: 0x4D9D
+        name: SUB_4D9D
+        confidence: static_branch
+        note: >-
+          Bound 4D9D-4DA6 (FC00@4DA6); callers F274 @4BBD/4D07 (gap-internal, survey-verified); nested as
+          interior calld target of SPAN_4BA8, coexists as callee; HYPOTHESIS.
+      - address: 0x4DA7
+        name: DISPATCH_4DA7
+        confidence: static_branch
+        note: >-
+          Bound 4DA7-4DD9 (exit BACCD F6E2@4DD7 + delays 4DD8/4DD9 byte-verified; 1w shorter than critic 4DDA
+          — catalog BACCD is 1-word op + 2 delays); callers 3x F274 @4BE5/4C51/4CFE (gap-internal, survey-
+          verified); computed continuation past baccd open per BACC rule (no fall-through); C85D-precedent
+          convention question recorded; HYPOTHESIS.
+      - address: 0x2E39
+        name: LEAF_2E39
+        confidence: static_branch
+        note: >-
+          Entry 61F8 0549 0020 F820 (bitf *(0x549)#32; bc); bound 2E39-2E51 (25w, FC00@2E51); 4x ext callers
+          F074->2E39 @211A/21FC/2237/227D (byte+objdump verified); post-ret boundary (FC00@2E38); no interior
+          joins/calls; HYPOTHESIS.
+      - address: 0x2E84
+        name: WORKER_2E84
+        confidence: static_branch
+        note: >-
+          Entry 12D2 F030 00FF (ldu *ar2+%,a; and#255); bound 2E84-2EC5 (66w, exit F073@2EC4->2E64 + operand
+          2EC5); ret-boundary entry (FC00@2E83; interior join 2E84<-2E79/F84D); interior join F073@2E8D->2EB7
+          parent-verified + 2E8F/2EAD/2EB7; interior calls 2E94->2D8F, 2EB4->2DE4, 2EB7->0620, 2EC2->43BA (all
+          in-slice objdump-verified); HYPOTHESIS.
+      - address: 0x3028
+        name: POST_RETD_3028
+        confidence: static_branch
+        note: >-
+          Entry E800 (ld #0,a) at post-retd boundary (FE00@3025 + delay 80F8/2648 @3026/3027); bound 3028-303E
+          (23w, exit F073@303D->0x2000 + operand 303E); callers 2x ext F073->3028 @452A/4531 (objdump-verified
+          branch-entries); interior calls 3029->3986, 3032->2E2F, 303B->226C; sits inside BUILD_OPCODE_SPLIT
+          reach (retd-split corroboration, 2F00 note capped); HYPOTHESIS.
+      - address: 0x311F
+        name: WORKER_311F
+        confidence: static_branch
+        note: >-
+          Entry 6F82 0C56 (ld *ar2,-10,a...), post-ret (FC00@311E); bound 311F-315E (64w, exit
+          F073@315D->2E64); no callers; no interior calls/joins; clean leaf; HYPOTHESIS.
+      - address: 0x3199
+        name: WORKER_3199
+        confidence: static_branch
+        note: >-
+          Entry 61F8 051D (bitf *(0x51d)#256), post-ret (FC00@3198); bound 3199-3265 (205w, exit
+          F073@3264->2E64); interior joins incl parent-verified F073 31E9->31EE, 3219->321E, 3235->325D + team
+          list (31BA/31BB/31BC/31D8/31EB/31EE/3200/320C/321B/321E/3223/3237/325D); interior calls 3228->05B6,
+          3262->2E2F; HYPOTHESIS.
+      - address: 0x32EE
+        name: WORKER_32EE
+        confidence: static_branch
+        note: >-
+          Entry 771A 0001 (stm #1,brc + rptbd), post-ret (FC00@32ED); bound 32EE-3305 (24w, exit
+          F073@3304->2E64); interior call 3302->2E2F; no interior joins; HYPOTHESIS.
+      - address: 0x3364
+        name: WORKER_3364
+        confidence: static_branch
+        note: >-
+          Entry 12D2 F130 (ldu *ar2+%,a; and), post-ret (FC00@3363); bound 3364-33BB (88w, exit
+          F073@33BA->2E64); no interior calls/joins; HYPOTHESIS.
+      - address: 0x2CB5
+        name: WORKER_2CB5
+        confidence: static_branch
+        note: >-
+          Entry 4A15 4A14 4A13 (pshm ar5/ar4/ar3), post-ret (FC00@2CB4 tail of RING_REPORT_GATE); bound
+          2CB5-2D5D (169w, exit FC00@2D5D gap end); branch entry 2C98/F846->2CB5 (interior); no ext callers;
+          interior joins incl parent-verified F073 2CE4->2CEF, 2D3B->2D46 + team list; interior call
+          2D5B->93CE; adjacent 2C88 (2C93-2CB4 likely 2C88 second half, left with existing symbol);
+          HYPOTHESIS.
+      - address: 0x2800
+        name: STRETCH_2800
+        confidence: static_branch
+        note: >-
+          Entry F84C 2875 (bc bneq; fall-through from 27FE-27FF instruction); bound 2800-2866 (103w, exit
+          FRETE F4E5@2866); WEAK head: possible FRAME_ISR_27CD continuation (no ret verified 27CD-2800, needs
+          slice decode); interior F5E2 bacc-b@28CE kept in-span per F4Ex-only rule (exit-class open); interior
+          joins 2811/2819/parent-verified 280F->2819/283D-hub (6 ext F073 + F845 to 283D objdump-verified);
+          zero interior calls; HYPOTHESIS.
+      - address: 0x68A2
+        name: SUB_68A2
+        confidence: static_branch
+        note: >-
+          Bound 68A2-68B6 (21w, exit FE00@68B4 + delays 68B5/68B6); callers F074 @64A9/66E8 (both slice-
+          verified call 0x68a2); HYPOTHESIS.
+      - address: 0x68CA
+        name: SUB_68CA
+        confidence: static_branch
+        note: >-
+          Bound 68CA-68F6 (45w, ret FC00@68F6); caller F074@650F (slice-verified); zero interior calls;
+          HYPOTHESIS.
+      - address: 0x69E4
+        name: SUB_69E4
+        confidence: static_branch
+        note: >-
+          Bound 69E4-6A1D (58w, exit FE00@6A1B + delays); caller F074@5D85 (slice-verified); interior 3x call
+          0598; HYPOTHESIS.
+      - address: 0x3609
+        name: LEAF_3609
+        confidence: static_branch
+        note: >-
+          Bound 3609-3615 (13w, ret FC00@3615); post-ret head of LEAF_35C5 (RET@3608); zero callers;
+          HYPOTHESIS.
+      - address: 0x3640
+        name: FRAG_3640
+        confidence: static_branch
+        note: >-
+          Bound 3640-3661 (34w + operand word; exit F073@3660->3664 + operand 3661; +1 fix applied); caller
+          F074@35B5 (slice-verified, consistent with LEAF_35C5 note); branch-entered fragment class;
+          HYPOTHESIS.
+      - address: 0x64F4
+        name: FRAG_64F4
+        confidence: static_branch
+        note: >-
+          Bound 64F4-6595 (162w, exit F073@6594->65AA + operand); branch-entry bc@64EB (zero F074 callers
+          whole-ROM); RECLASSIFIED from call symbol: branch-entered label; HYPOTHESIS fragment.
+      - address: 0x65AA
+        name: FRAG_65AA
+        confidence: static_branch
+        note: >-
+          Bound 65AA-65ED (exit F273 bd@65EA->676A + operand/delays 65EB-65ED; TRIMMED from team 6656: parent
+          byte-check found two unconditional early-outs F273@65EA/65F6->676A); callers are 2x F073 branch-
+          joins @6594/65A3 + 3x bc (not call entries); 6657-6665 shadow bytes unreachable; 65EE-6656 separate
+          re-entry frag; HYPOTHESIS fragment.
+      - address: 0x65EE
+        name: FRAG_65EE
+        confidence: static_branch
+        note: >-
+          Bound 65EE-6656 (exit F073@6655->6666 + operand); 9 conditional-branch entries (F845@65D6/65F0/6613,
+          F844@6617, F842@662F/6638/6640, F843@6644, F84C@6633) targeting 65EE/65FA/6619/662B/6636/6650
+          (whole-ROM scan, all BC-conditional per catalog); zero F074 callers; HYPOTHESIS multi-entry lane
+          fragment.
+      - address: 0x66CB
+        name: FRAG_66CB
+        confidence: static_branch
+        note: >-
+          Bound 66CB-66E1 (23w, exit F073@66E0->676A + operand); callers 4x F073 b @66A5/66AA/66B6/66C3
+          (branch-joins, not call entries); interior calld 697F@66DC; RECLASSIFIED branch-entered label;
+          HYPOTHESIS fragment.
+      - address: 0x66E2
+        name: FRAG_66E2
+        confidence: static_branch
+        note: >-
+          Bound 66E2-670C (43w, exit F073@670B->676A + operand); caller bc@66DD; interior calls F074 68A2@66E8
+          (slice-verified) + 688D@66F8; RECLASSIFIED branch-entered label; HYPOTHESIS fragment.
+      - address: 0x36FB
+        name: FRAG_36FB
+        confidence: static_branch
+        note: >-
+          Bound 36FB-372D (51w + operand; exit F073@372C->2E64); caller bc@36F3; interior calls
+          05B2/580B/2E2F/2C88; RECLASSIFIED branch-entered label; HYPOTHESIS fragment.
+      - address: 0x37D8
+        name: FRAG_37D8
+        confidence: static_branch
+        note: >-
+          Bound 37D8-3801 (42w + operand; exit F073@3800->3862); caller F074@2E52 (dispatcher clause; branch-
+          vs-call weak per critic); interior calls 05A0/942E; exits to 2E64/676A/3862 chain; RECLASSIFIED
+          branch-entered label; HYPOTHESIS fragment.

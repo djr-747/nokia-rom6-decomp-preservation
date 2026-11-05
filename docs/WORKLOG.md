@@ -2,6 +2,47 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-05 — second half wave-1: 60.4% bounded (was 50.4%)
+
+- 6 teams + critic + parent validation; 70 new symbols (515 total),
+  2 note fixes, `make test` 6 pass. Commit pushed; `make coverage`
+  33,389w = 60.4%. 100% needs 55,296w; 21,907w remain.
+- Convention adjudicated vs ti-c54x reference core catalog: F073 =
+  B unconditional exit (exact 0xF073); F820 in BC mask F800/FF80 =
+  conditional, NOT an exit (fall-through continues); F273 = BD exact
+  0xF273 unconditional-delayed, IS an exit (bound ends pc+3);
+  F4E2/BACC + F6E2/BACCD end linear bounds (no fall-through);
+  F981/FB81 = FCALL/FCALLD per catalog (calls, fall through for
+  bounds) — repo branch-convention kept for bounds, deviation
+  recorded; FB81/F981 interior-call lists provisional pending
+  far-target decode (wave-2 item).
+- Killed by adjudication: P2 AF/B lane splits (rested on F820-as-exit,
+  contradicted by catalog + objdump bc/bd renders); P5 A3 (overlaps
+  existing 2F00 entry), A5 (code-vs-data conflict at 3044, no entry),
+  A10 (no static entry); AFD3-AFF8 (zero external entries
+  whole-ROM scan); 4533/4590/463B drafts (swallow existing poster
+  symbols); 65AA team bound trimmed 6656->65ED (two unconditional
+  F273->676A early-outs found by parent check); 4DA7 bound 4DD9 not
+  4DDA (catalog BACCD = 1-word op + 2 delays).
+- Landed: 12 msg/setup symbols (9B5C/9C4D/9C61/A87F/A8BF/A8D4/A8FE/
+  AA7C/AAC7/AB2C/AB56/AB78), E9A1 code + EB9E/FC00 tables + FF40 run
+  (3 sub-entries) + FF78 traps + FFC0 BD-vector slots (->22DA/27CD/
+  2B53) + 6 AF57 jtab leaves + AF92/AFAB/AFBF (20w, ret@AFD2), 12
+  P3 8xxx/5xxx spans, 8 P4 mid spans (4883 frag zero-callers; 4944
+  ext-called @A4DB; 4BA8 4x ext; 4DA7 baccd-dispatch), 9 P5
+  dispatcher/low spans (B2 169w incl parent-verified joins; B1 weak
+  head caveat kept), 12 P6 64xx/68xx/36xx (5 called + 7
+  branch-entered frags incl 65EE 9-entry lane).
+- Parent validation: 63-claim scripted entry-linear check (7 flags
+  all resolved: interior joins verified, AFBF ret@AFD2 found by
+  objdump slice, 65EA early-out, 4DD9 delays); 2F00 note capped at
+  retd@3025; all new heads/callers byte- or objdump-verified.
+- Open (wave-2): P2 killed lanes re-walk (F820-conditional bounds),
+  6A1E (bcd->6D47 escapes), AFD3-AFF8 + 33E8-345A + 3044-span
+  (no-entry, BACC-sweep), 4533/4590/463B-region branch stretches,
+  P1 dark chunks A815-A87E/A91C-AA7B + runner-ups, FB81/F981
+  far-call review, S1a loop-guard, 65EE-lane interior verification.
+
 ## 2026-11-05 — final push: 50.4% bounded (goal met)
 
 - 2 survey teams + critic on 5282-56DD (1,116w), 5823-59DB, 4F6E-50B1,
