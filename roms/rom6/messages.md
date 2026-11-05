@@ -332,6 +332,15 @@ cf. `ST #53` candidate at `0x78FB` — consistent with a
 26-length echo carrying subtype `0x35`, still unproven).
 Only `0x36` is tied to a named ARM message; the length
 model reframes the rest as sized, not yet named, traffic.
+The `0x74/0x0C` site (block08 file offset `0x6B1`) assembles
+its payload first: `MVDM 0x315F,ar2`, `LD *(0x3176) →
+STL *ar2+`, `MVDD *ar4(0x317F) → *ar3(0x3167)`, then
+`AR4=0x74`, `CALLD 0x2C88` with `AR5=0x0C` in the delay
+slot. The `0x31xx` page (here `0x315F/0x3167/0x3176/0x317F`)
+is staged identity data, moved word-wise into the invoke.
+12-length + identity-page staging fits the 12-byte
+encrypted-identity flow (`{70 14}`); MSID/IMEI candidacy,
+not proof.
 
 Stage-exit `0x77EE` zeroes report staging (`RPTZ` clears at
 `0x3AD0/0x3AD8/0x3AE0/0x37E0` after `CMPM *(0x250F),#34`),
