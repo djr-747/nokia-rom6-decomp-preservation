@@ -3167,8 +3167,8 @@ spaces:
         note: >-
           Entry F074 0678; bound AFBF-AFD2 (20w, exit FC00@AFD2 objdump-verified); interior calls
           0678/A2C3/A3C5/A3E1/A4DE + F94D cc A815,beq (conditional call per catalog CC F900/FF80) + calld
-          A2B9; post-ret AFD3-AFF8 NOT claimed (zero external entries whole-ROM scan; decoded structure
-          recorded in WORKLOG for BACC-sweep wave-2); HYPOTHESIS.
+          A2B9; AFD3-AFF8 claimed separately as FRAG_AFD3 (bacc-table-arm entry via AFB5-table slot 1);
+          HYPOTHESIS.
       - address: 0x8E88
         name: WORKER_8E88
         confidence: static_branch
