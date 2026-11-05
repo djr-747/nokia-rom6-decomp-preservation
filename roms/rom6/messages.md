@@ -298,6 +298,27 @@ echoes: the SIML echo assembly lives elsewhere (unstaged
 `0x9Fxx` counts are 139/119; no 24-count loop found in
 mask — echo likely built word-wise in staged code).
 
+Dispatcher ring gate `0x2C88` (objdump-verified): `CALL
+0x622`; `LD *(0x8E5)`, `SUB *(0x8E4)` (MDIRCV ring head/tail);
+space check with `ADD #100` vs `(AR5+3)>>1` (`LDM ar5`,
+`ADD #3`, `SFTL -1`); `BITF *(0x3EC8),#2` and
+`BITF *(0x54D),#12` early-RCs; `AR2=0x2F00`,
+`ST #1025/#372/#4608` (pattern page); `LD #20`, `AR0=244`,
+`CALL 0x93CE`, `RET`. Block20 (runtime `0x9C6` block) invokes
+it as `AR4=0x74, AR5=0x36, CALLD 0x2C88` — only AR5 is read in
+the gate (`(0x36+3)>>1` = 28-word need vs head-tail+100).
+Resolved past `0x2CB5` (`LDM ar5,a; LDM ar4,b;
+`ADD a,8,b`): the two parameters combine into one header
+word `B = (AR4<<8)|AR5` = `0x7436`, stored to the ring
+(`STL b,*ar2+%`); `A = ((AR5+1)>>1)-1` feeds the copy
+length. The same window ties subtype arithmetic to the
+length math (`SUB #52` = `0x34` when `*(0xE)==9`;
+`CMPM *(0xE),#13` = `0x0D` aliveness with `SUB #24` and
+BRC 11 vs 25). So block20's `AR4=0x74, AR5=0x36, CALLD 0x2C88`
+emits the `0x74/0x36` SIML-validation report named by the ARM
+docs (`{70 17}` → pass value 0): the first per-opcode
+SIMLOCK-path link closed end to end, ring word included.
+
 Stage-exit `0x77EE` zeroes report staging (`RPTZ` clears at
 `0x3AD0/0x3AD8/0x3AE0/0x37E0` after `CMPM *(0x250F),#34`),
 then `MVDK *(0x265D)→0x34BC/0x34BD`, `ST #9312→*(0x264A)`

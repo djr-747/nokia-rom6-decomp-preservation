@@ -185,6 +185,13 @@ spaces:
         note: Called after LD *(0x3FC7/0x3FC9) on every taken producer path. Body open.
         evidence:
           - roms/rom6/messages.md
+      - address: 0x2C88
+        name: RING_REPORT_GATE
+        confidence: static
+        backing: code
+        note: Ring-space check on 0x8E4/0x8E5, combines AR4/AR5 into header word stored to ring, CALL 0x93CE, RET. Block20 invokes with 0x74/0x36 (SIML validation report).
+        evidence:
+          - roms/rom6/messages.md
       - address: 0x8641
         name: MSG_BUILDER_8641
         confidence: static
