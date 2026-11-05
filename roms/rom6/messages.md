@@ -267,9 +267,12 @@ the DROM face: static mask bytes, listed verbatim —
 1083 1C82 80B3 6B82 0001 6882 0007 F7BB 74F8 0008 0002 F030
 F7FF F495 75F8`; `0xB37B`+16 overlaps the same run from
 `B382`. (They disassemble as code; the fill reuses those
-bytes as constants.) Sources below `0xB000` are staged DARAM:
-`0x093A`+8 reads zero in-mask (filled at runtime from
-upload/HPI); dests `0x3025/0x119C/0x1100/0x1000` likewise.
+bytes as constants.) No branch in the image targets `0x3025`,
+`0x119C`, `0x1100`, or `0x093A` — fill targets are parsed as
+data, never executed; code-relocation read excluded.
+Sources below `0xB000` are staged DARAM: `0x093A`+8 reads
+zero in-mask (filled at runtime from upload/HPI); dests
+`0x3025/0x119C/0x1100/0x1000` likewise.
 
 - `0x8641-0x864D` (`MSG_BUILDER_8641`): sub-call chain
   `0x592 → 0x8BD5 → 0x8F97 → 0x8813 → 0x8653 → 0x8675`,
