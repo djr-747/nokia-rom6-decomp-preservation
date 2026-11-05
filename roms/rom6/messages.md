@@ -99,6 +99,21 @@ mask code (`0xA7xx`), and the ISRs (`COBBA_WORKER`,
 (MSID/SIMLOCK/IMEI/tune) stays open: the `0x573` selector
 values are the next attribution target.
 
+## Opcode extraction (`0x2E70+`, objdump-verified)
+
+`LDU *ar2` (ring word), `SFTL -8`, `XOR #5` → `0x2E84` on
+equal (family `5x`); `SFTL -8`, `XOR #0`, `RC bneq` (return
+unless high byte is 0); `AND #255`, `STL a,*(0x54D)`, `RET`.
+So DSP opcodes are single low bytes with high byte 0; the ARM
+`0x70` arrives as word `0x0070` → `OPCODE_KIND=0x70`. Range
+check 88-112 (`0x58-0x70`) routes to `CALL 0x43BA`, which
+unpacks the record (`MVDK *ar2+%→0x2F00` — same page as the
+`0x2F61/0x2F62` staged cells), `SUB #29`: bytes ≤29 go through
+an `ADD #-20258` + `BACC` jump table, larger bytes (incl.
+`0x70`) take the copy path (`RPTB` record→`0x2F01`,
+recursive `CALL 0x2E2F`). The `0x70` identity clause is the
+`0x5190+` record-compare reached downstream of this path.
+
 ## `*(0x573)` selector census (image-wide, exact `60F8 0573` scan)
 
 Four compared values, 13 sites. Routing shape everywhere:
