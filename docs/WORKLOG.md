@@ -363,6 +363,14 @@ plus inventoried.
   Evidence: op_cc mask FF80 (F9 = cond call, ti-c54x op_cc.c), F980-F9FF = FCALL (plan p3-s118),
   cascade [4C29-4C40] decoded (F110 + F84C-skip + F073-exit per cell), 7CD8/F062 ghost, 5E4E negative.
   Pre-existing overlap noted (RUN_FF40 x SUB_FF61, untouched, for wave-5). make test 6 pass.
+- Wave-5 landed (110 new + 30 bound upgrades, 799 total, 91.0% = 50,333/55,296w): 4 survey teams
+  (W/C/E/H) + parent byte-validation of every exit/entry/interior. Convention: retd/bd bounds INCLUDE
+  delay words (wave-1 precedent); chained inter-sibling lane edges are joins, not early-outs (4C41/4CB4);
+  F072/F071 = rptb/rptz, F272 = rptbd, FBFF 1-word (objdump). Closed: 942E/9459 double-claim (COBBA trims to
+  942E-9452, old RET@94EF model superseded by SUB_9459); C7F6-split rejected; B0E6 = F073 upheld; 9700/6657
+  withholds honored; 2E2F dispatcher fan-in 53 callers counted. Data-kills honored (AED9/B948/BFB7/E855/E9D6-
+  zeros/82D9/8329/8956/909F/95AA/9B6F-head/7EC5-head/9A50-weak/4B67-thin/4C29-cascade). Evidence-only, no
+  draft: 9146-tail (BUTTERFLY), 9C99-lanes (MSG_STAGE_9F35). make test 6 pass.
 
 ## Goal mapping
 

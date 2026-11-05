@@ -61,7 +61,10 @@ spaces:
           *(0x54D); port I/O under INTM lock. Tail closed: opcode-range
           check 88-112 to 0x43BA, recursive self-call plus 0x4590,
           BACC computed jump, flag-shaping and unpack cases, all
-          converging on the 0x2E64 match loop.
+          converging on the 0x2E64 match loop. Bound 2E2F-2E38 (wave-5:
+          exit RET FC00@2E38 + post-RET head FC00@2E2E byte-verified;
+          53 F074 call-sites counted ROM-wide, primary dispatch fan-in;
+          head calls 0x05A0).
         evidence:
           - roms/rom6/ivt.md
       - address: 0x2E64
@@ -130,7 +133,7 @@ spaces:
         name: PORT45_POLL
         confidence: static
         backing: code
-        note: PORTR pa45 poll loop at 0x40B4 (AND #4096, BNEQ), pa44 write, RPT-14 wait. Called from PORT0_TXN phases.
+        note: PORTR pa45 poll loop at 0x40B4 (AND #4096, BNEQ), pa44 write, RPT-14 wait. Called from PORT0_TXN phases. Bound 40A1-40BB (wave-5: exit RET FC00@40BB + post-RET head byte-verified; 6 F074 callers @4034/406F/4077/4084/4087/4093; interior join B@40B2->40B4).
         evidence:
           - roms/rom6/ivt.md
       - address: 0xCA69
@@ -563,6 +566,8 @@ spaces:
           0x363A/0x385E/block-0x9D11; BK=250 + *(0x20FF) flag lanes select builder callees. Overnight
           re-census: 12 refs total -- 7xF074 at 0x2CB1/0x2D5B/0x2D7B/0x2DD9/0x2E1D/0x385E/0xA211 (all
           verified) + 3xF274 CALLD at 0x363A/0x9D11/0x9F14 + FB20 at 0x3532 + FB30 at 0x354A (all verified).
+          Bound 93CE-9413 (wave-5: exit FC00@9413 + post-RET byte-verified; 7 F074 + 3 F274 counted ROM-wide,
+          6 CODE-verified entries; interior join F073@940E->9414 chains into MEAS_DISPATCH_9414).
       - address: 0x93F4
         name: MSG_OPCODE_VOCAB_05_4D_50_9A_9C
         confidence: static_branch
@@ -587,7 +592,8 @@ spaces:
         note: >-
           Called from 0x9425; LD *(0x21FD) - *(0x21FC) ring-space math; header OR #0x1C00/#0x1E00 tag bits;
           RPTB XOR rolling-checksum copy *ar2+ -> *ar3+% with byte-lane AND #1/#-256; MVMD AR3->0x21FC write-
-          ptr update; CALL 0x5CE.
+          ptr update; CALL 0x5CE. Bound 99A4-99E5 (wave-5: exit retd FE00@99E3 + delays 99E4-99E5; entry
+          F074@9425 + post-RET; remainder 99E6-99FE dark).
       - address: 0x99E6
         name: MSG_VERIFY_LOOP
         confidence: static_branch
@@ -599,7 +605,9 @@ spaces:
         confidence: static_branch
         note: >-
           Called from 0x9429; CALL 0x5D0 guard; LD #250 - *(0x2200) space check; RPT *(0x08) block move *ar2+
-          -> *ar3+0%; ORM #0x1000 *(0x20FF) done flag.
+          -> *ar3+0%; ORM #0x1000 *(0x20FF) done flag. Bound 9A11-9A36 (wave-5: exit retd FE00@9A34 +
+          delays 9A35-9A36; entry F074@9429 — corrected, not calld — plus post-RET; 9A50-9A81 stays dark,
+          weak-only entries).
       - address: 0x96BD
         name: MEAS_RSSI_POSTER
         confidence: static_branch
@@ -692,7 +700,9 @@ spaces:
           pa3/pa48/pa12/pa0/pa14 (0x67B2/0x67B8/0x67C1/0x67CC/0x6803/0x6867) + BITF polls + RPT #20; staged
           refs 0x2FDE/0x2FCF; span entry-to-0x6870 CONFIRMED by all-paths exit walk: 4 exits (rc tc
           0x6861, retd 0x6864 + 2 delay words, rc aneq 0x686C, ret 0x6870), 20 internal branch sites all
-          inside; mid-routine label, role hypothesis only.
+          inside; mid-routine label, role hypothesis only. Bound 676A-6866 (wave-5: sole live exit retd
+          FE00@6864 + delays 6865-6866; 17 exterior branch/call entries counted; tail 6867-6870 (old rc@686C/
+          ret@6870 model) unreferenced dead — old model superseded, not deleted).
       - address: 0x62F2
         name: BRANCH_TAIL_62F2
         confidence: static_branch
@@ -719,7 +729,8 @@ spaces:
         note: >-
           7 true CALLs (6xF074 @0x6431/0x6448/0x666C/0x668B/0x6748/0x6764 + F274 calld @0x66DC, objdump
           call/calld verified); 8-word leaf 7713 053C 7712 2614 E510 7683 0000 FC00 (STM AR3 #1340, STM AR2
-          #9748, MVDD *AR3->*AR2, ST #0 *AR3); RET 0x6986.
+          #9748, MVDD *AR3->*AR2, ST #0 *AR3); RET 0x6986. Bound 697F-6986 (wave-5: exit + post-RET
+          byte-verified; 6 callers F074@6431/6448/666C/6748/6764 + F274@66DC counted).
       - address: 0x6987
         name: SIBLING_LEAF_6987
         confidence: static_branch
@@ -732,7 +743,9 @@ spaces:
         note: >-
           6xF074 true CALLs @0x6B22/0x6B86/0x6B93/0x6C1A/0x6ECE/0x6FE1 (call 0x712d @0x6B22 objdump); body
           F074 05B4 + CMPM *(0x34BF) + RC + BITF *(0x3490); RET FC00 @0x713F; downstream call 0x05B4 @0x7143;
-          T-loop correlator (STM T, TMPYU/SFTA/SUB) + zeroing *(0x533)/(0x37F6/0x37F7).
+          T-loop correlator (STM T, TMPYU/SFTA/SUB) + zeroing *(0x533)/(0x37F6/0x37F7). Bound 712D-713F
+          (wave-5: exit RET FC00@713F + post-RET head byte-verified; 5 F074 callers @6B86/6B93/6C1A/6ECE/
+          6FE1).
       - address: 0x78B6
         name: MAC_STAGED_WINDOW
         confidence: static_branch
@@ -790,7 +803,9 @@ spaces:
         note: >-
           Entry 10F8 036F ld *(0x036F); F845 51AD miss lane; AR2=#880(0x370) loop banz 0x519C vs *(0x2F62) low
           byte, hit falls F073 51D4; zero true CALLs (1 F845 branch hit); no own RET, exits via miss sink
-          0x51D4.
+          0x51D4. Bound 5190-51CF (wave-5 byte-verified: exit retd FE00@51CD + delays 51CE-51CF; 5 exterior
+          bc entries from ROUTINE_516A span @5183/5188/518A/51D2 + sibling B@51AB->51D4 chain to FRAG_51D0;
+          F072 = rptb per objdump, non-branch).
       - address: 0x51AD
         name: LANE_375
         confidence: provisional
@@ -810,32 +825,40 @@ spaces:
         note: >-
           CORRECTED entry F074 05BA (no 74xx at 0x938C); PORTR pa0 74 82 00 00 @0x93A4 after STM AR2,#96
           @0x93A2 is interior, not entry; sisters pa2 @0x93B4, pa0 @0x93BF; RET FC00 @0x93CD; zero in-image
-          callers in any F074/F274/FBxx/F073/F8xx form; entry mechanism unknown.
+          callers in any F074/F274/FBxx/F073/F8xx form; entry mechanism unknown; wave-5 entry found: post-RET
+          head (FC00@938B in SUB_9331). Bound 938C-93CD (exit + post-RET byte-verified; interior call
+          ->9682).
       - address: 0x9414
         name: MEAS_DISPATCH_9414
         confidence: static_branch
         note: >-
           Branch-reached from 0x93CE cluster (F820 @0x93D3/0x93D9/0x93E1, F073 @0x940E); calls
-          0x99A4/0x9A11/0x96BD; RET FC00 @0x942D.
+          0x99A4/0x9A11/0x96BD; RET FC00 @0x942D. Bound 9414-942D (wave-5: exit + post-RET byte-verified;
+          JOIN-entered from ROUTINE_93CE lane; abuts COBBA_VERIFY_LOOP).
       - address: 0x942E
         name: COBBA_VERIFY_LOOP
         confidence: static_branch
         note: >-
           Branch-reached (F073 @0x9449, F846 @0x944F/0x9457); PORTR pa12 74 82 00 0c @0x94BD; dual bc-bneq
-          verdict ->0x94D0 @0x9464-74 + ldu/xor/bcd verdict @0x94A9-0x94B8; call 0x97A2 @0x948D; RET FC00
-          @0x94EF.
+          verdict ->0x94D0 @0x9464-74 + ldu/xor/bcd verdict @0x94A9-0x94B8; call 0x97A2 @0x948D; old RET FC00
+          @0x94EF model SUPERSEDED (PORTR@94BD/verdict/call@948D/RET@94EF belong to SUB_9459 [9459-94EF];
+          942E/9459 double-claim closed wave-5). Bound 942E-9452 (exit B F073@9451->9459 chained into SUB_9459
+          head per 4C41/4CB4 precedent; entries F074@37DF + post-RET; interior join F073@9449->942E).
       - address: 0x9F19
         name: COPY_ENGINE_9F19
         confidence: static
         note: >-
           PSHM AL/AH/AG/ST1, LD *AR2, RPTB->0x9F22, MVDD *AR3,*AR2+, ST A,*AR3+, POPM x4; RET 0x9F27; called
-          by stagers 0x9F28/0x9F35 (F274 9F19).
+          by stagers 0x9F28/0x9F35 (F274 9F19). Bound 9F19-9F27 (wave-5: exit FC00@9F27 + post-RET
+          byte-verified; 2 F274 callers @9F2E/9F3B). Wave-5 static confirms chain-head lanes (no separate
+          draft): lane 9C99-9CCE exit F073@9CCD->9CE7, exterior entries F074@9DD4 + CC F944@9EC8.
       - address: 0x9F42
         name: AUDIO_ENGINE_9F42
         confidence: static
         note: >-
           Entry F074 0614 + 61F8 0577 0400 BITF + F820 9F50 + MAC block F471/F485; RET FC00 @0x9FA7; callers
-          F274 9F42 @0xA785/0xA90F/0xA98D (0xA785 verified).
+          F274 9F42 @0xA785/0xA90F/0xA98D (0xA785 verified). Bound 9F42-9FA7 (wave-5: exit FC00@9FA7 +
+          post-RET byte-verified; 3 F274 callers).
       - address: 0x9C99
         name: CHAIN_HEAD_9C99
         confidence: static_branch
@@ -859,12 +882,15 @@ spaces:
         confidence: static
         note: >-
           10-word shared tail 1095 4A15 F4E3 8A15 F495 6085 00FF F820 A2B9; RET FC00 @0xA2C2; ~20 F274/F074
-          callers incl A2A9/AF6F-B355 range (count reported, first-FC00 verified).
+          callers incl A2A9/AF6F-B355 range (count reported, first-FC00 verified). Bound A2B9-A2C2 (wave-5:
+          exit + post-RET byte-verified; 29 callers counted: 28 F274 + F074@A2A9; abuts MSG_WORKER_A2C3).
       - address: 0xA2C3
         name: MSG_WORKER_A2C3
         confidence: static
         note: >-
-          F074 0654 class; RET FC00 @0xA360; callers F074 @0xA269/0xA2AC (0xA269 verified).
+          F074 0654 class; RET FC00 @0xA360; callers F074 @0xA269/0xA2AC (0xA269 verified). Bound A2C3-A360
+          (wave-5: exit + post-RET byte-verified; 18 F074 callers counted; joins A306/A311/A317->A31D;
+          abuts STUB_A361 at A361, no overlap).
       - address: 0xA3A3
         name: MSG_WORKER2_A3A3
         confidence: static
@@ -874,13 +900,15 @@ spaces:
         name: MEASUREMENT_A3F0
         confidence: static_branch
         note: >-
-          F074 0656 class; RET FC00 @0xA481; caller F074 @0xA271 (verified).
+          F074 0656 class; RET FC00 @0xA481; caller F074 @0xA271 (verified). Bound A3F0-A481 (wave-5: exit
+          + post-RET byte-verified; joins A42E->A45C, bd A46A->A47D).
       - address: 0xA109
         name: AUDIO_SELECT_A109
         confidence: static_branch
         note: >-
           Entry F074 061C + 61F8 0577 0420 + F820 A12A + 11F8 2AEE loads; RET FC00 @0xA12A; callers F074
-          @0xA6DF/0xA8F7/0xAA13 (0xA6DF verified).
+          @0xA6DF/0xA8F7/0xAA13 (0xA6DF verified). Bound A109-A12A (wave-5: exit + post-RET byte-verified;
+          join A124->A12A).
       - address: 0xA12B
         name: MESSAGE_SETUP_A12B
         confidence: static
@@ -888,13 +916,16 @@ spaces:
           Entry F074 061E + AR0-6 STM block to 0x288A+; slow-path 0x061E calls @entry 0xA12B + @0xA17A
           (counter-exhaustion retry) + @0xA1DD (post-MAC-loop reseed), all F074 verified; routine
           0xA12B-0xA248 dual-MAC correlation loop over *(0x288A/0x288E/0x3F1C/0x3F1D) with call 0x93CE
-          downstream; epilogue call 0x2C88 @0xA245 + popm st1; RET @0xA248.
+          downstream; epilogue call 0x2C88 @0xA245 + popm st1; RET @0xA248. Bound A12B-A248 (wave-5: exit
+          FC00@A248 + post-RET byte-verified; 3 F074 callers @A783/A90D/A98B; joins A160->A165,
+          A175/A1AD->A1DD).
       - address: 0xA06B
         name: SUB_A06B
         confidence: static_branch
         note: >-
           Entry F074 061A + F272 A08B loop; called at 0x9F68 (F074 verified) and 0x9F42+2 chain; RET FC00
-          @0xA108.
+          @0xA108. Bound A06B-A108 (wave-5: exit + post-RET byte-verified; entry F074@9F68; 5 interior joins
+          A0BA/A0C4/A0D8/A0E8/A0F2->A0FD).
       - address: 0xB5E6
         name: TUNE857_READER
         confidence: static
@@ -1307,7 +1338,8 @@ spaces:
         confidence: static_branch
         note: >-
           Entry EA14 6160 0002 after ret D666; caller F074 @D7CB (objdump call); calls DB4A DC18 E4CB; first-
-          RET ret @D69D via b D692; HYPOTHESIS.
+          RET ret @D69D via b D692; HYPOTHESIS. Bound D667-D69D (wave-5: exit FC00@D69D + post-RET
+          byte-verified; join D681->D692).
       - address: 0xD798
         name: SUB_D798
         confidence: static_branch
@@ -1520,7 +1552,8 @@ spaces:
         confidence: static_branch
         note: >-
           Entry F074 05A0 60F8 0013 0001 F020; RET @7C56 len 84; 0 callers; inner 0x05A0/0x42B8; min/max+subc
-          math; HYPOTHESIS.
+          math; HYPOTHESIS. Head-fill Bound 7C03-7C2B (wave-5: exit B@7C2A->7BEE chained into ROUTINE_7B72;
+          entries bc F830@7BCD + CC F94A@7B9D mid; dark sub-tail 7C2C-7C55; parsed [7C56-7CA9] unchanged).
       - address: 0x7E4D
         name: SUB90_7E4D
         confidence: static_branch
@@ -1533,7 +1566,9 @@ spaces:
         confidence: static_branch
         note: >-
           Entry F074 059E 6DEA 0007; RET @7F74 len 32; 12 callers (8x 7EBE-7F12 + 838E/83A2/83EA/8401); inner
-          0x059E only; dual E900/6DB3 lanes; sibling of 0x7FC6; HYPOTHESIS.
+          0x059E only; dual E900/6DB3 lanes; sibling of 0x7FC6; HYPOTHESIS. Head Bound 7F55-7F73 (wave-5:
+          no-exit tail abutting 7F74; 5 F274 callers @7EBE/838E/83A2/83EA/8401 + post-RET head; dark-RET
+          pre-word per rule).
       - address: 0x7FC6
         name: SUB46_7FC6
         confidence: static_branch
@@ -1554,14 +1589,17 @@ spaces:
         confidence: static_branch
         note: >-
           Entry 1282 771A 000F F072 80F9 F490 F591 8182; RET @80FB len 9; 4 callers 80AF/80B1/80CC/80CE; no
-          inner calls; HYPOTHESIS.
+          inner calls; HYPOTHESIS. Head-fill Bound 80F3-80FA (wave-5: no-exit, falls into 80FB; 4 interior
+          calls from FRAG_80A3 now CODE — contingent entry resolved).
       - address: 0x810A
         name: SUB232_810A
-        confidence: provisional
+        confidence: static_branch
         note: >-
           Entry F074 066E 10F8 264F F943 7D60; RET @81F1 len 232 (longest in span); ZERO callers -- possible
           fall-through from 0x80FB RET (control-flow unconfirmed); inner 0x066E + 0x807F@0x8135 +
-          0x7E88@0x813D + 4x 0x81F2 + 0x8335@0x81C2; dense-band dispatcher HYPOTHESIS.
+          0x7E88@0x813D + 4x 0x81F2 + 0x8335@0x81C2; dense-band dispatcher HYPOTHESIS. Head Bound 810A-81F0
+          (wave-5: no-exit, abuts 81F1; entries bc F830@7C62/7C66 + post-RET; interior joins ->81B7/81AD/
+          81ED/8196; zero-callers caveat closed).
       - address: 0x81F2
         name: SUB46_81F2
         confidence: static_branch
@@ -1592,13 +1630,15 @@ spaces:
         confidence: static_branch
         note: >-
           Entry 7710 0004 E741 6DB1 7710 000A F074 855F; RET @8554 len 26; 4 callers F074
-          @8505/8526/8538/855C; inner 0x855F x2/0x8572/0x85E4/0x85FD; HYPOTHESIS.
+          @8505/8526/8538/855C; inner 0x855F x2/0x8572/0x85E4/0x85FD; HYPOTHESIS. Head Bound 853B-8553
+          (wave-5: no-exit, abuts 8554; 4 F074 callers + post-RET).
       - address: 0x8611
         name: COPY14_8611
         confidence: static_branch
         note: >-
           Entry 4A15 EC05 E58B 8A15 7712 04F5 4492 1A8A 4595 1B8D F1C0 8395 818D FC00; RET @861E len 14; 4
-          callers F074 @850C/8517/8522/852D; no inner calls; block-copy+accumulate; HYPOTHESIS.
+          callers F074 @850C/8517/8522/852D; no inner calls; block-copy+accumulate; HYPOTHESIS. Head
+          Bound 8611-861D (wave-5: no-exit, abuts 861E; 4 F074 callers + post-RET).
       - address: 0x628C
         name: LOOP_628C
         confidence: static_branch
@@ -1667,6 +1707,8 @@ spaces:
         confidence: static_branch
         note: >-
           Entry 7712 3138 4497; sth/neg ladder + mvdd block; RET @918B len 70; 1x F074 @90EC; HYPOTHESIS.
+          Head Bound 9118-9145 (wave-5: exit FC00@9145 byte-verified; 2 F074 callers @90BC/90DB; tail
+          9146-918A parent-claimed confirming evidence: call F074@90EC->9146, no separate draft).
       - address: 0x918C
         name: WINDOW_918C
         confidence: static_branch
@@ -2014,7 +2056,8 @@ spaces:
           Post-unconditional-b head (F073 b @7F93, backscan 7F7D-7F94 exit-free); entry F074 059E 7715 0006;
           bound shrunk to interior F073 b @7FB3->7F54 incl operand 7FB4 len 32, tail-merges to FC00 @7F54
           ahead of existing 7F55; callers 8x F274 @8357/61/76/80/94/A8/F0/8407 verified (12x F273 bd not
-          calls); HYPOTHESIS shared-target.
+          calls); HYPOTHESIS shared-target. Pre-head Bound 7F95-7FB2 (wave-5: 8 F274 callers; exit branch
+          F073@7FB3->7F54 shared as SUB32 head, 1w 7FB3 outside bound — adjacent claim, no overlap).
       - address: 0x643E
         name: SUB13_643E
         confidence: provisional
@@ -3093,7 +3136,8 @@ spaces:
         note: >-
           Bound FF40-FF77 (56w run, F073/F820-free); entries: post-table fall-through head FF40 (7719...) +
           interior call-entries FF5E (head EC06, 2x F074 @FF54/FF5B)/FF61 (head E724, 3x @FF6D/71/75)/FF69
-          (head 7713, 2x @FF44/FF4A), all objdump-verified; exits FC00@FF60/FF68/FF77; HYPOTHESIS.
+          (head 7713, 2x @FF44/FF4A), all objdump-verified; exits FC00@FF60/FF68/FF77; overlap with interior
+          SUB_FF61/SUB_FF69 bounds is intentional (run + interior subroutines, merged once); HYPOTHESIS.
       - address: 0xFF61
         name: SUB_FF61
         confidence: static_branch
@@ -4390,7 +4434,9 @@ spaces:
           noreturn question stays open as disposition not mechanism); entries bc F84C@2817->C7B1 byte-verified
           (cond) + post-RET head (FC00@C7B0); interior bc F84C@C7D0->C7F6 in-span join + bc F84C@2813->C806
           interior-projection join (C806 in-span) + bc F830@C7D4->C7E9 exterior-fall to sibling FRAG_C7E9; no
-          F074/F274; HYPOTHESIS.
+          F074/F274; exterior-to-interior joins recorded (not entries): B F073@C8ED/C8F6->C7F8 + bc F84D@
+          C7F0->C7F8 (from FRAG_C7E9 interior); C7F6-split hypothesis REJECTED wave-5 (would shatter C7B1 at
+          pre-exit C7F6; C7D0->C7F6 stays interior join); HYPOTHESIS.
       - address: 0xC7E9
         name: FRAG_C7E9
         confidence: static_branch
@@ -4661,3 +4707,817 @@ spaces:
           4CFE + F073@4CF5->4CF9 + B F073@4D87->4D9C (tail self-join); end-RET shared tail converged from
           FILL exits B@4BD5(PRE-entry)/4C27->4D9C + FRAG_4C41 exit B@4CB2->4D9C (multi-frag tail-merge);
           HYPOTHESIS.
+      - address: 0x38C9
+        name: ROUTINE_38C9
+        confidence: static_branch
+        note: >-
+          Bound 38C9-38F5 (87w; exit RET FC00@38F5 byte-verified, exit scan clean); entries cc F930@38B3->
+          38C9 byte-verified (cond call, from FRAG_389C interior) + post-RET head (FC00@38C8); interior joins
+          bc F830@38CD->38D6 + F820@38D9->38DE + F84D@38DB->38DE + F820@38EF->38F6 (all fall-through, non-
+          exits); tail 38F6-3906 (11w) stays dark (no entry); HYPOTHESIS.
+      - address: 0x3A81
+        name: ROUTINE_3A81
+        confidence: static_branch
+        note: >-
+          Bound 3A81-3A8D (13w; exit RET FC00@3A8D byte-verified, exit scan clean); entries calld F274@4D17->
+          3A81 byte-verified + post-RET head (FC00@3A80); interior F074@3A81->0632 + F074@3A83->3ADE out-calls
+          + bc F84D@3A87->3A8E; tail 3A8E-3ADD stays dark; HYPOTHESIS.
+      - address: 0x2E52
+        name: FRAG_2E52
+        confidence: static_branch
+        note: >-
+          Bound 2E52-2E63 (18w; exit RET FC00@2E63 byte-verified, exit scan clean); post-RET head only
+          (FC00@2E51, zero exterior callers/branchers — thin entry per 3267 precedent); interior out-calls
+          F074@2E52->37D8 + bc F820@2E5B->2E61 + F074@2E61->2E64 (call immediately before RET); tail 2E64-
+          2E83 stays dark; HYPOTHESIS.
+      - address: 0x3616
+        name: FRAG_3616
+        confidence: static_branch
+        note: >-
+          Bound 3616-361B (6w; exit RET FC00@361B byte-verified; minimal RET-terminated cell); post-RET head
+          only (FC00@3615, zero exterior refs); no interior ops; tail 361C-363F stays dark; HYPOTHESIS.
+      - address: 0x3674
+        name: FRAG_3674
+        confidence: static_branch
+        note: >-
+          Bound 3674-3682 (15w; exit B F073@3681->2E64 + operand 3682 — branch-tailed, forward shared-tail to
+          dispatch loop; exit scan otherwise clean); post-RET head only (FC00@3673); interior out-call
+          F074@367F->2E2F; tail 3683-36FA stays dark; HYPOTHESIS.
+      - address: 0x3938
+        name: FRAG_3938
+        confidence: static_branch
+        note: >-
+          Bound 3938-397A (67w; exit RET FC00@397A byte-verified, exit scan clean); post-RET head only
+          (FC00@3937, zero exterior refs); interior joins 3x F073@3941/394C/3955->395E + bc F84E@393A->394E
+          + F84E@3945->3957 + interior call F074@395E->05A0 + bc F820@396D->397B; tail 397B-3985 stays dark;
+          HYPOTHESIS.
+      - address: 0x3CC9
+        name: FRAG_3CC9
+        confidence: static_branch
+        note: >-
+          Bound 3CC9-3CD1 (9w; exit RET FC00@3CD1 byte-verified, exit scan clean); entries B F073@3C1A->
+          3CC9 byte-verified (from the 3C00 to 3CC8 span) + post-RET head (FC00@3CC8); no interior ops;
+          branch-entered, hence FRAG; HYPOTHESIS.
+      - address: 0x3D1B
+        name: FRAG_3D1B
+        confidence: static_branch
+        note: >-
+          Bound 3D1B-3D3A (32w; exit RET FC00@3D3A byte-verified, exit scan clean); post-RET head only
+          (FC00@3D1A, zero exterior refs); no interior joins; tail 3D3B-3D78 stays dark; HYPOTHESIS.
+      - address: 0x3FC4
+        name: FRAG_3FC4
+        confidence: static_branch
+        note: >-
+          Bound 3FC4-3FF9 (54w; exit B F073@3FF8->3FBA + operand 3FF9 — branch-tailed backward into bounded
+          3EBE-3FC3; exit scan otherwise clean); post-RET head only (FC00@3FC3 RF-program sweep end, zero
+          exterior refs); interior 3x F074@3FCC/3FD0/3FD5->4007 out-calls + bc F830@3FED->3FBA; tail 3FFA-
+          3FFF (6w) stays dark; HYPOTHESIS.
+      - address: 0x423B
+        name: ROUTINE_423B
+        confidence: static_branch
+        note: >-
+          Bound 423B-425E (36w; exit RET FC00@425E byte-verified, exit scan clean; 3w dark sliver 4238-423A
+          retd@4238 split-off precedes); entries 2x call F074@32EB/6E94->423B byte-verified (call-only entry,
+          pre-word E510 = retd delay, not post-RET); interior calld@4255->2C88 out-call; no interior
+          branches; HYPOTHESIS.
+      - address: 0x42B8
+        name: ROUTINE_42B8
+        confidence: static_branch
+        note: >-
+          Bound 42B8-4312 (91w; exit RET FC00@4312 byte-verified; tail 4313-4314 2w dark); entries calld
+          F274@7C4C->42B8 byte-verified + post-RET head (FC00@42B7); interior F847@42C7->42CB + F072@42F3->
+          42F7 (rptb per objdump, fall-through) + head out-call F074@42B8->0606; HYPOTHESIS.
+      - address: 0x434F
+        name: ROUTINE_434F
+        confidence: static_branch
+        note: >-
+          Bound 434F-436B (30w; exit RET FC00@436B byte-verified; 1w orphan 434E (7FFF) stays dark);
+          entries call@344D (F074) + calld@526D/71F4 (F274) ->434F head+1 byte-verified (split-head: true
+          entry at target, orphan pre-word dark); interior out-calls call@434F->0608 + sibling call@4362/
+          calld@4366->436C (chained into FRAG sibling); HYPOTHESIS.
+      - address: 0x436C
+        name: ROUTINE_436C
+        confidence: static_branch
+        note: >-
+          Bound 436C-4383 (24w; exit RET FC00@4383 byte-verified, exit scan clean); entries sibling-only
+          call@4362/calld@4366->436C (from ROUTINE_434F interior, chained-frag edge) + post-RET head
+          (FC00@436B); interior F072@436F->437E (rptb) + F820@4376->437A; sibling-entry flag noted;
+          HYPOTHESIS.
+      - address: 0x43BA
+        name: ROUTINE_43BA
+        confidence: static_branch
+        note: >-
+          Bound 43BA-43CC (19w; exit BACC F4E2@43CC computed-target, byte-verified — computed exit, no
+          fall-through); entries call F074@2EC2->43BA byte-verified + post-RET head (FC00@43B9); interior bc
+          F84E@43C4->43CD (falls into dark 43CD-43D2 sliver, non-exit per BC convention); HYPOTHESIS.
+      - address: 0x43D3
+        name: FRAG_43D3
+        confidence: static_branch
+        note: >-
+          Bound 43D3-43E9 (23w; exit RET FC00@43E9 byte-verified, exit scan clean); post-RET head
+          (FC00@43D2, zero exterior refs — thin entry); interior F072@43D7->43DA (rptb) + out-call
+          F074@43DB->2E2F; HYPOTHESIS.
+      - address: 0x44B2
+        name: FRAG_44B2
+        confidence: static_branch
+        note: >-
+          Bound 44B2-44BC (11w; exit RET FC00@44BC byte-verified); post-RET head (FC00@44B1, zero exterior
+          refs); interior out-calls call@44B2->0594 + call@44B4->2E2F; first link of 44B2-454E post-RET
+          frag chain; HYPOTHESIS.
+      - address: 0x44BD
+        name: FRAG_44BD
+        confidence: static_branch
+        note: >-
+          Bound 44BD-44D6 (26w; exit RET FC00@44D6 byte-verified); post-RET head (FC00@44BC = FRAG_44B2
+          exit); interior out-calls call@44BD->0594 + call@44BF->2E2F + calld@44D2->2C88; chain link;
+          HYPOTHESIS.
+      - address: 0x44D7
+        name: FRAG_44D7
+        confidence: static_branch
+        note: >-
+          Bound 44D7-44E6 (16w; exit RET FC00@44E6 byte-verified); post-RET head (FC00@44D6); interior
+          out-calls call@44D7->2E2F + calld@44E2->2C88; chain link; HYPOTHESIS.
+      - address: 0x44E7
+        name: FRAG_44E7
+        confidence: static_branch
+        note: >-
+          Bound 44E7-44FC (22w; exit RET FC00@44FC byte-verified); post-RET head (FC00@44E6); interior
+          out-calls call@44E7->2E2F + calld@44F8->2C88; chain link; HYPOTHESIS.
+      - address: 0x44FD
+        name: FRAG_44FD
+        confidence: static_branch
+        note: >-
+          Bound 44FD-452B (47w; exit B F073@452A->3028 + operand 452B — branch-tailed outside gap; exit scan
+          otherwise clean); post-RET head (FC00@44FC); interior out-calls call@44FD->0594 + call@4506->2E2F
+          + call@450F->226C + calld@4516->2262 + call@451A->226C + calld@451E->2262 + call@4522->226C +
+          calld@4524->2262 + call@4528->226C; inter-sibling chain edge F073@451C->452C (join per 4C41/4CB4
+          precedent, chains into FRAG_452C); HYPOTHESIS.
+      - address: 0x452C
+        name: FRAG_452C
+        confidence: static_branch
+        note: >-
+          Bound 452C-4532 (7w; exit B F073@4531->3028 + operand 4532 — branch-tailed); entry sibling-only B
+          F073@451C->452C (from FRAG_44FD interior, chained entry) + pre-word 3028 (44FD exit operand, not
+          post-RET); chain-tail link; HYPOTHESIS.
+      - address: 0x4533
+        name: FRAG_4533
+        confidence: static_branch
+        note: >-
+          Bound 4533-454E (28w; exit RET FC00@454E byte-verified, exit scan clean); entries bc F845@43E1->
+          4533 byte-verified (truly exterior, other gap) + sibling call@458D->4533 (gap-sibling span 457F-
+          458F zone); branch-led entry, hence FRAG (sibling call noted, not ROUTINE); call-outs call@4533->
+          0594 + call@4546->454F + calld@454A->2C88; HYPOTHESIS.
+      - address: 0x457F
+        name: ROUTINE_457F
+        confidence: static_branch
+        note: >-
+          Bound 457F-458F (17w; exit RET FC00@458F byte-verified); entries cc F945@5D35->457F byte-verified
+          (exterior, other gap) + post-RET head (FC00@457E — pre-word of data-killed 4557-4577 zone, valid
+          post-RET rule); interior call@458D->4533 (sibling edge into FRAG_4533); HYPOTHESIS.
+      - address: 0x4590
+        name: ROUTINE_4590
+        confidence: static_branch
+        note: >-
+          Bound 4590-459F (16w; exit RET FC00@459F byte-verified, exit scan clean); 10 callers byte-verified:
+          6x F074 @2D8C/2EC9/43D0/4AE1/7C99/7FFF + 4x cc F945 @7D7D/8041/80A8/811A ->4590; post-RET head
+          (FC00@458F = ROUTINE_457F exit); HYPOTHESIS.
+      - address: 0x45A0
+        name: FRAG_45A0
+        confidence: static_branch
+        note: >-
+          Bound 45A0-45A8 (9w; exit RET FC00@45A8 byte-verified); post-RET head (FC00@459F, zero exterior
+          refs); interior out-call call@45A6->B4A8; chain link; HYPOTHESIS.
+      - address: 0x45A9
+        name: FRAG_45A9
+        confidence: static_branch
+        note: >-
+          Bound 45A9-45B1 (9w; exit RET FC00@45B1 byte-verified); post-RET head (FC00@45A8); interior
+          out-calls call@45A9->2E2F + calld@45AF->B4A8; chain link; HYPOTHESIS.
+      - address: 0x45B2
+        name: FRAG_45B2
+        confidence: static_branch
+        note: >-
+          Bound 45B2-45B9 (8w; exit RET FC00@45B9 byte-verified); post-RET head (FC00@45B1); head 7713 04FA;
+          no interior ops; chain link; HYPOTHESIS.
+      - address: 0x45BA
+        name: FRAG_45BA
+        confidence: static_branch
+        note: >-
+          Bound 45BA-45C1 (8w; exit RET FC00@45C1 byte-verified); post-RET head (FC00@45B9); head 7714 04FA;
+          no interior ops; chain link; HYPOTHESIS.
+      - address: 0x45C2
+        name: FRAG_45C2
+        confidence: static_branch
+        note: >-
+          Bound 45C2-45F9 (56w; exit RET FC00@45F9 byte-verified, exit scan clean); post-RET head
+          (FC00@45C1); head 7713 2F00; interior out-calls call@45D3->2E2F + call@45D5->8529 + calld@45D7->
+          8529 + calld@45F5->2C88 + F072@45CF->45D2 (rptb); chain link; HYPOTHESIS.
+      - address: 0x45FF
+        name: FRAG_45FF
+        confidence: static_branch
+        note: >-
+          Bound 45FF-463A (60w; exit RET FC00@463A byte-verified, exit scan clean); post-RET head
+          (FC00@45FE — 5w dark sliver 45FA-45FE precedes); interior out-calls call@45FF->06F6 + call@4605->
+          2E2F + calld@4616->8534 + calld@4636->2C88 + F072@460D->4612/@4624->462E (rptb); chain link;
+          HYPOTHESIS.
+      - address: 0x463B
+        name: ROUTINE_463B
+        confidence: static_branch
+        note: >-
+          Bound 463B-4838 (382w; exit RET FC00@4838 byte-verified; 10 interior B joins byte-verified in-span:
+          @466C->4664/@4697->468F/@46AD->4838/@46BF->4775/@46C8->4775/@470D->4715/@472C->4731/@4785->4791/
+          @47CA->47F0/@47D8->47DC; exit scan otherwise clean); entries call@A506 + calld@A539/A58D->463B
+          byte-verified (far exterior) + post-RET head (FC00@463A = FRAG_45FF exit); interior out-calls incl
+          call@467A->4858 + cc@4791->4839 + call@4823->5825; largest draft in window; HYPOTHESIS.
+      - address: 0x4AE0
+        name: FRAG_4AE0
+        confidence: static_branch
+        note: >-
+          Bound 4AE0-4AF2 (19w; exit B F073@4AF1->4ADF + operand 4AF2 — branch-tailed, tail-shares FRAG_4ADF
+          RET; exit scan otherwise clean); entry BD F273@4A5F->4AE0 byte-verified (delayed branch from
+          existing 4A4B span, head-exact); interior out-call call@4AE1->4590; branch-entered, hence FRAG;
+          HYPOTHESIS.
+      - address: 0x4B06
+        name: FRAG_4B06
+        confidence: static_branch
+        note: >-
+          Bound 4B06-4B2B (38w; exit RET FC00@4B2B byte-verified, exit scan clean); entries bc F820@4AF8->
+          4B07 byte-verified (exterior, SUB_4AF3 span) + F84D@4B00->4B06 (gap-interior pre-head); pre-word
+          4AF3 not RET (entry is branch-based, post-RET rule not invoked); interior F072@4B0E->4B14/@4B26->
+          4B2A (rptb) + raw F800@4B1A->F600 (F8xx two-word, exterior target, fall-through assumed — arch
+          check open); no calls, hence FRAG; HYPOTHESIS.
+      - address: 0x4B9A
+        name: FRAG_4B9A
+        confidence: static_branch
+        note: >-
+          Bound 4B9A-4BA7 (14w; exit RET FC00@4BA7 byte-verified, exit scan clean); entries bc F845@4B86/
+          4B8A->4B9A byte-verified (exterior, existing 4B81 span) + B F073@4B98->4BA6 mid-span; interior
+          F072@4B9E->4BA5 (rptb); no calls, hence FRAG; HYPOTHESIS.
+      - address: 0x4EF3
+        name: FRAG_4EF3
+        confidence: static_branch
+        note: >-
+          Bound 4EF3-4F39 (71w; exit RET FC00@4F39 byte-verified, exit scan clean); entry BD F273@4EEF->
+          4EF9 byte-verified (delayed branch from existing 4EE0 span into head+6 — valid span entry);
+          interior joins B@4F0F->4F1D + B@4F2A->4F2D + bc @4F02/4F07/4F0C/4F20/4F25; no calls, hence FRAG;
+          HYPOTHESIS.
+      - address: 0x51D0
+        name: FRAG_51D0
+        confidence: static_branch
+        note: >-
+          Bound 51D0-51D7 (8w; exit RET FC00@51D7 byte-verified); head 10F8 0374; entries bc F830@5176->51D4
+          + F84D@517F->51D4 (from ROUTINE_516A span) + sibling B@51AB->51D4 (from FRAG_5190 interior, chained
+          edge) + interior bc F820@51C4->51D0 + F820@51CA->51D4; pre-word FEFF (516A retd delay — not post-
+          RET, entry is branch-based); abuts FRAG_5190 chain; HYPOTHESIS.
+      - address: 0x5755
+        name: ROUTINE_5755
+        confidence: static_branch
+        note: >-
+          Bound 5755-576D (25w; exit RET FC00@576D byte-verified, exit scan clean); entries cc F920@5207->
+          5755 byte-verified (exterior) + post-RET head (FC00@5754); interior out-calls call@5755->059C +
+          calld@5767->6993; HYPOTHESIS.
+      - address: 0x576E
+        name: FRAG_576E
+        confidence: static_branch
+        note: >-
+          Bound 576E-57A2 (53w; exit RET FC00@57A2 byte-verified, exit scan clean); entries sibling-only bc
+          F844@5760->576E + F820@576B->5785 mid-span (from ROUTINE_5755 interior, chained edges) + post-RET
+          head (FC00@576D); interior join B F073@577C->5785; no calls, hence FRAG; HYPOTHESIS.
+      - address: 0x57CC
+        name: FRAG_57CC
+        confidence: static_branch
+        note: >-
+          Bound 57CC-57FD (50w; exit RET FC00@57FD byte-verified, exit scan clean); entries bc F820@57AC->
+          57D3 + F820@57BC->57EE + F845@57C1->57CC + F845@57C5->57F2 + BD F273@57C8->57F4 (all exterior,
+          SUB_57A3 span); interior joins BD@57CF/57EA/57EE->57F4 (delays verified interior); pre-word 0004
+          not RET (branch-based entry); no calls, hence FRAG; HYPOTHESIS.
+      - address: 0x5A68
+        name: FRAG_5A68
+        confidence: static_branch
+        note: >-
+          Bound 5A68-5AAB (68w; exit RET FC00@5AAB byte-verified, exit scan clean); post-RET head only
+          (FC00@5A67, zero exterior refs — thin entry, head out-call F074@5A68->059C corroborates code);
+          interior join B@5A84->5A88 + F072@5A79->5A9E (rptb) + F820@5A7F->5A86; HYPOTHESIS.
+      - address: 0x5AFB
+        name: FRAG_5AFB
+        confidence: static_branch
+        note: >-
+          Bound 5AFB-5B17 (29w; exit RET FC00@5B17 byte-verified, exit scan clean); entries bc F820@5AF5->
+          5AFB byte-verified (exterior, SEG_5AC8) + B F073@5AF9->5AFD mid-span; interior join B@5B0C->5B10 +
+          F842@5B01->5B05 + F820@5B08->5B0E; head-idiom F010 unclassified single-word op — straight-line
+          assumption flagged; HYPOTHESIS.
+      - address: 0x5B18
+        name: ROUTINE_5B18
+        confidence: static_branch
+        note: >-
+          Bound 5B18-5B25 (14w; exit RET FC00@5B25 byte-verified, exit scan clean); entries 4x calld F274@
+          4BE0/4C4C/4CDD/4CF9->5B18 byte-verified + post-RET head (FC00@5B17 = FRAG_5AFB exit); interior
+          F072@5B1D->5B22 (rptb); HYPOTHESIS.
+      - address: 0x5B5C
+        name: FRAG_5B5C
+        confidence: static_branch
+        note: >-
+          Bound 5B5C-5B9D (66w; exit BD F273@5B9A->5B48 + delays 5B9C-5B9D (7710 2B55 execute as delays) —
+          outside gap, end 5B9D per pc+3; exit scan otherwise clean); entries B F073@5BB0->5B68 backward
+          (gap-sibling span) + pre-word 5BC6 (not RET — branch-based entry); interior forth-chain edge
+          F073@5B88->5BB2 (join per 4C41/4CB4 precedent, into sibling FRAG_5B9E) + call-outs calld@5B6D/
+          5B76->5BD9; inter-sibling chained-lane edges treated as joins, not early-outs (convention
+          recorded); HYPOTHESIS.
+      - address: 0x5B9E
+        name: FRAG_5B9E
+        confidence: static_branch
+        note: >-
+          Bound 5B9E-5BD8 (59w; exit RET FC00@5BD8 byte-verified, exit scan clean; abuts SUB_5BD9 head —
+          pre-word F074@5BD9 is next routine, not operand); entries B F073@5B5A->5BC6 (exterior, SEG_5B26) +
+          sibling bc F844@5B7C->5BB2 + F842@5B83->5BB2 + sibling B F073@5B88->5BB2 (chained forth-edges) +
+          interior bc F845@5BB9->5BC6 + F820@5BBE->5BC6; back-chain edge F073@5BB0->5B68 (join per chained-
+          lane convention, into sibling FRAG_5B5C); raw FA42@5BA9->5B68 (FAxx two-word, semantics unverified
+          — fall-through assumed, flagged); HYPOTHESIS.
+      - address: 0x5C34
+        name: ROUTINE_5C34
+        confidence: static_branch
+        note: >-
+          Bound 5C34-5C4E (27w; exit RET FC00@5C4E byte-verified, exit scan clean); entries 8x calld F274@
+          5C00/5C05/5C0D/5C12/5C1C/5C21/5C29/5C2E->5C34 byte-verified (all inside existing HUB_5BF1) +
+          post-RET head (FC00@5C33); interior F072@5C38->5C4D (rptb); HYPOTHESIS.
+      - address: 0x5EB3
+        name: FRAG_5EB3
+        confidence: static_branch
+        note: >-
+          Bound 5EB3-5EF6 (68w; exit RET FC00@5EF6 byte-verified, exit scan clean); entries bc F820@5E83->
+          5EE1 + F843@5E8D->5EE1 + F820@5E92->5EE1 + F820@5EAD->5EB3 head + B F073@5EB1->5EB5 mid-span (all
+          exterior, SUB_5E7D span); interior F820@5ECF->5EE1 + out-calls calld@5EC4->2C88 + calld@5ED5->2D5E;
+          raw FBFF@5ED2 resolved 1-word per objdump (no trim impact); no calls, hence FRAG; HYPOTHESIS.
+      - address: 0xA4BA
+        name: ROUTINE_A4BA
+        confidence: static_branch
+        note: >-
+          Bound A4BA-A4D4 (27w; exit RET FC00@A4D4 byte-verified, exit scan clean); entries call F074@B3A6->
+          A4BA byte-verified (caller sits in ROUTINE_B39E draft span — sibling edge, flagged) + post-RET head
+          (FC00@A4B9); interior out-calls call@A4BA->0656 + call@A4D2->7C57; HYPOTHESIS.
+      - address: 0xA515
+        name: FRAG_A515
+        confidence: static_branch
+        note: >-
+          Bound A515-A581 (103w; exit RET FC00@A581 byte-verified; interior join A568->A56D; exit scan
+          otherwise clean); post-RET head only (FC00@A514, zero ext calls/branches — single-entry FRAG);
+          interior out-calls call@A515->0658 + calld@A539->463B; raw 8FC6/E5E6 FB81->A54E discounted (FCALLD =
+          non-call/non-entry per rule); remainders drafted below (ROUTINE_A582/A5C6); HYPOTHESIS.
+      - address: 0xA582
+        name: ROUTINE_A582
+        confidence: static_branch
+        note: >-
+          Bound A582-A5C5 (68w; exit RET FC00@A5C5 byte-verified; interior joins A5A4/A5AD->A5B1; exit scan
+          otherwise clean); entries call F074@B426->A582 byte-verified + post-RET head (FC00@A581); interior
+          out-calls call@A582->0658 + calld@A58D->463B; HYPOTHESIS.
+      - address: 0xA5C6
+        name: ROUTINE_A5C6
+        confidence: static_branch
+        note: >-
+          Bound A5C6-A5D1 (12w; exit RET FC00@A5D1 byte-verified, exit scan clean); entries single call
+          F074@A273->A5C6 byte-verified (weak single-caller, flagged) + post-RET head (FC00@A5C5); interior
+          out-calls call@A5C6->065A + call@A5CC->4BA8; tail A5D2-A5E0 (15w) stays dark; HYPOTHESIS.
+      - address: 0xA843
+        name: FRAG_A843
+        confidence: static_branch
+        note: >-
+          Bound A843-A87E (60w; exit RET FC00@A87E byte-verified, exit scan clean); post-RET head only
+          (FC00@A842 = ROUTINE_A815 exit, zero ext calls/branches — multi-call body, FRAG by entry class);
+          interior 6 out-calls call@A843->067C + cc F920@A85B->AB2C + cc F945@A86A->9E2F + call@A86C->A8FE +
+          call@A875->BA56 + calld@A877->BAC2 (feeds ROUTINE_BAC2 draft); HYPOTHESIS.
+      - address: 0xA89B
+        name: FRAG_A89B
+        confidence: static_branch
+        note: >-
+          Bound A89B-A8A4 (10w; exit RET FC00@A8A4 byte-verified); post-RET head (FC00@A89A, zero ext refs);
+          interior bc F820@A89E->A8A5 (targets past-RET remainder — mid-entry to micro-FRAG_A8A5 below);
+          remainder A8A5-A8B0 + dark A8B1-A8BE; HYPOTHESIS.
+      - address: 0xA8A5
+        name: FRAG_A8A5
+        confidence: static_branch
+        note: >-
+          Bound A8A5-A8B0 (6w; exit RET FC00@A8B0 byte-verified; micro-span); entry interior bc F820@A89E->
+          A8A5 (from FRAG_A89B span, exterior to this span — valid mid-entry); head 7713... post-RET-adjacent
+          (FC00@A8A4); HYPOTHESIS.
+      - address: 0xA954
+        name: FRAG_A954
+        confidence: static_branch
+        note: >-
+          Bound A954-A999 (70w; exit RET FC00@A999 byte-verified, exit scan clean); post-RET head only
+          (FC00@A953 = ROUTINE_A91C exit, zero ext refs); interior 12 out-calls incl call@A954->0686 +
+          call@A95A->877D + call@A96A->D8F6 + call@A978->D90B + call@A97A->068A + call@A981->9E2F + calld@
+          A983->BBEF + calld@A987->9FCF + call@A98B->A12B + calld@A98D->9F42 + call@A991->9E2F + calld@A995->
+          BADB; remainder FRAG_A99A/A9AB + dark tail A9E9-AA7B (147w); HYPOTHESIS.
+      - address: 0xA99A
+        name: FRAG_A99A
+        confidence: static_branch
+        note: >-
+          Bound A99A-A9AA (17w; exit RET FC00@A9AA byte-verified, exit scan clean); post-RET head (FC00@A999);
+          zero ext refs; no interior calls; chain link; HYPOTHESIS.
+      - address: 0xA9AB
+        name: FRAG_A9AB
+        confidence: static_branch
+        note: >-
+          Bound A9AB-A9E8 (62w; exit RET FC00@A9E8 byte-verified, exit scan clean); post-RET head (FC00@A9AA);
+          5 interior out-calls call@A9AB->0686 + call@A9B5->AB2C + call@A9BB->BA56 + call@A9D5->068A + call@
+          A9E6->B750; HYPOTHESIS.
+      - address: 0xACBB
+        name: FRAG_ACBB
+        confidence: static_branch
+        note: >-
+          Bound ACBB-ACF2 (56w; exit B F073@ACF1->AE22 + operand ACF2 — branch-tailed outside gap into AE70
+          filler zone; exit scan otherwise clean); post-RET head only (FC00@ACBA, zero ext entries — single-
+          entry FRAG); raw ACA0 F820->ACBB (merged-neighbor zone ref, not counted); remainder ACF3-AD0C
+          (26w) stays dark; HYPOTHESIS.
+      - address: 0xAF16
+        name: ROUTINE_AF16
+        confidence: static_branch
+        note: >-
+          Bound AF16-AF3D (38w; exit RET FC00@AF3D byte-verified, exit scan clean; interior join B@AF37->
+          AF3A); entries 3x call F074@B3AE/B3DF/B42E->AF16 byte-verified (all target head+2, not AF14) +
+          post-RET at AF14 (FC00@AF13); 2w orphan stub AF14-AF15 (post-RET, zero entries) stays dark — split-
+          head, bound not extended; interior call@AF14->059A; remainder AF3E-AF56 (25w) stays dark;
+          HYPOTHESIS.
+      - address: 0xB0E8
+        name: FRAG_B0E8
+        confidence: static_branch
+        note: >-
+          Bound B0E8-B0F4 (13w; exit RET FC00@B0F4 byte-verified, exit scan clean); entries bc F820@B0E2->
+          B0E8 byte-verified (head) + B F073@B0E6->B0F0 mid-span (bytes verify B0E6 = F073, not F820 —
+          WORKLOG falsification upheld) + raw F845@B0CD/F820@B0D4->B0F0 + F820@B0E2 (merged-neighbor zone);
+          interior calld F274@B0F0->A2B9 (feeds ROUTINE_A2B9); head reached by fall-through + branch (weak-
+          head flag, single span kept); HYPOTHESIS.
+      - address: 0xB39E
+        name: ROUTINE_B39E
+        confidence: static_branch
+        note: >-
+          Bound B39E-B3B0 (25w; exit RET FC00@B3B0 byte-verified, exit scan clean); entries 2x call F074@
+          B446/B45E->B39E byte-verified head-exact + post-RET head (FC00@B39D); interior out-calls call@B3A4->
+          AEEC + call@B3A6->A4BA (feeds ROUTINE_A4BA) + call@B3AE->AF16 (feeds ROUTINE_AF16); remainder B3B1-
+          B3E1 (49w) unscanned post-RET head; HYPOTHESIS.
+      - address: 0xB4A8
+        name: ROUTINE_B4A8
+        confidence: static_branch
+        note: >-
+          Bound B4A8-B4F7 (80w; exit RET FC00@B4F7 byte-verified; interior join B@B4DD->B4E1; exit scan
+          otherwise clean); entries 5x head-exact byte-verified: F074@2011/45AF/5444/B655 + CC F945@B534->
+          B4A8 + post-RET head (FC00@B4A7); interior out-calls call@B4A8->06B2 + calld@B4E2->4055 + calld@
+          B4E6->4007; HYPOTHESIS.
+      - address: 0xB5FF
+        name: FRAG_B5FF
+        confidence: static_branch
+        note: >-
+          Bound B5FF-B604 (10w; exit RET FC00@B604 byte-verified, exit scan clean); post-RET head only
+          (FC00@B5FE, zero ext refs); interior out-call call@B602->06B4; raw B5B9 F845->B5FF (merged zone);
+          remainder FRAG_B605 + dark tail B61F-B633; HYPOTHESIS.
+      - address: 0xB605
+        name: FRAG_B605
+        confidence: static_branch
+        note: >-
+          Bound B605-B61E (26w; exit RET FC00@B61E byte-verified, exit scan clean); post-RET head (FC00@B604);
+          no ext refs; no interior calls; tail B61F-B633 (21w) stays dark; HYPOTHESIS.
+      - address: 0xBAC2
+        name: ROUTINE_BAC2
+        confidence: static_branch
+        note: >-
+          Bound BAC2-BADA (25w; exit RETD FE00@BAD8 + delays BAD9-BADA (7313 054A) included per wave-1
+          convention; exit scan otherwise clean; BADB+ stays dark — exterior call target, unentered); entries calld
+          F274@A877->BAC2 byte-verified (targets head+2) + post-RET at BAC0 (FE00@BAC0); 2w orphan BAC0-BAC1
+          (7315 0243, zero entries) stays dark — split-head; interior call@BAC2->06A6; raw A794/A9C6 FB20->
+          BAC2 (FCALLD, non-entries per rule); HYPOTHESIS.
+      - address: 0xBCAC
+        name: FRAG_BCAC
+        confidence: static_branch
+        note: >-
+          Bound BCAC-BCB9 (14w; exit RET FC00@BCB9 byte-verified, exit scan clean); post-RET head only
+          (FC00@BCAB, zero ext refs — thin entry); interior F072@BCAD->BCB8 (rptb per objdump, fall-through,
+          F072 class closed wave-5); remainder BCBA-BCC7 (14w) stays dark; HYPOTHESIS.
+      - address: 0xC556
+        name: FRAG_C556
+        confidence: static_branch
+        note: >-
+          Bound C556-C575 (32w; exit RET FC00@C575 byte-verified, exit scan clean); post-RET head only
+          (FC00@C555, zero ext refs); head RPTB-form 7716 0008 / F272 C574; remainder C576-C5C2 (77w) stays
+          dark; HYPOTHESIS.
+      - address: 0xC67F
+        name: FRAG_C67F
+        confidence: static_branch
+        note: >-
+          Bound C67F-C6B1 (55w; exit RET FC00@C6B1 byte-verified, exit scan clean); post-RET head only
+          (FC00@C67E); full coverage with sibling FRAG_C6B2, no remainder; HYPOTHESIS.
+      - address: 0xC6B2
+        name: FRAG_C6B2
+        confidence: static_branch
+        note: >-
+          Bound C6B2-C716 (69w; exit RET FC00@C716 byte-verified, exit scan clean); post-RET head (FC00@C6B1
+          = FRAG_C67F exit); no ext refs, no joins, no interior calls; full coverage, no remainder;
+          HYPOTHESIS.
+      - address: 0xCED6
+        name: ROUTINE_CED6
+        confidence: static_branch
+        note: >-
+          Bound CED6-CF00 (43w; exit retd FE00@CEFE + architectural delays CEFF-CF00 included per wave-1
+          convention; exit scan otherwise clean); entries call F074@D1D4->CED6 byte-verified head-exact
+          (call-only entry, pre-word E512 not post-RET); no interior joins; remainder CF01-CF24 (36w) stays
+          dark; HYPOTHESIS.
+      - address: 0xCFAE
+        name: FRAG_CFAE
+        confidence: static_branch
+        note: >-
+          Bound CFAE-CFBC (15w; exit RET FC00@CFBC byte-verified, exit scan clean); post-RET head only
+          (FC00@CFAD); no joins; HYPOTHESIS.
+      - address: 0xD95F
+        name: ROUTINE_D95F
+        confidence: static_branch
+        note: >-
+          Bound D95F-D96F (17w; exit retd FE00@D96D + delays D96E-D96F included per convention; exit scan
+          clean); entries 2x calld F274@D91B/D953->D95F byte-verified head-exact + post-RET head (FC00@D95E,
+          head RPTB-form E900/F272 D965); HYPOTHESIS.
+      - address: 0xDA21
+        name: FRAG_DA21
+        confidence: static_branch
+        note: >-
+          Bound DA21-DA31 (25w; exit retd FE00@DA2F + delays DA30-DA31 included per convention; exit scan
+          clean); post-RET head only (FE00@DA20, zero ext refs); remainder DA32-DA47 (24w) stays dark;
+          HYPOTHESIS.
+      - address: 0xDA7E
+        name: FRAG_DA7E
+        confidence: static_branch
+        note: >-
+          Bound DA7E-DAC8 (75w; exit retd FE00@DAC6 + delays DAC7-DAC8 included per convention; 2x interior
+          F273 joins DA86->DA8A + DAAD->DAB3; exit scan otherwise clean); post-RET head only (FE00@DA7D,
+          zero ext refs); raw DA77 F820->DA80 (merged DA48-DA7D zone); remainder DAC9-DAFC (54w) stays dark;
+          HYPOTHESIS.
+      - address: 0xDB3E
+        name: ROUTINE_DB3E
+        confidence: static_branch
+        note: >-
+          Bound DB3E-DB49 (12w; exit RET FC00@DB49 byte-verified, exit scan clean); entries 3x calld F274@
+          D776/DDD2/DEF8->DB3E byte-verified head-exact + post-RET head (FC00@DB3D); HYPOTHESIS.
+      - address: 0xDB81
+        name: ROUTINE_DB81
+        confidence: static_branch
+        note: >-
+          Bound DB81-DB8B (11w; exit retd FE00@DB89 + delays DB8A-DB8B included per convention; exit scan
+          clean); entries call F074@D4C4 + calld F274@D519->DB81 byte-verified (both head+2) + post-RET at
+          DB7F (FC00@DB7E); 2w orphan DB7F-DB80 (FD30 825B, zero entries) stays dark — split-head; HYPOTHESIS.
+      - address: 0xDC18
+        name: ROUTINE_DC18
+        confidence: static_branch
+        note: >-
+          Bound DC18-DC2D (22w; exit RET FC00@DC2D byte-verified, exit scan clean); entries 2x calld F274@
+          D67D/D782->DC18 byte-verified head-exact (D67D inside ROUTINE_D667 draft — sibling edge, noted);
+          call-only entry (pre-word 941F not post-RET); HYPOTHESIS.
+      - address: 0xDCE6
+        name: FRAG_DCE6
+        confidence: static_branch
+        note: >-
+          Bound DCE6-DD39 (88w; exit retd FE00@DD37 + delays DD38-DD39 absorbed (1AF8 0C4E); exit scan clean);
+          post-RET head only (FE00@DCE5, zero ext refs); interior out-calls calld@DCF1->DBC3 + calld@DD01->
+          DBD4 (targets 2w DBD4-DBD9 sliver) + calld@DD2B->DB76; HYPOTHESIS.
+      - address: 0xDD6D
+        name: FRAG_DD6D
+        confidence: static_branch
+        note: >-
+          Bound DD6D-DD76 (10w; exit retd FE00@DD74 + delays DD75-DD76 absorbed (F495 440B); exit scan clean);
+          post-RET head only (FC00@DD6C, zero ext refs); HYPOTHESIS.
+      - address: 0xDEC6
+        name: FRAG_DEC6
+        confidence: static_branch
+        note: >-
+          Bound DEC6-DF08 (67w; exit RET FC00@DF08 byte-verified, exit scan clean); post-RET head only
+          (FE00@DEC5, zero ext refs); interior 5x calld DEE2/DEE8->E526 + DEF8->DB3E + DEFE/DF04->E4CB;
+          discounted false entry FF1D F070->DEFF (target = operand word of interior F274@DEFE — mid-
+          instruction, headless/datalike, not an entry); HYPOTHESIS.
+      - address: 0xE0A2
+        name: ROUTINE_E0A2
+        confidence: static_branch
+        note: >-
+          Bound E0A2-E0B4 (27w; exit retd FE00@E0B2 + delays E0B3-E0B4 (B04D B4AF) included per convention;
+          exit scan clean); entries 2x calld F274@E1FB/E20C->E0A2 byte-verified head-exact (call-only entry,
+          pre-word F76F not post-RET); remainder E0B5-E0EC (56w) stays dark; HYPOTHESIS.
+      - address: 0xE50B
+        name: ROUTINE_E50B
+        confidence: static_branch
+        note: >-
+          Bound E50B-E525 (27w; exit RET FC00@E525 byte-verified, exit scan clean); entries 2x calld F274@
+          DDA0/DDA6->E50B byte-verified head-exact (call-only entry, pre-word ED00 not post-RET); HYPOTHESIS.
+      - address: 0x6596
+        name: FRAG_6596
+        confidence: static_branch
+        note: >-
+          Bound 6596-65A4 (15w; exit B F073@65A3->65AA + operand 65A4 — branch-tailed into FRAG_65AA
+          head; exit scan otherwise clean); entry bc F84E@6587->6596 byte-verified (from FRAG_64F4); interior
+          conds ->65AA/65B1; tail 65A5-65A9 (5w) stays dark (branch-entered but sub-threshold, no draft);
+          HYPOTHESIS.
+      - address: 0x6679
+        name: FRAG_6679
+        confidence: static_branch
+        note: >-
+          Bound 6679-6692 (26w; exit B F073@6691->676A + operand 6692 — branch-tailed forward into
+          BRANCH_TAIL_676A head; exterior-to-draft edge noted); entry bc F820@6605->6679 byte-verified (from
+          FRAG_65EE); interior calld F274@6681->6976 + call F074@668B->697F + calld@668D->6987 (out-calls into
+          dark/697F zone) + cond ->6693 + raw F846@6688->676A; tail 6693-66CA (56w) stays dark (no exterior
+          refs); HYPOTHESIS.
+      - address: 0x6AE9
+        name: FRAG_6AE9
+        confidence: static_branch
+        note: >-
+          Bound 6AE9-6B25 (61w; NO own exit: exit scan clean of RET/FE00/BD/BACC/F073 — falls into SPANHEAD_
+          6B26, tail-frag abut like FRAG_6753; interior join B F073@6B13->6B22); entries branch-only: bc F820@
+          6AD9->6AE9 head + F84D@6A5C/F830@6A60/F820@6A9E/F845@6AB9/F84A@6ABF->6AF9 mid + F830@6AE1/F073@6AE7->
+          6AF9 + interior out-call F074@6B22->712D (into ROUTINE_712D); HYPOTHESIS.
+      - address: 0x72E3
+        name: ROUTINE_72E3
+        confidence: static_branch
+        note: >-
+          Bound 72E3-730E (44w; exit RET FC00@730E byte-verified, exit scan clean); entries cc F946@71FC->
+          72E3 byte-verified (cond call, A815/A91C precedent) + post-RET head (FC00@72E2); interior rptb
+          F072@72F9->730C + F842 conds; HYPOTHESIS.
+      - address: 0x795D
+        name: ROUTINE_795D
+        confidence: static_branch
+        note: >-
+          Bound 795D-7966 (26w; exit retd FE00@7964 + delays E58E/E765 7965-7966 included per convention;
+          exit scan clean); entries call F074@7946 + calld F274@7948/794D/7953->795D byte-verified + post-RET
+          head (FC00@795C); HYPOTHESIS.
+      - address: 0x7A5B
+        name: FRAG_7A5B
+        confidence: static_branch
+        note: >-
+          Bound 7A5B-7AB0 (85w; exit BD F273@7AAC->7AB1 + operand/delays 7AAD-7AAF, end pc+3; FRAG_7AB1 head at
+          7AB1, tail-1w 7AB0 absorbed — branches @7A5D/7A60->7AB0 interior-ized; exit scan otherwise clean);
+          entries branch-only from FRAG_7A4B span: bc F84C@7A34->7A62 + F820@7A39->7A5F head + F830@7A4E/7A53->
+          7A5B; interior joins F073@7A5D/7A60->7AB0 + F073@7A8E/7AA0->7AA8 + conds FA20@7A64->7AB0/F844@7A69->
+          7AA8/F820@7A6F->7AA2/F830@7A74/7A79/7A89->7A90/F844@7A8C->7A8E/F844@7A9E->7AA0; HYPOTHESIS.
+      - address: 0x7BF8
+        name: FRAG_7BF8
+        confidence: static_branch
+        note: >-
+          Bound 7BF8-7C02 (11w; exit RET FC00@7C02 byte-verified, exit scan clean); entries post-RET head
+          (FC00@7BF7 = ROUTINE_7B72 exit) + bc F842@7BC9->7BFD byte-verified (from PORT_PROGRAMMER_7AE5);
+          big tail 7C03+ covered by upgraded SUB84_7C03 head-fill; HYPOTHESIS.
+      - address: 0x7FDC
+        name: ROUTINE_7FDC
+        confidence: static_branch
+        note: >-
+          Bound 7FDC-7FF3 (24w; exit RET FC00@7FF3 byte-verified, exit scan clean); entries calld F274@4C19/
+          4D60->7FDC byte-verified (CODE) + calld@8056/80EE->7FDC (upgraded to CODE — sources inside FRAG_
+          802D/FRAG_80A3 drafts, now written) + post-RET head (FC00@7FDB); HYPOTHESIS.
+      - address: 0x802D
+        name: FRAG_802D
+        confidence: static_branch
+        note: >-
+          Bound 802D-807E (82w; exit RET FC00@807E byte-verified; interior join BD F273@8034->804D; exit scan
+          otherwise clean); entries branch-only: bc F830@7C92->8038 + F844@7FF8->805A + bc F830@801D/8022/
+          8027->802D head + B F073@802B->802F (SUB_7FF4 tail); interior CC F945@8041->4590 + out-calls calld@
+          8056->7FDC/807F + calld@7EB3/7FC6/7C9E + call@059E; HYPOTHESIS.
+      - address: 0x80A3
+        name: FRAG_80A3
+        confidence: static_branch
+        note: >-
+          Bound 80A3-80F2 (80w; exit RET FC00@80F2 byte-verified, exit scan clean); entry bc F830@7C96->80A3
+          byte-verified (branch-led, hence FRAG despite F074 head idiom); head F074 059E; interior 4 calls
+          ->80F3 (@80AF/80B1 F074/F274 + @80CC/80CE — feed upgraded LEAF9_80F3 head-fill) + CC->4590 + call->
+          7FDC; pre-word 8183 not post-RET (entry is branch-based); HYPOTHESIS.
+      - address: 0x8433
+        name: FRAG_8433
+        confidence: static_branch
+        note: >-
+          Bound 8433-8448 (22w; exit RET FC00@8448 byte-verified, exit scan clean); entries branch-only bc
+          F820@841E/8423->8436 + F820@8428->8433 head + B F073@8431->843A; interior rptb F072@8442->8447;
+          pre-word 843A (mid-span branch target, entry is branch-based); HYPOTHESIS.
+      - address: 0x86CF
+        name: ROUTINE_86CF
+        confidence: static_branch
+        note: >-
+          Bound 86CF-86E2 (20w; exit RET FC00@86E2 byte-verified, exit scan clean); entries call F074@86A2/
+          86B6->86CF byte-verified (in SUB_867E — corroborates its inner-call note) + post-RET head (FC00@
+          86CE); head RPTZ-form F071 004B; HYPOTHESIS.
+      - address: 0x8775
+        name: ROUTINE_8775
+        confidence: static_branch
+        note: >-
+          Bound 8775-877C (8w; exit RET FC00@877C byte-verified, exit scan clean); entries 3x calld F274@
+          8761/8766/876B->8775 byte-verified (call-only entry, pre-word F7B8 not post-RET); head rptb F072@
+          8775->877B; HYPOTHESIS.
+      - address: 0x87EB
+        name: ROUTINE_87EB
+        confidence: static_branch
+        note: >-
+          Bound 87EB-8812 (40w; exit RET FC00@8812 byte-verified, exit scan clean); entries calld F274@86B8->
+          87EB byte-verified (in SUB_867E — corroborates its CALLD note, targets head+2) + post-RET at 87E9
+          (FE00@87E8 = ROUTINE_87D3 retd); 2w orphan 87E9-87EA (F48F F623 retd delays, zero entries) stays
+          dark — split-head; interior rptbd F272@87FA->8810; discounted phantoms FBB6@DCC9/FBA6@DD95->8812
+          (DROM table payloads, not branches); HYPOTHESIS.
+      - address: 0x88B9
+        name: FRAG_88B9
+        confidence: static_branch
+        note: >-
+          Bound 88B9-88D9 (33w; exit B F073@88D8->88AD + operand 88D9 — branch-tailed into HEAD_8854 zone;
+          exit scan otherwise clean); post-RET head only (FC00@88B8, zero exterior refs — thin entry); head
+          7714 09C8; interior out-calls calld@88BB->86FB + call@88C9->89C4; tail 88DA+ drafted below (mid-
+          entered FRAG_88DA); HYPOTHESIS.
+      - address: 0x88DA
+        name: FRAG_88DA
+        confidence: static_branch
+        note: >-
+          Bound 88DA-8906 (45w; exit B F073@8905->88AD + operand 8906 — branch-tailed into bounded zone;
+          exit scan otherwise clean); entry B F073@8954->891C byte-verified mid-span (from FRAG_8936 —
+          head 88DA unentered, mid-entry flag); interior out-calls calld@88E5->86FB + call@8903->89C4 +
+          rptb; sub-tail 8907-8935 (29w) stays dark; HYPOTHESIS.
+      - address: 0x8A3A
+        name: ROUTINE_8A3A
+        confidence: static_branch
+        note: >-
+          Bound 8A3A-8A44 (19w; exit retd FE00@8A42 + delays F0FF/0783 8A43-8A44 included per convention
+          (unusual delay words, flagged); exit scan clean); entries 4x calld F274@8A14/8A1C/8A22/8A28->8A3A
+          byte-verified + post-RET head (FC00@8A39); interior rptbd F272@8A3C->8A41; abuts ROUTINE_8A45
+          (starts 8A45); HYPOTHESIS.
+      - address: 0x8A45
+        name: ROUTINE_8A45
+        confidence: static_branch
+        note: >-
+          Bound 8A45-8A53 (15w; exit RET FC00@8A53 byte-verified, exit scan clean); entries call F074@8650->
+          8A45 byte-verified (from MSG_BUILDER_864E) + post-RET at 8A43 (retd delays of ROUTINE_8A3A);
+          HYPOTHESIS.
+      - address: 0x8AA5
+        name: ROUTINE_8AA5
+        confidence: static_branch
+        note: >-
+          Bound 8AA5-8AC8 (40w; exit BD F273@8AC6->8ACE + operand 8AC7, second delay slot spills onto
+          BLOCK_8AC9 head 8AC9 (shared word, coverage-merged, no separate claim); exit scan otherwise
+          clean); entries call F074@8A68->8AA5 byte-verified + post-RET head (FC00@8AA4); interior FA4F@8AA9->
+          8AB0 + FA4D@8AB5->8ACA (outside, cond) + rptb + FA4E@8ABE->8AC6; HYPOTHESIS.
+      - address: 0x8B03
+        name: ROUTINE_8B03
+        confidence: static_branch
+        note: >-
+          Bound 8B03-8B2F (45w; exit RET FC00@8B2F byte-verified, exit scan clean); entries call F074@8A6B->
+          8B03 byte-verified + post-RET head (FC00@8B02); interior rptbd F272@8B20->8B25; HYPOTHESIS.
+      - address: 0x8DDB
+        name: ROUTINE_8DDB
+        confidence: static_branch
+        note: >-
+          Bound 8DDB-8E04 (42w; exit RET FC00@8E04 byte-verified, exit scan clean); entries call F074@8D46->
+          8DDB head byte-verified + 3x calld F274@8D62/8D80/8D99->8DDC mid-span + post-RET head (FC00@8DDA);
+          interior rptbd F272@8DE5->8E02; HYPOTHESIS.
+      - address: 0x8F7A
+        name: ROUTINE_8F7A
+        confidence: static_branch
+        note: >-
+          Bound 8F7A-8F96 (29w; exit RET FC00@8F96 byte-verified, exit scan clean); entries 8x calld F274@
+          8B4B/8B62/8B7C/8B91/8D3C/8D59/8D77/8D90->8F7A byte-verified + post-RET head (FC00@8F79); interior
+          joins BD@8F89/8F8D->8F92 + rptbd; tail ROUTINE_8F97 + 2w sub-tail; HYPOTHESIS.
+      - address: 0x8F97
+        name: ROUTINE_8F97
+        confidence: static_branch
+        note: >-
+          Bound 8F97-8FAD (23w; exit retd FE00@8FAB + delays 7691/FFFF 8FAC-8FAD included per convention;
+          exit scan clean); entries call F074@8645->8F97 byte-verified (from MSG_BUILDER_8641) + post-RET
+          head (FC00@8F96 = ROUTINE_8F7A exit); HYPOTHESIS.
+      - address: 0x929E
+        name: FRAG_929E
+        confidence: static_branch
+        note: >-
+          Bound 929E-92BA (29w; exit RET FC00@92BA byte-verified, exit scan clean); post-RET head only
+          (FC00@929D, zero exterior refs — thin entry); head F074 0594; interior out-calls ->9217/9071x2/
+          9315/0594; tail 92BB-92F3 (57w) stays dark; HYPOTHESIS.
+      - address: 0x955F
+        name: FRAG_955F
+        confidence: static_branch
+        note: >-
+          Bound 955F-956D (15w; exit BD F273@956A->9667 + operand/delays 956B-956D, end pc+3 (9667 = FRAG_
+          9667 head); exit scan clean); entries bc F84D@9557->955F byte-verified (from FRAG_953C) + pre-word
+          95A2 (FRAG_95A2 exit word — not post-RET, entry is branch-based); HYPOTHESIS.
+      - address: 0x9591
+        name: FRAG_9591
+        confidence: static_branch
+        note: >-
+          Bound 9591-95A1 (17w; exit BD F273@959E->9667 + operand/delays 959F-95A1, end pc+3; exit scan clean);
+          entries bc F84B@9575->9591 + bc F830@958D->959D mid-span byte-verified (both in FRAG_955E); pre-word
+          95A2 not post-RET (branch-based entry); HYPOTHESIS.
+      - address: 0x9BF8
+        name: FRAG_9BF8
+        confidence: static_branch
+        note: >-
+          Bound 9BF8-9C12 (27w; exit B F073@9C11->9C15 + operand 9C12 — branch-tailed into FRAG_9C13 zone;
+          exit scan otherwise clean); entries bc F845@9BF1->9BF8 byte-verified (from FRAG_9BC3, head) +
+          pre-word 9C15 (FRAG_9C13 zone word — not post-RET, entry is branch-based); interior cond F845@
+          9BFB->9C15 + BD-join F273@9C03->9C0C + cond F844@9C0E->9C13; 3w micro-stub 9BF5-9BF7 (entry F845@
+          9BED, sub-threshold) stays dark; HYPOTHESIS.
+      - address: 0x9C8F
+        name: ROUTINE_9C8F
+        confidence: static_branch
+        note: >-
+          Bound 9C8F-9C98 (10w; exit RET FC00@9C98 byte-verified, exit scan clean); entries call F074@9C89->
+          9C8F byte-verified (from WRAP_9C61 span 9C61-9C8E — exterior, pre-head) + pre-word FFFF (not post-
+          RET, call-based entry); tail 9C99+ parent-claimed (CHAIN_HEAD_9C99 note: lane 9C99-9CCE, exit F073@
+          9CCD->9CE7, entries F074@9DD4 + CC@9EC8 — confirming evidence, no separate draft); HYPOTHESIS.
+      - address: 0x9D16
+        name: FRAG_9D16
+        confidence: static_branch
+        note: >-
+          Bound 9D16-9D2C (23w; exit retd FE00@9D2A + delays F2C4/1C86 9D2B-9D2C included per convention;
+          exit scan clean); post-RET head only (FC00@9D15, zero exterior refs — thin entry, no interior
+          calls/branches at all, Fxxx density 12/21 all 1-word ops); tail 2w absorbed; HYPOTHESIS.
