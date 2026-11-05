@@ -2,6 +2,24 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-05 — night-one span survey: 13.5% bounded (was 5.3%)
+
+- 9 span teams + critic + follow-up + synthesis (workflow); 46 new
+  symbols, all entry/RET pairs re-verified against image bytes
+  (47th claim, 0x4348 FC00 exit, falsified and corrected to RETD
+  0x434C). 163 symbols total, YAML valid, `make test` 6 pass.
+- Coverage metric: bounded routine/table words over 0x2800-0xFFFF
+  (57,856). Now 7,810 words = 13.5%. 50% needs ~28.9K.
+- Landed: A-cluster message setup (A482/A4DE 11 callers/B3B1 12
+  callers), audio pair A7B7/A7EB, RF_MEAS B461, span-8674 dozen
+  (superblock 8C0A len 465), B/C-series workers (FIR B743, BA32,
+  BCC8, B6E6, BCFC, BF8C, C5F9, C717, BE22, BBEF), 3460-39A4
+  dispatch band, 40BC-44A5 port/arith band, 4660 poster-loop head,
+  51D8 dispatch head. Roles stay HYPOTHESIS; bounds first-RET.
+- Open: all-paths exits, role proofs, 0x0590 slot contents,
+  0x2F61/0x2F62 feeder writer, 0x3EBD FIR taps (claim disproved
+  there), 43EA/44BD-class entry via 4433 cala table.
+
 ## 2026-11-05 — repo published; memory-map terms fixed; RF topology in
 
 - Repo live: `djr-747/nokia-rom6-decomp-preservation`, baseline commit

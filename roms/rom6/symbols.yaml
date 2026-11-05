@@ -874,3 +874,287 @@ spaces:
         note: >-
           First 0x0857 reader: entry 7714 0857 STM #2135 AR4 (verified) + TMPYU *AR4+ SFTA -12 streams to
           0x04CD-0x04D1; CALL 0xB461; RET FC00 @0xB5FE (gap 24).
+      - address: 0xA482
+        name: MSG_SETUP_A
+        confidence: static_branch
+        note: >-
+          Entry F074 0656 10F8 262C FC45 11F8; first-RET FC00 @0xA4B9 (len 56); 7 callers A27D A281 B059 B0CB
+          B163 B2D4 B34D; body calls 0x656/0x3986/calld-AB82; role HYPOTHESIS.
+      - address: 0xA4D5
+        name: MSG_SETUP_B
+        confidence: static_branch
+        note: >-
+          Entry F074 0658 7712 262B 1082 FC45; first-RET @0xA4DD (len 9); 5 callers B18A B1F5 B227 B276 B310;
+          body calls 0x658/0x4944; HYPOTHESIS leaf.
+      - address: 0xA4DE
+        name: MSG_SETUP_C
+        confidence: static_branch
+        note: >-
+          Entry F074 0658 7713 262F 1183 7083; first-RET @0xA514 (len 55); 11 callers A27B A28F AFCA B057 B084
+          B0C9 B138 B161 B188 B2D2 B34B; body calls 0x658/0x463B/calld-ABD2; hottest in cluster; HYPOTHESIS.
+      - address: 0xA5E1
+        name: MEAS_SETUP_A
+        confidence: static_branch
+        note: >-
+          Entry F074 065A 61F8 2628 0200 FC20; first-RET @0xA5F1 (len 17); 5 callers AFD7 B032 B03E B0AB B34F;
+          body calls 0x65A/0x3D79; distinct 0x65A primitive vs 0x656/0x658 message group; HYPOTHESIS.
+      - address: 0xA679
+        name: MEAS_SETUP_B
+        confidence: static_branch
+        note: >-
+          Entry F074 065C 10F8 262E FC45 E901; first-RET @0xA6AD (len 53); 3 callers B0A9 B1B2 B351; body
+          calls 0x65C/0x4BA8/0x65E/AB2C/0xBA56/0xB750; HYPOTHESIS measurement setup.
+      - address: 0xA7B7
+        name: AUDIO_A
+        confidence: static_branch
+        note: >-
+          Entry F074 0660 F074 3EE1 60F8 250F; first-RET @0xA7EA (len 52); objdump call 0x660 + call 0x3EE1; 8
+          callers AFF4 B0B8 B1E8 B21A B269 B303 B341 B353; HYPOTHESIS audio codec path A.
+      - address: 0xA7EB
+        name: AUDIO_B
+        confidence: static_branch
+        note: >-
+          Entry F074 0660 61F8 2628 0100 7712; first-RET @0xA805 (len 27); 8 callers AFF6 B0BA B1EA B21C B26B
+          B305 B343 B355; body calls 0x660/0x9E85; FB30 branch excluded; HYPOTHESIS audio path B.
+      - address: 0xAB82
+        name: SHARED_WORKER_596
+        confidence: static_branch
+        note: >-
+          Entry F074 0596 4A12 7712 0013 60F8; first-RET @0xABD1 (len 80); objdump call 0x596 + cmpm
+          *(0x250F)/*(0x34BF); 3 callers A3ED A47F A4B4-calld; HYPOTHESIS audio/message shared worker.
+      - address: 0xAEEC
+        name: REGFIELD_HELPER
+        confidence: static_branch
+        note: >-
+          Entry 11F8 3490 ld *(0x3490),b; F330 0007 and #7; 81F8 0013 stl *(0x13) + rptb loop; zero F074/F274
+          in body; first-RET @0xAF13 (len 40); 3 callers B3A4 B3B9 B422; HYPOTHESIS regfield helper.
+      - address: 0xB358
+        name: DISPATCH_A
+        confidence: static_branch
+        note: >-
+          Entry F074 05A8 F074 A3D5 FC45 7712; first-RET @0xB39D (len 70); 5 callers B17D B1ED B21F B26E B30A;
+          body calls 0x5A8/A3D5/0x39A4; HYPOTHESIS dispatcher.
+      - address: 0xB3B1
+        name: DISPATCH_B
+        confidence: static_branch
+        note: >-
+          Entry F074 05A8 7715 B550 7716 B565; first-RET @0xB3E1 (len 49); objdump call 0x5A8 then calls
+          AEEC/AF40; 12 callers B1A8 B1CD B1E3 B1FC B20C B23D B2A0 B2D9 B2E5 B2F8 B328 B333 (hottest site);
+          HYPOTHESIS central dispatcher.
+      - address: 0xB461
+        name: RF_MEAS_B461
+        confidence: static_branch
+        note: >-
+          Entry F074 06B2 61F8 0007 0800 F7BB; first-RET @0xB4A7 (len 71); objdump call 0x6B2 + ssbx intm +
+          andm *(0x51E); 6 callers incl 45A6 53D5 B531 B5FC C875 C8C8 (cross-span); body calls
+          0x6B2/0x4055/0x4007; HYPOTHESIS RF/measurement; COBBA_WORKER at 0xB4F8 not re-mapped.
+      - address: 0x8675
+        name: SPAN_HEAD_8675
+        confidence: static_branch
+        note: >-
+          Span 0x8674 head: F074 0592 76F8 10FE 0017 E800 FE00 80F8; first-RET @0x86CE (len 90); caller 0x864B
+          (F074); inner calls 0x86CF/0x87EB/0x87D3; BITF *(0x051E); HYPOTHESIS dispatch.
+      - address: 0x86FB
+        name: SHARED_SUB_86FB
+        confidence: static_branch
+        note: >-
+          Entry F074 0590 F6B8 E735 F071 004B 8095 7715; first-RET @0x877C (len 130); 7 callers 8856 88BB 88E5
+          891E 8997 9D72 A7A2 (all F274 calld verified); inner 3x calld 0x8775; HYPOTHESIS shared subroutine.
+      - address: 0x8821
+        name: TABLE_ENGINE_8821
+        confidence: static_branch
+        note: >-
+          Entry F074 0592 E9FF 7712 119C 771A 000B F272; first-RET @0x88B8 (len 152); caller A76B; calls
+          0x86FB+0x86E3; STM x26/RPT x4; HYPOTHESIS table engine.
+      - address: 0x8A54
+        name: HELPER_GROUP_8A54
+        confidence: static_branch
+        note: >-
+          0612-prologue head F074 0612 4A07 4A12 F6BE F7B9 F7B6 ED00; first-RET @0x8AA4 (len 81); callers 9D79
+          A775 (F274); fans out 0x8AA5/0x8B03/0x8B30; HYPOTHESIS helper group.
+      - address: 0x8C0A
+        name: SUPERBLOCK_8C0A
+        confidence: static_branch
+        note: >-
+          0612-prologue head; first-RET @0x8DDA (len 465, longest in span); 2 callers 9CB8 A72C; 19 inner
+          F074/F274 sites incl 4x to 0x8F7A hub (8D3C/8D59/8D77/8D90) plus 0x8DDB/0x8DDC/0x8E05/0x8E88
+          (critic: hub-only phrasing falsified); HYPOTHESIS superblock.
+      - address: 0x8E05
+        name: DARAM_WORKER_8E05
+        confidence: static_branch
+        note: >-
+          Entry 7710 FFD8 7719 0000 E800 880E 771A 0027; first-RET @0x8E87 (len 131); 4 callers 8DAA 8DB2 8DBA
+          8DC2 (all F274); ports 1064/108C, mem 2F50/2F7D/3084/3221/323F; HYPOTHESIS.
+      - address: 0x9217
+        name: LATE_LEAF_9217
+        confidence: static_branch
+        note: >-
+          Entry F074 0594 7313 0060 7710 0009 7713 3218; first-RET @0x9232 (len 28); 6 callers 924E 926A 9283
+          92A0 92BD 92D9 (all F074); HYPOTHESIS late-stage leaf.
+      - address: 0x9315
+        name: SPAN_TAIL_9315
+        confidence: static_branch
+        note: >-
+          Entry F074 0594 7714 B405 E800 7710 0000 7711; first-RET @0x9330 (len 28); 6 callers 9260 927C 9295
+          92B2 92CF 92EB (all F074); span tail into 0x938C; HYPOTHESIS leaf.
+      - address: 0xB743
+        name: FIR_WORKER_B743
+        confidence: static_branch
+        note: >-
+          Entry F6B6 rsbx frct/ovm + rpt-mac + mvdd + call 0x6A6 + bitf 0x2B08/0x577; first-RET @0xB808 (len
+          198); 3 calld callers B87B B881 B942; tail call 0xBA32; HYPOTHESIS FIR worker.
+      - address: 0xBA32
+        name: DELAY_UPDATE_BA32
+        confidence: static_branch
+        note: >-
+          Entry E801 00F8 2AF1; pure RPTBD-MVDD delay shuffle, no subcalls; first-RET @0xBA55 (len 36); 2 F074
+          callers B740 B805 (B740 objdump-verified call 0xBA32).
+      - address: 0xBCC8
+        name: TABLE_INIT_BCC8
+        confidence: static_branch
+        note: >-
+          Entry F071 0007; RPTZ-zero 0x28B4/0x28AC/0x28E2 + consts 0x28A6=50/0x28A8=656; first-RET @0xBCFB
+          (len 52); 1 F074 caller B6E8; HYPOTHESIS table init.
+      - address: 0xB6E6
+        name: PARAM_BUILDER_B6E6
+        confidence: static_branch
+        note: >-
+          Entry F074 06AA + call 0xBCC8; param block AR2=0x2AF1 gated cmpm 0x2547/0x2546; tail call 0xBA32;
+          first-RET @0xB742 (len 93); 8 callers 53C5 53DF 5416 5428 547F 5498 B56B C8AA; HYPOTHESIS.
+      - address: 0xBCFC
+        name: FRAME_DISPATCH_BCFC
+        confidence: static_branch
+        note: >-
+          Entry F074 06DC; DP=98; staged calld C4E8/BF21/BFDE/C450/C471; first-RET @0xBE21 (len 294); 3 ccd
+          callers A6DB A8F3 AA0F; HYPOTHESIS frame dispatch.
+      - address: 0xBF8C
+        name: NORMALIZE_BF8C
+        confidence: static_branch
+        note: >-
+          Entry F074 06DE; exp/norm/sat + subc-divide + DP+0x41/0x42/0x43 scale; first-RET @0xBFA9 (len 30); 4
+          callers BD5D C057 C31F C49A-calld; HYPOTHESIS normalize/scale.
+      - address: 0xC5F9
+        name: CONFIG_DISPATCH_C5F9
+        confidence: static_branch
+        note: >-
+          Entry F074 0692; bitf gates 0x51C/0x2B08/0x577/0x2AEE; calls 0xC5D2 + ccd 0x696/0x69E; first-RET
+          @0xC65F (len 103); 3 F074 callers A6D6 A8EE AA05; HYPOTHESIS config dispatch.
+      - address: 0xC717
+        name: INIT_FILTER_C717
+        confidence: static_branch
+        note: >-
+          Entry F074 0694 + rptz-zero + cc-C7A4 + mvdk-init mac/delay/sat loop; first-RET @0xC7A2 (len 140);
+          11 callers 53C7 53E1 5418 542A 5446 5481 549A B50E B56D C8AC C8BA; HYPOTHESIS init filter worker.
+      - address: 0xBE22
+        name: BUTTERFLY_BE22
+        confidence: static_branch
+        note: >-
+          Entry F074 06DE; add/sub butterfly on 0x2F00-0x2F08 tables + norm/mpy; first-RET @0xBF20 (len 255);
+          callers BF23 BF7B-calld; HYPOTHESIS butterfly kernel.
+      - address: 0xBBEF
+        name: CORREL_INIT_BBEF
+        confidence: static_branch
+        note: >-
+          Entry F074 06AA + table-init + banz/calad + abdst-norm + subc; first-RET @0xBCAB (len 189); 3 F074
+          callers A77B A905 A983; HYPOTHESIS correl init worker.
+      - address: 0x3460
+        name: DISPATCH_CMP_3460
+        confidence: static_branch
+        note: >-
+          Entry F0F8/F030/00FF/8813 (sftl a,-8; and #255; stlm ar3) + cmpm *(0x250F),#34 + bc 3475/3480; fall-
+          through first-RET FC00 @0x34FF; no F074/F274 target; 0x345F is data word 0x00FF (operand of F130 at
+          0x345E), not an entry.
+      - address: 0x3500
+        name: ROUTINE_3500
+        confidence: static_branch
+        note: >-
+          Entry 6FF8/04FA/0C43 (ld *(0x4FA),3,a); interior target 0x350C (3x F074 callers 34EC/34EE/34F0);
+          fall-through first-RET FC00 @0x351C; HYPOTHESIS shared-tail.
+      - address: 0x35C5
+        name: LEAF_35C5
+        confidence: static_branch
+        note: >-
+          Entry 71DA/0578 post-RET; body calls 0x2E2F (F074 35B7/35C7) + 0x3640 (F074 35B5); first-RET FC00
+          @0x3608; HYPOTHESIS leaf.
+      - address: 0x3907
+        name: ROUTINE_3907
+        confidence: static_branch
+        note: >-
+          Entry F074/391F call; interior target 0x391F (entry F110/03CF sub #975; 2x F074 callers 3907/3913);
+          F273 390F/391B are bd branches excluded; first-RET FC00 @0x3937; HYPOTHESIS.
+      - address: 0x39A4
+        name: ROUTINE_PA60_57
+        confidence: static_branch
+        note: >-
+          Entry F074/0630 (objdump call 0x630; callers 2BE9-F074 + B399-F274); portw pa60 x4
+          (0x39A8/0x39AD/0x39CB/0x39D0) + pa57 x2 (0x39C0/0x39C5); first-RET FC00 @0x39EF; adjacent leaf
+          0x399F (andm *(0x263A) + RET 0x39A3); HYPOTHESIS pa60/57 stream.
+      - address: 0x40BC
+        name: MEMSCAN_SETUP
+        confidence: static_branch
+        note: >-
+          Entry F074 0602 61F8...; first-RET FC00 @0x4145 (bound 40BC-4145); 2 calld callers A36B A3B0; no
+          port ops; internal call 40DA->4146; HYPOTHESIS memscan setup.
+      - address: 0x4146
+        name: SWEEP_PROC_4146
+        confidence: static_branch
+        note: >-
+          Entry F074 0604; first-RET FC00 @0x4237 (bound 4146-4237); caller 40DA internal (objdump call);
+          internal calld 419C/41F8->422B shared tail; HYPOTHESIS sweep proc.
+      - address: 0x425F
+        name: ARITH_BLK_425F
+        confidence: static_branch
+        note: >-
+          Entry F074 0606; first-RET FC00 @0x42B7; 3 calld callers 51F4 5806 7227; internal calld 4255->2C88;
+          no port ops; HYPOTHESIS arith block.
+      - address: 0x4315
+        name: GAIN_MAP_4315
+        confidence: static_branch
+        note: >-
+          Entry F074 0606 + BITF 61F8 3EC8 0020 + 61F8 263B 0004; first-RET FC00 @0x4347; 2 callers 6BAC 756F;
+          internal bd 433F->4345; HYPOTHESIS gain map.
+      - address: 0x4348
+        name: DIV_STEP_4348
+        confidence: static_branch
+        note: >-
+          CORRECTED exit: entry F074 0606; RPT #14 + SUBC *AR4,A loop; exit RETD FE00 @0x434C with delay slot
+          (objdump retd), NOT FC00 -- synthesis FC00 claim falsified by byte check; bound 0x4348-0x434D; 7
+          callers 4E39 4FDF 50D0 7788 77A0 78DF 78FD; HYPOTHESIS divide step.
+      - address: 0x4384
+        name: DIV_CORE_4384
+        confidence: static_branch
+        note: >-
+          Entry F074 0606; RPTB + TDSUB divide-loop form; first-RET FC00 @0x43B9; 10 calld callers
+          5717...7274; no port ops; HYPOTHESIS divide core.
+      - address: 0x43EA
+        name: PORT35_DISPATCH
+        confidence: static_branch
+        note: >-
+          Entry F074 0594 7714...; first-RET FC00 @0x4432; zero F-refs (branch/table-entered HYPOTHESIS via
+          4433 cala-b table words 4439/4444/4453/4444/446D/4474); ports pa35 x3 + reada *(0xB) + F5E3 cala b;
+          HYPOTHESIS port-35 dispatch.
+      - address: 0x4474
+        name: PORT4_49_50_IO
+        confidence: static_branch
+        note: >-
+          Entry 69F8 13D0 0400 orm *(0x13D0); first-RET FC00 @0x44A5; zero F-refs; ports pa4/pa49/pa50 + BITF
+          61F8 13D0 0400 + call 4479->3EE1; entry mechanism unproven; HYPOTHESIS port io.
+      - address: 0x4660
+        name: POSTER_LOOP_HEAD
+        confidence: static_branch
+        note: >-
+          Entry 467C/E87C set DP/a, ssbx intm, sub *(0x0231) busy-wait with idle loop back to 0x4664 (F073
+          verified branch); sole FC00 in 0x4660-0x4838 is @0x4838; fall-through branches not all walked;
+          HYPOTHESIS loop head.
+      - address: 0x4858
+        name: SUM_RPTB_4858
+        confidence: static_branch
+        note: >-
+          Entry F074 059E + ldm ar5 + add #36 + add *ar2+ RPTB-4865 accumulation; first-RET FC00 @0x4882; 1
+          caller 0x467A via F074 (objdump call 0x4858 verified); HYPOTHESIS sum loop.
+      - address: 0x51D8
+        name: DISPATCH_HEAD_51D8
+        confidence: static_branch
+        note: >-
+          Entry F074 059C + bitf *(0x2F5C),#-256 + bcd 0x51E6; first-RET FC00 @0x520B; 1 caller 0x4BC9 via
+          F074; body calls 0x57FE/0x52C4/0x573B/0x520C/0x57A3; HYPOTHESIS dispatch head.
