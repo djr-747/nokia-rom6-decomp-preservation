@@ -72,6 +72,22 @@ All-paths upgrades on 10 longest routines (no redraft).
 Standing negatives: `0x2F61/0x2F62` writer, ROM FIR taps,
 `0x3EBD` (portw code), `0x56BD` (data block).
 
+## Night-three survey (leftovers + tails + tables, objdump-verified)
+
+7Cxx fanout/post-RET heads (14: `0x7C57` dispatcher w/ 059E,
+twins `0x82D4/0x82FF`, copy/XOR chains `0x8555-0x85E4` abutting
+`0x8611`); D-span caller-bearing routines (14 + 7 cap-overflow
+deferred); branch-only shared labels (`0x643E/0x644B`
+provisional, `0x7E88` 4 callers, `0x7F95` 8 callers tail-merged
+to `0x7F54`); C7A4 routine vs C7B1 noreturn negative; D3BE
+overlap ruled (5 routines + 4 shared tails); staged `0x2F61/0x2F62`
+writers in block06/09 (file-off namespace, VMA unmapped);
+cross-boundary closes (`0x5EF7/0x9459/0x978F/0xA6E2/0xA74C/
+0x9DD7/0x9F0A`); tables `0xAE6C/0xAEAD/0x4433+arms/0xE9EE/
+0xF000/0x56DE` (AED9 consumer still unproven, E9EE/F000 row
+widths open); all-paths upgrades on 14 routines (7 shrunk, 5
+head-rc, 2 confirmed).
+
 ## D→M (DSP reports)
 
 | code | layout | status | evidence |

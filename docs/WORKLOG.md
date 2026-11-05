@@ -2,6 +2,34 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-05 — night-three leftovers: 2F61 writer found, 7 bounds shrunk
+
+- 8 teams + critic + follow-up + synthesis; 53 new symbols (317
+  total), all entry/exit pairs re-verified (51/51 clean), YAML
+  valid, `make test` 6 pass.
+- `0x2F61/0x2F62` feeder hunt CLOSED at block level: block06
+  file-off 0x134 writes *(0x2F62)=0xFFFF (+C1BF/FFEE/FFF9,
+  zero-fill); block06 file-off 0x1F0 RMW path; block09 file-off
+  0x504 pointer + calld 0x0D6C (overlay-RAM callee, store
+  unverified). MCU-staged fill confirmed; DP-relative stores not
+  exhaustively excluded.
+- D3BE overlap RULED: no single D3BE-D5D5 routine (interior
+  true-called entries break it); span = 5 called routines + 4
+  forward-chained shared tails, all with own ret/retd.
+- C7A4+ RULED: C7A4-C7B0 is a boundable callerless routine;
+  C7B1-C850 is a bounded negative (zero FC00/FE00, noreturn
+  worker, exits to C878/C8F8/C8FE/283D).
+- All-paths upgrades on 14 routines: 7 spans shrunk (E674->E794
+  fbacc, E837->E854 fbacc, E583->E59C retd, 8675->867D retd,
+  86FB->872A retd, 8821->8853 bacc, E923->E9A0 fbacc), 5 kept with
+  new head-rc exits (A4D5/B358/D0BE/A4DE + B3B1/CFBD single-exit
+  confirmed).
+- 96BD RETE convention: first fall-through exit is RETE @9737
+  (F4EB objdump-verified); bound semantics open, symbol untouched.
+- Post-exit remainders (E795-E79C, E855-E8E3, E59D-E625,
+  E9A1-E9C7) and cap-overflow drafts (DB4A/DB8C/DC77/DD3A/DD77/
+  DD9B/DFCF + caller-less tails) deferred to night four.
+
 ## 2026-11-05 — night-two span survey: high region is code
 
 - 8 teams + critic + follow-up + synthesis; 101 new symbols after
