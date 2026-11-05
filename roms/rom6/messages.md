@@ -319,6 +319,16 @@ emits the `0x74/0x36` SIML-validation report named by the ARM
 docs (`{70 17}` → pass value 0): the first per-opcode
 SIMLOCK-path link closed end to end, ring word included.
 
+Family-`0x74` invoke census (block `STM AR4` + `STM AR5`
+pairs, static): block08 (runtime `0x926` scheduler) invokes
+`AR4=0x74` with `AR5 = 0x04 / 0x3E / 0x1A / 0x0C` (4 sites);
+block30 (runtime `0x0A00` image block) `0x74/0x10`; block20
+`0x74/0x36` (SIML validation, attributed). Whether AR5 is a
+length or the subtype byte is unresolved — the combined
+header word carries it either way, and only `0x36` is tied
+to a named ARM message. The `0x04/0x3E/0x1A/0x0C/0x10`
+invokes are unattributed `0x74`-family traffic.
+
 Stage-exit `0x77EE` zeroes report staging (`RPTZ` clears at
 `0x3AD0/0x3AD8/0x3AE0/0x37E0` after `CMPM *(0x250F),#34`),
 then `MVDK *(0x265D)→0x34BC/0x34BD`, `ST #9312→*(0x264A)`
