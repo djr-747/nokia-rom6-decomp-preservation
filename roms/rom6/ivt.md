@@ -6,12 +6,12 @@ Mask table: all slots are `RETF` stubs except reset. Source:
 ## Runtime table image
 
 `/tmp/setB/block23.bin` (manifest block0F: flash 3173396, dest
-`0x200`, len 140) is a full 26-slot IVT image. CAUTION: manifest
-`dest` is `0x200` (staging), not `0x0A00`; the "runs `0x0A00-0x0A68`"
-read in earlier notes assumes an installer copy (loader2 `@0xD80`
-does run-mode init incl. vectors, per emulator
-`docs/dsp-boot-upload-architecture.md` §6) that is not yet traced.
-Offets below are slot offsets; divide by 4 for the vector number.
+`0x200`, len 140) is a full 26-slot IVT image running at
+`0x0A00-0x0A68`. Manifest `dest` is relative: runtime address is
+`0x0800 + dest` (extractor docstring, verified: block00 dest
+`0x500` lands at `0x0D00`, exactly the loader's MVDP source).
+No installer copy is needed for placement. Offsets below are
+slot offsets; divide by 4 for the vector number.
 Head mirrors the mask table (reset + stubs, offsets `0x00-0x3F`).
 Populated slots use the 4-word hardware form
 `PSHM XPC / PSHM ST0 / FB handler`.
@@ -343,11 +343,11 @@ Clauses (offsets from entry, `program.be16`):
 
 ## Open
 
-1. Runtime IVT base per build. block23 stages at manifest dest
-   `0x200`; the `0x0A00` run claim needs its installer (loader2
-   `@0xD80` untraced). Other candidates: IPTR `0x0B` (base
-   `0x0580`, build unattributed); 5110/R4 `0x3204` reads as a
-   handler address, not a vector. Needs per-build installer trace.
+1. Runtime IVT base per build. 3310/R6 resolved: block23 dest
+   `0x200` runs at `0x0A00` (`0x0800 + dest` rule). Open for other
+   builds: IPTR `0x0B` (base `0x0580`, build unattributed);
+   5110/R4 `0x3204` reads as a handler address, not a vector.
+   Needs the same dest-rule check on their tables.
 2. `0x05xx` mini-kernel (`0x05DA/0x05DC/0x05E8/0x05F0/0x05F4/0x05F6`).
    Proven zero-filled in `program.be16` (verified all-zero
    `0x05C0-0x0610`): unobservable in-mask. Runtime source is the
