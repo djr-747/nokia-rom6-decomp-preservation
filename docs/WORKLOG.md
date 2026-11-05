@@ -2,6 +2,17 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-05 — table-bound batch: 72.4% bounded (was 65.8%)
+
+- Parent synthesis: AFD3-AFF8 rescued as bacc-table-arm frag
+  (AFB5-table slot 1 lists AFD3 — same entry class as B12F arms;
+  AFAB-table list corrected AFF3->AFD3 per image bytes); A25A/A25F/
+  A264 stubs byte-verified (F274 A2B9 + stm + FC00); TABLE_AFB5/
+  B129/B177 symbols; parseable Bound sentences on F000-FBFF (3072w),
+  E9EE-EB9D (432w), E9C8-E9D5, AE6C, AEAD, 4433, AF64, A249 head+table.
+  `make test` 6 pass; `make coverage` 40,034w = 72.4%. 15,262w dark
+  in 179 gaps (71 >=80w). Wave-3 = BACC/dispatcher-arm sweep.
+
 ## 2026-11-05 — second half wave-2: 65.8% bounded (was 60.4%)
 
 - 6 teams + critic + parent adjudication; 90 new symbols (605 total),
