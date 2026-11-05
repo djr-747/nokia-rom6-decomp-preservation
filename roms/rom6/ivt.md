@@ -5,24 +5,44 @@ Mask table: all slots are `RETF` stubs except reset. Source:
 
 ## Runtime table image
 
-`build/3310-v579/block23.bin` (manifest block0F, runs `0x0A00-0x0A68`)
-is a full 26-slot IVT image. Head mirrors the mask table (reset +
-stubs, offsets `0x00-0x3F`). Populated slots use the 4-word hardware
-form `PSHM XPC / PSHM ST0 / FB handler`. Offset `/4` = vector number.
+`/tmp/setB/block23.bin` (manifest block0F: flash 3173396, dest
+`0x200`, len 140) is a full 26-slot IVT image. CAUTION: manifest
+`dest` is `0x200` (staging), not `0x0A00`; the "runs `0x0A00-0x0A68`"
+read in earlier notes assumes an installer copy (loader2 `@0xD80`
+does run-mode init incl. vectors, per emulator
+`docs/dsp-boot-upload-architecture.md` §6) that is not yet traced.
+Offets below are slot offsets; divide by 4 for the vector number.
+Head mirrors the mask table (reset + stubs, offsets `0x00-0x3F`).
+Populated slots use the 4-word hardware form
+`PSHM XPC / PSHM ST0 / FB handler`.
 
 | vector | slot image | handler | note |
 |---|---|---|---|
-| V16 | `FB 0x22DA` | `0x22DA` | full context save; `CALL 0x05DA` first |
-| V17 | `FB 0x27CD` | `0x27CD` | shared ×3 |
-| V18 | `FB 0x27CD` | `0x27CD` | mask V18 instead runs resident `0x3598` |
-| V19 | `FB 0x05FA` | `0x05FA` | DARAM; no static source (open §4) |
-| V20 | `FB 0x25DF` | `0x25DF` | clears RSA/REA (repeat-safe ISR) |
-| V24 | `FB 0x27CD` | `0x27CD` | shared ×3 |
-| V25 | `FB 0x2B53` | `0x2B53` | polls HPI words `*(0x866/0x870)` |
+| V16 | `FB 0x22DA` | `0x22DA` | INT0 (verified, see line map) |
+| V17 | `FB 0x27CD` | `0x27CD` | INT1 (verified); shared ×3 with V18/V24 |
+| V18 | `FB 0x27CD` | `0x27CD` | INT2 by +n; boot-phase host path used resident `0x3598` instead |
+| V19 | `FB 0x05FA` | `0x05FA` | INT3 by +n; lands in the uploaded mini-kernel window (zeros in-mask) |
+| V20 | `FB 0x25DF` | `0x25DF` | INT4 by +n; clears RSA/REA (repeat-safe ISR) |
+| V21 | stub | — | INT5 by +n; unpopulated = line unused in this build |
+| V24 | `FB 0x27CD` | `0x27CD` | TINT0 per convention, unconfirmed |
+| V25 | `FB 0x2B53` | `0x2B53` | BRINT0 per convention, unconfirmed; polls HPI words `*(0x866/0x870)` |
 | rest | `RETF` stubs | — | no handler |
 
-Vector-to-line map (V16-21 = INT0-5, V24 = TINT0, V25 = BRINT0) follows
-SPRU131 convention. LEAD wiring unconfirmed.
+Line map, verified legs: mask `0xFFC0` is documented as the INT0
+vector (emulator `docs/5110-dsp-boot-sequence.md` §5: boot wedges
+there); `0xFFC0-0xFF80 = 0x40` = vector 16. Memory-model doc gives
+INT1 at `0xFFC4` (base `0xFF80`); `0xFFC4-0xFF80 = 0x44` =
+vector 17. So external INTn = vector 16+n on this silicon (not the
+textbook 6+n). V18-V20 follow by +n; V24/V25 names stay
+conventional. LEAD pin wiring (which physical line each INTn is)
+still unconfirmed.
+
+Run base per build, open: candidates are `0x0A00` (3310/R6 prior
+claim, installer untraced), `0x0580` (emulator IPTR `0x0B`
+observation, build unattributed), and the 5110/R4 `0x3204`
+observation which reads as a handler address, not a vector
+(`0x3204-0x40` is not a valid IPTR base, so it cannot be
+INT0/vector-16).
 
 ## Handler prologues (from `program.be16`, BE words)
 
@@ -323,9 +343,11 @@ Clauses (offsets from entry, `program.be16`):
 
 ## Open
 
-1. Runtime IVT base per build. 3310 image runs the table at `0x0A00`.
-   The emulator observed IPTR `0x0B` (base `0x0580`) on another
-   build. Both cannot hold for one image. Needs per-build check.
+1. Runtime IVT base per build. block23 stages at manifest dest
+   `0x200`; the `0x0A00` run claim needs its installer (loader2
+   `@0xD80` untraced). Other candidates: IPTR `0x0B` (base
+   `0x0580`, build unattributed); 5110/R4 `0x3204` reads as a
+   handler address, not a vector. Needs per-build installer trace.
 2. `0x05xx` mini-kernel (`0x05DA/0x05DC/0x05E8/0x05F0/0x05F4/0x05F6`).
    Proven zero-filled in `program.be16` (verified all-zero
    `0x05C0-0x0610`): unobservable in-mask. Runtime source is the
@@ -341,6 +363,8 @@ Clauses (offsets from entry, `program.be16`):
    bootcode with no DSP descriptor. Masked callers into the
    window are real: `0xC851` head is `CALL 0x5EA`. Only
    referrer of `0x05FA` is the vector image itself.
-3. Vector-to-line wiring (INT0-5, TINT, BRINT/BXINT) against LEAD.
+3. Vector-to-line wiring: INT0=V16 and INT1=V17 verified;
+   V18-V20 follow by +n; V24/V25 (TINT0/BRINT0) conventional only.
+   LEAD pin wiring still open.
 4. `0x2B53` continuation past the HPI prologue (RF vs audio edge).
 5. Callee bodies `0x05DA/0x05E8/0x05F4` (need `0x05xx` source first).
