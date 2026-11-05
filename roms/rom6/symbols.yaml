@@ -151,14 +151,26 @@ spaces:
         name: COBBA_WORKER
         confidence: static
         backing: code
-        note: 0x85D mode dispatch to 0x9F28/0x864E/0x9F35/0x8641 paths, lane split into 0x572/0x2AFE/0x2AFD/0x2B08 cells, INTM-locked 0x51E update. Tail open past 0xB57B.
+        note: >-
+          0x85D mode dispatch to 0x9F28/0x864E/0x9F35/0x8641 paths,
+          lane split into 0x572/0x2AFE/0x2AFD/0x2B08 cells,
+          INTM-locked 0x51E update. Tail closed - tune cells
+          0x4C3/0x4C4/0x4CD via bitfield extracts and MPYU scaling,
+          CALL 0x4007 RF write, epilogue RET at 0xB5FE.
         evidence:
           - roms/rom6/ivt.md
       - address: 0xC851
         name: STATE_WORKER
         confidence: static
         backing: code
-        note: Mini-kernel call, 0x20F4/0x51C flag setup, pa0 strobe, worker call, RET. Sibling entry at 0xC86C.
+        note: Mini-kernel call, 0x20F4/0x51C flag setup, pa0 strobe, worker call, RET at 0xC85C. Next routine starts at 0xC85D.
+      - address: 0xC85D
+        name: STATE_DISPATCH_WORKER
+        confidence: static
+        backing: code
+        note: BACC jump-table dispatch, pa1/pa2 transactions, pa54 poll, two CALL 0x4007, CALLD chain, RET at 0xC91B. Entry corrected from 0xC86C.
+        evidence:
+          - roms/rom6/ivt.md
         evidence:
           - roms/rom6/ivt.md
       - address: 0x2BA1

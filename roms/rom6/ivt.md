@@ -152,8 +152,26 @@ status poll, `B 0x283D` gate. pa1/pa56 handshake routine.
 `SUB *(0x2B08),a,b` → `0xB56F`, `LD *(0x2510)`,
 `AND #240`, `SUB #192` → `0xB56F` else `ST t,*(0x2B08)`,
 `CALL 0xB6E6`, `CALL 0xC717`, `BITF *(0x7),#0x800`,
-`SSBX INTM`, `ANDM #-8193,*(0x51E)` … (tail open past
-`0xB57B`).
+`SSBX INTM`, `ANDM #-8193,*(0x51E)` → `0xB57B`, else
+`ORM #8192,*(0x51E)`; pa0 strobe (`PORTR`, `OR #12`,
+`PORTW`, RPT #20); `BITF *(0x51E),#8192` → `0xB58C`;
+`RSBX INTM`; `LDU *(0x854)`, `SFTL -12`;
+`CMPM *(0xB),#9` → `0xB5A1`, `AND #4095` → `*(0x58D)`;
+`CMPM *(0x125C),#0` → `0xB5B1`; `AND #3855`,
+`OR *(0x125E)`; `CMPM *(0xB),#8` → `0xB5B1`;
+`BITF *(0x4C2),#15` → `0xB5AF`, `AND #2559`, `B 0xB5B1`
+else `OR #1536`, `AND #4095`, `CALL 0x4007` (port-0
+transaction reused as RF writer); `LD *(0x856)`,
+`AND #1` → `0xB5FF aeq`; `LD *(0x4C2)`, `AND #1` →
+`0xB5C5 aneq`; zero `0x4C6-0x4CC` (RPT #6); bitfield
+extracts from `*(0x856)` (`AND #7,2`, `SFTL -2`,
+`ADD #-17533` → `LD *ar3` → `*(0x4C3)`; `AND #7,5`,
+`SFTL -5`, `ADD #-17541` → `*(0x4C4)`; `ST #0,*(0x4C5)`);
+`CALL 0x6B4`; `T=8389`, `MPYU *ar4+(0x857)`,
+`SFTA -12` → `*(0x4CD)` (×2 lanes). Epilogue `0xB5FB`:
+`LD #1,b`, `CALL 0xB461`, `RET` at `0xB5FE`. Followers
+`0xB5FF` (`ST #3,*(0x4C5)`, `CALL 0x6B4`, `RET`) and
+`0xB606` (SUBC divide loop, `RET`) are separate subroutines.
 
 ## STATE_WORKER `0xC851` (mask, called from V20)
 
@@ -162,10 +180,31 @@ runtime via loader copy). `ANDM #-3073,*(0x51C)`,
 `ANDM #-1792,*(0x20F4)`, `ORM #2,*(0x20F4)`, zero
 `*(0x20F5/0x20F6/0x20F9)`, `ST #0,*(0x20FA)`,
 `ST #-1,*(0x2203)`; `PORTR pa0`, `OR #28`, `PORTW pa0`
-(RPT #20); `LD #8,b`, `CALL 0xB461`, `RET`. Sibling entry
-at `0xC86C`: `CALL 0x5EA`, `*(0x51C)` flag RMW
-(`ANDM #-8989`, `ORM #4`, `ANDM #-65`), `LD #768,b` …
-(tail open).
+(RPT #20); `LD #8,b`, `CALL 0xB461`, `RET` at `0xC85C`.
+(Correction: the next routine starts at `0xC85D`, not
+`0xC86C`; `0xC86C` is its pa1-strobe line.)
+
+## STATE_DISPATCH_WORKER `0xC85D-0xC91B` (mask)
+
+`CALL 0x5EA` (mini-kernel), `*(0x51C)` flag RMW
+(`ANDM #-8989`, `ORM #4`, `ANDM #-65`), `LD #768,b`,
+`PORTW pa1` (RPT #22), `PORTR pa2` with `ANDM #-769`,
+`PORTW pa2`; `LD *ar6`, `ANDM #-257,*ar6`, lane split
+(`AND #1536` → `*(0x20F9/0x20F5)`, `*ar7`; `SFTA -8`,
+`ADD #-14175`), `BACC a` into jump table
+(`B 0xC8A9/0xC8B6/0xC8B8/0xC8BA`). Case: save AR4,
+`CALL 0xB6E6`, `CALL 0xC717`, `CALL 0x9FA8`,
+`ORM #7328,*(0x577)`, restore, `B 0xC8D4` (×3 cases).
+Convergence `0xC8D4`: `CALL 0xC717`,
+`ANDM #-7329,*(0x577)`, `ST #0,*(0x2B08)`,
+`CMPM *(0x573),#-23991` → `0xC8D4`; `LD #8,b`,
+`CALL 0xB461`; `LD #1538,a` + `LD #8,b`, `CALL 0x4007`;
+`LD #2372,a` + `LD #9,b`, `CALL 0x4007`; `AR2=0x20F7`,
+`AR3=0x20F9`, pa54 status poll (`PORTR pa54`,
+`AND #8192` → `0xC8EF` else `PORTW`), delay loop,
+`CALLD 0xC91C`, `CALLD 0xC965`, `CALL 0xC9E3`,
+`CALL 0xCA69` (DSP kernel; the caller already on record),
+`CALLD 0xCE05`, `CALL 0xCEB4`, `RET` at `0xC91B`.
 
 ## STATE_ISR_ENTRY `0x25DF` (V20, mask)
 
@@ -289,13 +328,19 @@ Clauses (offsets from entry, `program.be16`):
    build. Both cannot hold for one image. Needs per-build check.
 2. `0x05xx` mini-kernel (`0x05DA/0x05DC/0x05E8/0x05F0/0x05F4/0x05F6`).
    Proven zero-filled in `program.be16` (verified all-zero
-   `0x05C0-0x0610`): unobservable in-mask, not analyzable
-   statically from the ROM image. Runtime source is the loader's
-   `MVDP *AR2+(0x0D00)→0x590` ×421-word copy (loader.md `0x0F2B`);
-   no extracted DSP block has dest `0x590`, so the ultimate FLS
-   source is still untraced. Masked callers into the window are
-   real: `0xC851` head is `CALL 0x5EA`. Only referrer of `0x05FA`
-   is the vector image itself.
+   `0x05C0-0x0610`): unobservable in-mask. Runtime source is the
+   loader's `MVDP *AR2+(0x0D00)→0x590` ×421-word copy
+   (loader.md `0x0F2B`). FLS hunt: no setB descriptor carries
+   dest `0xD00` (3310 v5.79 table `0x300CD8`, 49 slots, 20 live;
+   placeholders are consecutive 12-byte zeroed descriptor slots,
+   e.g. idx 2/3 at flash 3156292/3156304). Two candidates left:
+   (a) the payload hides in a zeroed/elsewhere descriptor —
+   5110 documents block0 staged at DSP `0x0D00` by the HPI
+   hardware boot (emulator `docs/dsp-boot-upload-architecture.md`
+   §6); (b) the MCU HPI-writes the 421 words straight from ARM
+   bootcode with no DSP descriptor. Masked callers into the
+   window are real: `0xC851` head is `CALL 0x5EA`. Only
+   referrer of `0x05FA` is the vector image itself.
 3. Vector-to-line wiring (INT0-5, TINT, BRINT/BXINT) against LEAD.
 4. `0x2B53` continuation past the HPI prologue (RF vs audio edge).
 5. Callee bodies `0x05DA/0x05E8/0x05F4` (need `0x05xx` source first).
