@@ -12,6 +12,11 @@ code: `verified` | `static` | `hypothesis` (see
 | boot-ready `DSP_BOOT_READY` (=6, unconfirmed) | version word at MBOX | hypothesis | ROM revision number is what the MCU accepts at boot |
 | `0x84` `RA_INFO` | random-access burst transmitted | hypothesis | emulator ROM4 path; ROM6 layout unconfirmed |
 | `0x12` `UPLOAD_READY` | `[0x871]=0x12` | static | window field map, doc 01 |
+| `0x83` RSSI | via `0x2C3690`, gated `0x110FE0==1` | static | disfw 3310 v5.79 |
+| `0x88` neighbour timing | via `0x2C3CFC`; advances camping if status `!=0x1A` | static | disfw 3310 v5.79 |
+| `0x89` channel changed | via `0x2C3D4C` | static | disfw 3310 v5.79 |
+| `0x8B` all-RSSI | via `0x2C3FC4` | static | disfw 3310 v5.79 |
+| `0x74` local response | subtypes `0x34/0x35/0x0D/0x36`; consumer `0x2C1948` | static | emulator static RE, 3310 v5.79 |
 
 ## M→D (MCU commands)
 

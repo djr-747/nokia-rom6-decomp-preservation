@@ -29,3 +29,30 @@ Shared core (called by 3+ blocks): `0x2E2F` (dispatcher = ROM4
 (port txn A = ROM4 `45c2`), `0x4055` (port txn B = ROM4 `4610`).
 The shared core is the dedicated-mode spine: dispatch plus port
 transactions.
+
+## Payload identity (build file → manifest block → run range)
+
+| file | manifest | runs at | note |
+|---|---|---|---|
+| block00.bin | block00 | `0x0D00-0x0F7E` | loader + branch table |
+| block01.bin | block01 | `0x0930-0x14DA` | main code / MDI dispatch |
+| block04/17.bin | block02/block0B | `0x0930-0x0A7C` | data pages inside block01's range |
+| block06.bin | block03 | `0x09C6-0x0E43` | RF page |
+| block08.bin | block04 | `0x0926-0x0FEF` | mixed RF page |
+| block09.bin | block05 | `0x09C6-0x0EFA` | — |
+| block11.bin | block06 | `0x09C6-0x0BF6` | — |
+| block13.bin | block08 | `0x09C6-0x0AC1` | audio page |
+| block15.bin | block09 | `0x09C6-0x0DE8` | audio page |
+| block19.bin | block0C | `0x0B3A-0x0FD6` | — |
+| block20.bin | block0D | `0x09C6-0x0BA0` | — |
+| block23.bin | block0F | `0x0A00-0x0A68` | IVT image |
+| block30.bin | block14 | `0x0A00-0x0C75` | overwrites IVT range (phases) |
+| block32/35/38.bin | block15/16/17 | `0x0800-0x08F7` | HPI window (same payload ×3) |
+| block41/45.bin | block18/1A | `0x0800-0x0943` | HPI window (same payload ×2) |
+| block48.bin | block1B | `0x0F00-0x0FDF` | version publisher, overwrites loader |
+
+Run ranges overlap: upload is phased, later phases overwrite earlier
+ones (`0x0A00`: IVT image then block14; `0x0F00`: loader then
+publisher; `0x0930`: code then data pages). Phase order = walk order.
+A static call graph across phases is unsound without the order;
+that order plus the overwrite map is the next static step.

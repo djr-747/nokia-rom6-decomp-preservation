@@ -60,6 +60,24 @@ plus inventoried.
 - Style pass complete and verified: facts intact.
 - xrefs staged at `/tmp/xref/3310-setB-xrefs.json` (block01: 47 ROM
   targets; shared core `0x2E2F` = ROM4 `3900`).
+- Loader1 decoded: IPTR `0x0F` (vectors → `0x0780`), `0x0590`
+  mini-kernel = block00 copy, upload engine on `0x87B-0x87F`.
+- Version path closed: mask `0xFF87` (`6` ROM6 / `4` ROM4, verified)
+  → `*(0x802)` → MCU `[0x10004]` → gate. Block48 publishes it.
+- Method rule: annotate in bring-up order (doc 05). Dedicated mode
+  comes last.
+- Identity dance grounded in emulator static RE: `0x70/0x74` family,
+  subtype map, 24-byte record loop, table `0x10EB48`, bridge
+  `0x287BE8`, evaluator, accept gate (edges.md). DSP decode routine
+  and COBBA-ID read site still open.
+- RSSI/camping grounded: ingest fns `0x83/0x88/0x89/0x8B`, gate
+  `0x110FE0`, camp ladder states, `0x88` advance rule (edges.md,
+  messages.md). DSP producer mapping open (AR-indirect writes).
+- Tuning consumer side mapped (block08 structs + AR2 streams to
+  pa48/49/50); boot-time tune opcode open.
+- Payload identity resolved (build idx → manifest → run range);
+  upload is phased with overwrites (`0x0A00`, `0x0F00`, `0x0930`).
+  Cross-phase static call graph needs the phase order (xrefs.md).
 
 ## Goal mapping
 

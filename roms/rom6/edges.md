@@ -36,6 +36,59 @@ listings carry the full decode.
 - block08 is the mixed page: pa3/4, pa33/39 sample path, pa43-45,
   pa48-50 control.
 
+## Identity dance (SIM-lock / MSID / COBBA ID)
+
+Family protocol `0x70` (M→D) / `0x74` (D→M). Grounded in emulator
+static RE (`simlock-table.md`, `00-mdi-catalog.md`, 3310 v5.79).
+
+M→D subtypes: `0x13` MSID setup, `0x16` 24-byte SIML block,
+`0x0D` aliveness, `0x17` final validation. D→M subtypes: `0x34`
+(MSID), `0x35` (24-byte echo), `0x0D`, `0x36` (validation pass=0).
+Consumer `0x2C1948`; OPER dispatch `(op&0xF0)==0x70`.
+
+Record loop: MCU sends a 30-byte frame (`0x1A 0x70 0x16`, len 24)
+with the encrypted record from nonvolatile offset `32+24*cursor`.
+Backing store is per-model ground truth (emulator profiles):
+I2C EEPROM on 3210 (NSE8), 5110/5110i/5130/5190/6190 (NSE1),
+6110/6130 (NSE3), 6150 (NSM1), 8810 (NSE6); in-flash EEPROM on
+the rest (3310 family, 8210 family, and later);
+DSP decodes and returns it in d2m `0x74` (`msg[+12..35]`,
+more-records flag in low nibble, eor checksum at `msg[+60]`);
+`0x287BE8` copies it to table `0x10EB48+cursor*24` (24-byte stride,
+10 records). Table compare mask `[0..7]` (packed-BCD IMSI,
+reject-all seed `8×0xEE`) comes only from the ROM seed or the DSP
+copy. Evaluator `0x286F68`; accept gate `0x21C630`.
+
+DSP-side decode routine still unlocated (no absolute opcode store
+in any setB payload; writes go through pointers). COBBA-ID read
+site open.
+
+## RSSI and camping (3310 v5.79, static)
+
+D→M reports enter via `GU2_MDIRCV_BOOT_DISPATCH_TABLE`, gated on
+`GU2_DSP_MEAS_OPER_GATE (0x110FE0)==1`, then forwarded with
+`TASK_SEND_TYPED #10`. Ingest fns: `0x83` RSSI `0x2C3690`,
+`0x88` neighbour timing `0x2C3CFC`, `0x89` chan changed `0x2C3D4C`,
+`0x8B` all-RSSI `0x2C3FC4`.
+
+Camping is a state ladder in `GU3_NET_CAMP_STATUS (0x110F96)`:
+states `0x1A/0x20/0x30/0x40/0x44/0x80`, dispatch at `0x22EB50`
+(RR region `0x224xxx-0x231xxx`). The `0x88` handler advances camping
+when status `!= 0x1A` (sends `GU3_TASK10_ADVANCE_TEMPLATE`).
+DSP producers use AR-indirect writes (no absolute opcode store in
+any payload); producer-side mapping open.
+
+## Tuning upload (NVRAM → DSP)
+
+Consumer side (block08, 3310 setB): absolute forms
+`PORTW *(0x8/0x9/0xB),pa{3,4,5,7,8,12,32,48,50}` and
+`PORTR pa{1,2,3,33}` plus AR2-streamed `PORTW *AR2,pa{33,36,49}`.
+Tune/control structs live in low DARAM; tables stream through AR2
+to synth ports 48/49/50. The MDISND opcode that fills those structs
+at boot stays open (candidate: channel-configure family around
+`0x02→0x89`; trace the boot-time builders, not the traffic path).
+Tune values come from the per-model store (I2C vs in-flash, above).
+
 ## MCU side (3310 v5.79 symbols, static)
 
 D→M opcodes with named handlers: `0x83` RSSI, `0x84` RA_INFO,

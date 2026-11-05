@@ -48,9 +48,25 @@ SPRU131 convention. LEAD wiring unconfirmed.
 Targets sit in uploaded-code space. Table ends `0x0D6A`
 (`F4E5 F495`).
 
+## Loader1 sequence (`0x0F00`, block00 tail; 3310 v5.79)
+
+`STM SP/SWWSR/CLKMD` (PLL on), zero DARAM (`0x60+`, `0x1000+`),
+`MVPD 0xFF80→0x0780` (mask vectors to DARAM), `STM #0x07A8,PMST`
+(IPTR `0x0F`: runtime base `0x0780`), `MVPD 0x0D00→0x0590`
+(branch table to mini-kernel), upload engine on UPLOADHEADER
+(`0x87B-0x87F`). The `0x05DA/0x05E8/0x05F4/0x05FA` callees are
+copies of block00 code, not separate uploads.
+
+Late page block48 (runs `0x0F00`, overwrites loader): re-inits,
+`ST #6,*(0x803)`, `MVPD 0xFF87→*(0x802)`. Mask `0xFF87` is the
+version constant: `6` on ROM6, `4` on ROM4 (byte-verified both).
+MCU poll `[0x10004]` = HPI word 2 = `*(0x802)`. Full version path:
+silicon constant → HPI word → version word → set gate (doc 08).
+Predicts `5`/`3` on R5/R3 silicon. Untested: no images.
+
 ## Open
 
-1. Runtime IVT base per build. Image runs at `0x0A00` (IPTR `0x14`).
+1. Runtime IVT base per build. 3310 image runs the table at `0x0A00`.
    The emulator observed IPTR `0x0B` (base `0x0580`) on another
    build. Both cannot hold for one image. Needs per-build check.
 2. `0x05xx` mini-kernel (`0x05DA/0x05E8/0x05F4`, maybe `0x05FA`).
