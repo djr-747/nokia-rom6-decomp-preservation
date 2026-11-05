@@ -203,7 +203,7 @@ spaces:
         name: MSG_FILL_8653
         confidence: static
         backing: code
-        note: MVDK table fills from data-space 0xB373/0xB37B into 0x3025/0x119C staging, CALLD 0x86E3, RET at 0x8674. Sources staged, not in-mask.
+        note: MVDK fills from DROM-static 0xB373/0xB37B (bytes listed in messages.md) into staged 0x3025/0x119C, CALLD 0x86E3, RET at 0x8674.
         evidence:
           - roms/rom6/messages.md
       - address: 0x9F28

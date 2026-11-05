@@ -203,12 +203,37 @@ compared/subtracted in the worker — the most-polled identity
 state cell in the image. Tune path closed at the mechanism
 level; key VALUES are staged, not in mask.
 
+## D→M enqueue engine (`0xA130+`, objdump-verified)
+
+Guards `BITF *(0x577),#16` → `0xA247`,
+`BITF *(0x2B08),#2` → `0xA247`; pointer block
+`AR0-AR6 = 0x288A/0x288E/0x2893/0x2894/0x08E6/0x2898/0x2896`
+(ring at `0x8E6`, control at `0x288A+`); ring-full check
+(`LD *ar4 & 255`, `SUB *ar5`, `STL *ar5`);
+`BITF *ar4,#256` with `BCD` takes; `DLD *(0x288A)` /
+`DST *(0x288E)` pointer advance; `B 0xA1DD` (doorbell post,
+5 internal branches converge there); slow path zeroes and
+`CALL 0x61E` (also called from `0xA17A` and `0xA1DD`
+itself). No direct caller of `0xA130` — entered by
+fall-through from the `0xA6xx-0xA7xx` producer stretch
+(`CALL 0x8641`, `CALLD 0xAB78/0x8BDE` region). Chain closed:
+builders stage payloads → producers invoke enqueue →
+ring `0x8E6` → doorbell. Per-message identity (which
+payload is SIMLOCK vs MSID vs IMEI) is in the staged
+payload bytes, not the engine.
+
 ## Builder bodies (objdump-verified, `program.be16`)
 
 Message construction is table-driven fill + staged copy.
-All `MVDK` sources are *data-space* addresses: their runtime
-content is staged, not visible in-mask (program-space at the
-same numbers holds unrelated mask code — do not conflate).
+`MVDK` sources split two ways. Sources at/above `0xB000` read
+the DROM face: static mask bytes, listed verbatim —
+`0xB373`+24 = `FFFE 7712 2F00 7082 250D 771A 0002 F072 B382
+1083 1C82 80B3 6B82 0001 6882 0007 F7BB 74F8 0008 0002 F030
+F7FF F495 75F8`; `0xB37B`+16 overlaps the same run from
+`B382`. (They disassemble as code; the fill reuses those
+bytes as constants.) Sources below `0xB000` are staged DARAM:
+`0x093A`+8 reads zero in-mask (filled at runtime from
+upload/HPI); dests `0x3025/0x119C/0x1100/0x1000` likewise.
 
 - `0x8641-0x864D` (`MSG_BUILDER_8641`): sub-call chain
   `0x592 → 0x8BD5 → 0x8F97 → 0x8813 → 0x8653 → 0x8675`,
