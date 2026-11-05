@@ -137,6 +137,23 @@ ISRs use. Simlock-candidate shape (decode then reply), but no
 lock-data constants observed yet — identity-opcode match is
 the next hop.
 
+## Simlock anchor: negative result (recorded 2026-11-05)
+
+Emulator `docs/dct3-identity-provisioning.md` says the ROM's
+SIMlock decode writes DSP words `[0x1202..0x1207]`. Exhaustive
+static search finds no reference to that range in mask ROM:
+zero absolute-operand hits (`0x1202-0x1207` never appears as a
+word in `program.be16` `0x2800-0xFFFF`), zero `STM #imm,ARx`
+loads of it (nearest staged pointers: `0x123C/0x124C/0x125A`),
+and zero hits in any setB uploaded block. Consequence: the
+decode either addresses the buffer AR-relative/computed, or
+the doc addresses are MCU-side. Either way the simlock
+routine is not locatable by buffer anchor from static DSP
+bytes. The remaining route is ARM-side: match MDISND
+per-opcode builder constants (doc-04) against the DSP
+record-compare pattern tables (`0x2F61/0x2F62`) and the
+`0x36B-0x375` unpack zone at runtime.
+
 ## Builder bodies (objdump-verified, `program.be16`)
 
 Message construction is table-driven fill + staged copy.
