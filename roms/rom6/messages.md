@@ -118,6 +118,25 @@ jump table — the VALUES in the `0x2F61/0x2F62` pattern tables are
 the opcode→identity map and are still unread (data-space tables,
 staged at runtime).
 
+## Block-code producer chain (`0x9C99+`, objdump-verified)
+
+Worker mode words are block-driven: `*(0x85D)` referenced at 17
+sites, `*(0x860)` at 14, nearly all in uploaded block code
+`0x9C9F-0x9ED2` (plus the worker itself). Representative chain
+at `0x9C99`: `CALL 0x6D4`, `CALL 0x6BE`,
+`LD *(0x860) → STL *ar2+` (`AR2=0x29C8`, the STATE_ISR
+round-robin zone); `AR3=0x85C`, BRC-159 `RPTBD` scaling loop
+(`TMPY *ar2,*ar3`, `STH *ar2+` — 160-tap keyed transform of
+the worker buffer); `BITF *(0x860),#144` → `0x9CCF`;
+`CALL 0x9F35` (stager), `CALLD 0x8BDE`, `AR4=0x29C9`,
+`CALL 0x8C0A`, `CALL 0x9F35` again; `CMPM *(0x2F03),#0`;
+`ANDM/ORM` on `*(0x860)`; `CALLD 0x86E3` (fill engine).
+Decode-transform-stage in one chain: worker state in,
+scaled buffer out, staged message via the same builders the
+ISRs use. Simlock-candidate shape (decode then reply), but no
+lock-data constants observed yet — identity-opcode match is
+the next hop.
+
 ## Builder bodies (objdump-verified, `program.be16`)
 
 Message construction is table-driven fill + staged copy.
