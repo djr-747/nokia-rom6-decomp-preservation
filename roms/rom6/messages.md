@@ -5,6 +5,21 @@ Conventions: word addresses, DSP-space. `M→D` is the MDISND ring
 code: `verified` | `static` | `hypothesis` (see
 `docs/05-methodology.md`). Unknown codes stay `UNKNOWN_xx`.
 
+## Identity-trace map (2026-11-05, static DSP only)
+
+| layer | finding | status |
+|---|---|---|
+| HPI mailbox | `0x802` version publish, `0x866` status, `0x870` COBBA-cmd slot, `0x871/0x872` upload handshake | static, bounded |
+| mode/identity state | `*(0x85D/0x860)` worker mode, block R/W at 13+11 sites; `0x2B08` polled 21×; `0x572` lane cell | static, census |
+| tune keys | `0x85C/0x857` staged, never mask-written; applied by `0x9C99` chain + worker extracts | static, mechanism closed |
+| producer builders | `0x8641/0x864E/0x8653` fills, `0x9F28/0x9F35` stagers, engines `0x9F19/0x86E3` | static, RET-bounded |
+| producer groups | dispatcher switch, mask `0xA7xx`, both ISRs, block `0x9C99` chain | static, caller census |
+| opcode dispatch | table-indirect via `0x2F61/0x2F62`, record-compare `0x5190+` | static, values staged |
+| `0x573` selectors | 4 values / 13 sites, group routing not per-message | static, census |
+| MSID/SIMLOCK/IMEI per-opcode | needs staged tables or ARM MDISND constants | open |
+| SIMlock decode routine | `0x1202-0x1207` anchor absent from all static bytes | open (negative result) |
+| LEAD pin mapping | service manual confirms API/vectors-RAM/boot only | open (schematics) |
+
 ## D→M (DSP reports)
 
 | code | layout | status | evidence |
