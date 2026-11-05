@@ -71,7 +71,10 @@ spaces:
         name: DISPATCH_MATCH_LOOP
         confidence: static
         backing: code
-        note: Match loop, not an epilogue. Every clause converges here with B 0x2E64 for re-match.
+        note: >-
+          Match loop, not an epilogue. Every clause converges here with B 0x2E64 for re-match. Wave-7:
+          referenced from uploaded code (block01 + block30 ROM-xref targets) — exterior callers exist; loop
+          never returns (no RET claimed, no bound); entry evidence recorded, mechanism unchanged.
         evidence:
           - roms/rom6/ivt.md
       - address: 0x25DF
@@ -1115,6 +1118,8 @@ spaces:
         note: >-
           Entry F074 0694 + rptz-zero + cc-C7A4 + mvdk-init mac/delay/sat loop; first-RET @0xC7A2 (len 140);
           11 callers 53C7 53E1 5418 542A 5446 5481 549A B50E B56D C8AC C8BA; HYPOTHESIS init filter worker.
+          Wave-7: block00 loader branch-table slot F073@110->C736 corroborates (interior reference, table is
+          ROM6-consistent); C7A3 1w RET sliver between spans stays dark.
       - address: 0xBE22
         name: BUTTERFLY_BE22
         confidence: static_branch
@@ -1811,7 +1816,9 @@ spaces:
         confidence: static_branch
         note: >-
           Post-RET entry 4A15 4A14 4A11 10F8 04FA F010; caller F074@2784 (objdump call 0xb634); first-RET
-          @0xB6E5 (178w, ends at existing 0xB6E6); HYPOTHESIS.
+          @0xB6E5 (178w, ends at existing 0xB6E6); HYPOTHESIS. Wave-7: block00 loader branch-table slot
+          F073@126->B634 corroborates head entry (table is ROM6-consistent); bound [B634-B6E5] already
+          parses (exit scan wave-7: joins B@B64B/B660->B668 in-span, single RET@B6E5).
       - address: 0xAD0D
         name: TABLE_DISPATCH_DRIVER
         confidence: static_branch
@@ -4692,7 +4699,9 @@ spaces:
           Bound 29B1-29B8 (8w; TRIMMED from 29B1-2A72 draft at first-outside B F073@29B7->2A8A + operand 29B8
           per ordered-scan rule; remaining outside-targeting F073s 29D1-2A71 fall in dark zone); entries 2x
           bc F846@29A7 + F84E@29AB->29B1 byte-verified (cond pair); abuts FRAG_2983 (ends 29B0); dark
-          remainder 29B9-2A72 (DARK_2AFC entry-open question recorded); HYPOTHESIS.
+          remainder 29B9-2A72 (DARK_2AFC entry-open question recorded); wave-7 partial close: block01 bc
+          F820@6FC->2A5F heads FRAG_2A5F [2A5F-2A72] (tail covered), head 29B9-2A5E stays dark, still
+          entry-less; HYPOTHESIS.
       - address: 0x4C41
         name: FRAG_4C41
         confidence: static_branch
@@ -5667,6 +5676,97 @@ spaces:
           micro-span, retd-headed); entry bc F845@DA29->DA32 byte-verified (gap-sibling span DA21-DA31
           zone, exterior to this span); fall-through continuation of FRAG_DA21 delay tail, branch-entered;
           HYPOTHESIS.
+      - address: 0x2B53
+        name: ROUTINE_2B53
+        confidence: static_branch
+        note: >-
+          Bound 2B53-2BA9 (87w; exit B F073@2BA8->283D + operand 2BA9 — branch-tailed backward into dispatch
+          loop; exit scan otherwise clean; head PSHM-like prologue 4A07 69F8; pre-word 283D not post-RET —
+          entry is vector-based); entry FB F880@66->2B53 byte-verified (far branch per op_fb_pmad mask FF80,
+          in block23 runtime IVT image = hardware ISR vector into COBBA command handler); interior out-call
+          F074@2B7C->B4F8; closes COBBA_CMD_ISR_ENTRY vector; HYPOTHESIS.
+      - address: 0x2C75
+        name: ROUTINE_2C75
+        confidence: static_branch
+        note: >-
+          Bound 2C75-2C87 (13w; exit RET FC00@2C87 byte-verified, exit scan clean); entry call F074@40->
+          2C75 byte-verified (from block30 uploaded code, head-exact; call-only entry, pre-word 283D not
+          post-RET); adjacent below known 2C88 symbol (2C87|2C88, no overlap); HYPOTHESIS.
+      - address: 0x2A5F
+        name: FRAG_2A5F
+        confidence: static_branch
+        note: >-
+          Bound 2A5F-2A72 (26w; exit B F073@2A71->2979 + operand 2A72 — branch-tailed backward, first and
+          only exit-class in span; exit scan clean; pre-word 2993 = operand value, not post-RET); entry bc
+          F820@6FC->2A5F byte-verified (cond, from block01 uploaded code); closes DARK_2AFC entry-open
+          question for the tail (head 29B9-2A5E stays dark, still entry-less); HYPOTHESIS.
+      - address: 0x3691
+        name: FRAG_3691
+        confidence: static_branch
+        note: >-
+          Bound 3691-36A0 (16w; exit B F073@369F->2E64 + operand 36A0 — dispatch-loop trampoline tail, like
+          FRAG_3674/2E52/3616 family; exit scan clean; pre-word 05B2 not post-RET); entries bc F830@97D->
+          3691 + B F073@9B1->3691 byte-verified (both from block01 uploaded code); dark neighbors 3683-3690
+          (early-out head, no entry) + 36A1-36AF stay dark; HYPOTHESIS.
+      - address: 0x36B0
+        name: FRAG_36B0
+        confidence: static_branch
+        note: >-
+          Bound 36B0-36C1 (18w; exit B F073@36C0->2E64 + operand 36C1 — dispatch-loop trampoline; exit scan
+          clean; pre-word 36C2 not post-RET); entry bc F830@998->36B0 byte-verified (block01); ROM-side ref
+          F830@36A4->36B0 discounted (dark-src, unclaimed sliver); dark neighbors 36C2-36FA stay dark;
+          HYPOTHESIS.
+      - address: 0x3FFA
+        name: ROUTINE_3FFA
+        confidence: static_branch
+        note: >-
+          Bound 3FFA-4006 (13w; exit RET FC00@4006 byte-verified; tail 4000-4006 (4EF8 01FE / F495 75F8 /
+          0008 0019) falls through from 3FFA head — single execution unit; head F074 064A call idiom); NINE
+          block callers byte-verified: 3x block13 (F274@75 + F074@93 + F274@BE) + 6x block15 (F274@35/3E/24C/
+          255 + F074@60/16B) + FB30@138 (block15) discounted (FCALLD, non-entry per rule); call-entered
+          ROUTINE; HYPOTHESIS.
+      - address: 0x43CD
+        name: FRAG_43CD
+        confidence: static_branch
+        note: >-
+          Bound 43CD-43D2 (6w; exit RET FC00@43D2 byte-verified, exit scan clean; micro-span); entries FOUR
+          B F073@02/14/16/18->43CD byte-verified (block08 head branch sled — 4 dispatch branches converging;
+          sled head F073@00->0BC6 self-range + F073@02->43CD exterior ROM target); pre-word F4E2 (ROUTINE_
+          43BA BACC exit, not post-RET — branch-based entry); interior 2x out-call F074@43CD->2E2F + F074@
+          43D0->4590; HYPOTHESIS.
+      - address: 0x9AFC
+        name: FRAG_9AFC
+        confidence: static_branch
+        note: >-
+          Bound 9AFC-9B5B (96w; exit RET FC00@9B5B byte-verified; interior join B F073@9B13->9B20 in-span; exit
+          scan otherwise clean; pre-word 001E = retd delay of FRAG_9AF4, not post-RET — branch-based entry);
+          entry B F073@7CE->9AFC byte-verified (from block01 uploaded code); HYPOTHESIS.
+      - address: 0xA8B9
+        name: FRAG_A8B9
+        confidence: static_branch
+        note: >-
+          Bound A8B9-A8BE (6w; exit RET FC00@A8BE byte-verified, exit scan clean; micro-span); entry B F073@
+          AE4->A8B9 byte-verified (from block01 uploaded code); pre-word FC45 not post-RET (branch-based
+          entry); HYPOTHESIS.
+      - address: 0xACF4
+        name: ROUTINE_ACF4
+        confidence: static_branch
+        note: >-
+          Bound ACF4-AD0C (25w; exit RET FC00@AD0C byte-verified; interior joins B@ACFB->AD0A + B@AD04->AD0A
+          in-span; exit scan otherwise clean); entry call F074@43B->ACF4 byte-verified (from block19 uploaded
+          code, head-exact; call-only entry, pre-word E850 not post-RET); 1w orphan ACF3 (E850) stays dark;
+          HYPOTHESIS.
+      - address: 0xB948
+        name: FRAG_B948
+        confidence: static_branch
+        note: >-
+          Bound B948-BA07 (192w; exit RETD FE00@BA07 byte-verified; delays BA08-BA09 stay dark-claimed, so
+          bound ends AT retd word with spill noted; interior joins B@B99E/B9B0->B9D9 + BD@B9E6->B9F7 in-span;
+          exit scan otherwise clean; head F58E long-body island, not call-head); entry branch-table slot
+          F073@120->B948 byte-verified (block00 loader image branch table: slots F073->C556/C576/C660/C67F/
+          C6B2/C736/BCBA/BCAC/B605/B634/9D16/B948 — all ROM6-validated routines, so the table is
+          ROM6-consistent and the B948 slot is meaningful); table-entered, hence FRAG with entry-weak flag;
+          remainder BA08-BA31 (42w, 2x FE00, no entries) stays dark; HYPOTHESIS.
       - address: 0xE0B5
         name: ROUTINE_E0B5
         confidence: static_branch

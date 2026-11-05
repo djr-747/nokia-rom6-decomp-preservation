@@ -380,6 +380,18 @@ plus inventoried.
   9B72, AF40 split-head (orphan AF3E-3F dark), 7C2C/7C2F, C806, B61F, CF01, DA32, 4AD8 (5 entries).
   Micros promoted: 65A5/6928/6987/9AF4 (+delays)/9BF5/68B7/690E/6940. 7ED4-7F54 stays dark (no head entry).
   make test 6 pass.
+- Wave-7 landed (11 new + 4 corroborations, 839 total, 93.5% = 51,706/55,296w): block-xref exterior entries.
+  Method: 3310-setB ROM-xref targets filtered to dark zones, sites verified in block binaries (opcode+operand
+  alignment), catalog decode for F880 (= FB far branch, op_fb_pmad mask FF80), ROM-side exit/interior scans.
+  ROUTINE_2B53 (FB-vector F880@66 block23 IVT image — hardware ISR entry, closes COBBA_CMD_ISR_ENTRY vector);
+  FRAG_2A5F (block01 BC, closes DARK_2AFC tail — head 29B9-2A5E stays dark, note updated); ROUTINE_2C75
+  (block30 call); FRAG_3691/36B0 (block01 branches, dispatch trampolines; 3683-368E dark, no entry);
+  ROUTINE_3FFA (9 block calls, extended to [3FFA-4006] on clean tail); FRAG_43CD (block08 4xB head sled);
+  FRAG_9AFC (block01 B, 96w); FRAG_A8B9 (block01 B micro); ROUTINE_ACF4 (block19 call); FRAG_B948 (192w,
+  block00 loader branch-table slot — table, not executed branch, flagged; slots corroborate ROM6 table
+  C556/C576/C660/C67F/C6B2/C736/BCBA/BCAC/B605/B634/9D16). Corroborations: DISPATCH_MATCH_LOOP
+  (2E64 block01+30 refs, no bound — loop), INIT_FILTER_C717 (C736 slot interior), GAP_B634 (B634 slot;
+  [B634-B6E5] already parses). 2E64 note YAML fixed (plain->folded scalar). make test 6 pass.
 
 ## Goal mapping
 
