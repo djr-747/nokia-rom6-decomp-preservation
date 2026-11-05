@@ -83,3 +83,22 @@ mask code (`0xA7xx`), and the ISRs (`COBBA_WORKER`,
 `STATE_DISPATCH_WORKER`). Opcode-to-identity mapping
 (MSID/SIMLOCK/IMEI/tune) stays open: the `0x573` selector
 values are the next attribution target.
+
+## `*(0x573)` selector census (image-wide, exact `60F8 0573` scan)
+
+Four values, 13 sites. Routing shape everywhere: `CMPM`,
+`BC ...,ntc` — the ntc-taken (non-equal) path does the work,
+the equal path joins convergence `0x54BB`.
+
+| value | sites | taken-path behavior |
+|---|---|---|
+| `0xA249` (-23991) | `0x53BC`, `0x540B`, `0x5436`, `0x546D`, `0xC8C2` | switch: `ANDM`, `ST #0,*(0xB68)`, `CALL 0xD970`, `LD #1→*(0xC4C)`, `ST #3,*(0xA5A)` …; worker site `0xC8C2` (`STATE_DISPATCH_WORKER`) |
+| `0xAF57` (-20649) | `0x5402`, `0x9DA0`, `0x9DFB`, `0x9E38`, `0xAB11` | switch + four block-code sites: `CALL 0x6BE`, `LD *(0x85D)`, BRC-159, mode-bit tests, `RPTBD` loop consuming the `0x29C9` STATE_ISR buffer (`LD *ar3+`, `ADD *ar2`) |
+| `0xB11C` (-20196) | `0x5464`, `0x8796` | equal path skips to `0x54BB`; non-equal falls into the `A249` test |
+| `0xAFAB` (-20565) | `0x53B3` | equal path skips to `0x54BB`; non-equal `CALL 0x672`, then `A249` test whose taken path issues far-call-form `0xF981` sequences (target decode uncertain) |
+
+Block sites (`0x9Dxx-0xABxx`) sit in uploaded block code
+(dest `0x1C6`→`0x9C6` run range). No selector test names an
+identity opcode yet: the `0x573` values select producer
+groups, not individual MSID/SIMLOCK/IMEI messages. The
+per-opcode builders of doc-04 §M→D remain the next hop.
