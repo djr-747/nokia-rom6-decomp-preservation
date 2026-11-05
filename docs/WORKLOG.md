@@ -2,6 +2,29 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-05 — night five: 60 symbols, reproducible coverage (46.5%)
+
+- 10 teams + critic + entry-linear validation; 60 new symbols (427
+  total), 66/66 entry-exit pairs objdump-verified, 9 apparent
+  mismatches resolved as bound-vs-exit confusion, YAML valid,
+  `make test` 6 pass. Commit `dd7dadc`, pushed.
+- Landed: 56FC-5F4A lane (8), 6B14-78B5 DSP chain (14), BFAA-C5F8
+  normalize lane (9), 3xxx port writers (9), ISR/dispatch + 50B2
+  feeder (7), 9FCF EB9E-table gater, 7937 mode-22 leaf, small-gaps
+  west (9). 0x50B2 feeds 0x2D5E ISR (calld @50F9) and stages IDBUS
+  words 0x2F61/0x2F62 (`F072 5194` rptbd fill).
+- Corrections: 2D5E not sole-called from 50F9 (9 image-wide F274
+  callers); 4F5F calld opcodes; 6B26 head extent; 56FC dedup;
+  3E53 split around 0x3EBD FIR table word (bounds 3E53-3EBC +
+  3EBE-3EE0).
+- Coverage method fixed: `tools/coverage.py` parses bound/first-RET/
+  true-end/RET-at/words-to/adjacent/len patterns from notes, merges
+  intervals, `make coverage`. 25,715w = 46.5% of 0x2800-0xFFFF.
+  Supersedes ad-hoc 24,558w/42.4%. Window size corrected: the
+  window holds 55,296 words, not 57,856 (that size is 0x1E00-0xFFFF).
+  Six parsed bounds spot-verified against image bytes. 50% needs
+  27,648w; 1,933w remain.
+
 ## 2026-11-05 — night four: 50 symbols, RETE + callerless rulings
 
 - 8 teams + critic + follow-up + gap-followup (whole-image linear
