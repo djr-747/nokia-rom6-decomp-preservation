@@ -18,6 +18,7 @@ code: `verified` | `static` | `hypothesis` (see
 | `0x573` selectors | 4 values / 13 sites, group routing not per-message | static, census |
 | MSID/SIMLOCK/IMEI per-opcode | ARM opcodes listed; no DSP stamping site found (coincidences rejected) | open |
 | SIMlock decode routine | `0x1202-0x1207` anchor absent from all static bytes | open (negative result) |
+| IMEI-check / FAID compare | no `CMPM/SUB #0x030A` in mask; decode outside static bytes like the validation verdict | open (negative result) |
 | LEAD pin mapping | service manual confirms API/vectors-RAM/boot only | open (schematics) |
 
 ## D→M (DSP reports)
