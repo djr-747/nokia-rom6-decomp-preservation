@@ -103,6 +103,21 @@ identity opcode yet: the `0x573` values select producer
 groups, not individual MSID/SIMLOCK/IMEI messages. The
 per-opcode builders of doc-04 §M→D remain the next hop.
 
+## Opcode dispatch is table-indirect (`0x5100+`, objdump-verified)
+
+The `0x2F61/0x2F62` cells are not constants but table handles:
+`AR5=0x2F61`, `LD *ar5,a`, `SFTA a,-8`, `SUB #43` → table index,
+`BC 0x515E,beq`, then flag shaping on `*(0x264E)`/`*(0x2662)`
+(`BITF #4`, `ORM #64`, XC-gated `STL`). The record-compare at
+`0x5190+` then scans the unpack zone for the selected marker.
+Only 6 references to `0x2F61/0x2F62` exist image-wide, all
+inside this clause — the tables themselves are staged DARAM,
+unreadable statically. Consequence for the identity goal: the
+opcode→MSID/SIMLOCK/IMEI/tune map cannot be recovered from
+mask bytes; it needs the staged table contents (runtime read
+of `0x2F61`-rooted tables) or the ARM-side MDISND builder
+constants that fill them.
+
 ## Opcode dispatch is record-compare (`0x5190+`, objdump-verified)
 
 Upstream of the producer switch, a clause compares the unpacked
