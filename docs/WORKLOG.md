@@ -2,6 +2,41 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-05 — second half wave-3: 76.5% bounded (was 72.4%)
+
+- 4 teams + critic + parent adjudication; 40 new symbols (652 total),
+  STUB_A361 trimmed, 9A82 note fixed, `make test` 6 pass. Commit
+  pushed; `make coverage` 42,289w = 76.5%. 13,007w dark remain.
+- Critic kills honored: TABLE_AF64 (dup of JTAB), FRAG_6657 (overlaps
+  6666), FRAG_4533 (overlaps 454F), 5B5C/86CF/A815/A91C (no valid
+  entry), 28CF/7EBC (fall-through-after-BACC validity open), C7B1
+  (standing BOUNDED-NEGATIVE ruling, reversal deferred), 9700/970B
+  (inside ROUTINE_9682), 2983-single-span (trimmed to first outside
+  exit [2983-29B0]), B0E8 (entry claim falsified: B0E6=F073, not
+  F820 — byte proof).
+- Critic demotions honored: 7DB5/B41C/E8C7 ROUTINE->FRAG (entry class
+  insufficient). Critic error corrected with bytes: F273@2A86 is
+  UNCONDITIONAL (catalog exact 0xF273), not conditional — FRAG_2A73
+  split multi-segment [2A73-2A89]+[2A8A-2ACB] instead of single span.
+- STUB_A361 trimmed A361-A3BD->A361-A3A2: interior retd@A3A0 ends it;
+  MSG_WORKER2_A3A3 double-claim resolved (trim, other symbol kept).
+  3044 verdict: BOTH (Harvard alias — program word F330 inside
+  FRAG_303F, data cell RSSI counter; no self-modifying code).
+- 9331 written over provisional 9343 point label (interior loop
+  descriptor, no entry/exit — 4055-precedent interior label, no
+  conflict). A2C3 over-claim investigated: interior F073s all target
+  A31D interior — stands, no change. 942E/9459 double-claim recorded,
+  no action.
+- BACC census: 16 sites, selector idioms mapped (A254/AF63/AFB4/B128/
+  B176 + tables; 8346-table arms; 95A9/97FF computed; 2ED5/43CC
+  epilogues; 538C vector followers; 8853 unreached into 88B9).
+- Open (wave-4): C7B1-reversal, 28CF/7EBC fall-through validity,
+  F84x/F072/F808 catalog classes, A269-A2AB/A2AC-A2B8 done this wave;
+  dead lanes 3273/2C75/2BED-zone/3802/351D/994F-tail/DA7E/7CB6/7EC5/
+  B39E/E855/5DF4/33E8/DARK_2AFC/29B1-2A72/4660-middle/A91C/A815/
+  670D-rest/88B9/3044-sliver-3115/A91C/A3CE-stub/AE71-lanes/AEA0-lanes/
+  B0E8-dead/AE87/AEA8-arms/929E/9239/3044-zone-tail + residue gaps.
+
 ## 2026-11-05 — table-bound batch: 72.4% bounded (was 65.8%)
 
 - Parent synthesis: AFD3-AFF8 rescued as bacc-table-arm frag
