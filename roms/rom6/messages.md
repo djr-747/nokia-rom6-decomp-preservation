@@ -54,6 +54,24 @@ bounds are first-RET unless stated. Open: all-paths bounds,
 `0x0590` slot contents, `0x938C` entry mechanism, boot-time
 `0x85C/0x857` uploader, pa48/49/50 mapping.
 
+## Night-two survey (high region + dense bands, objdump-verified)
+
+High region is live code (99 CALL targets at/above `0xC800`; code
+ends at last RET `0xE9C7`; `0xF000-0xFBFF` are data tables).
+`0xC800-0xDFFF`: ea00-family workers (`0xCF25/0xCF4B/0xCFBD/
+0xD0BE`), 070E-family (`0xD2BA/0xD2E2`), delay/math leaves.
+`0xE000-0xE9C7`: MAC kernels (`0xE06A`, `0xE90F`), exp/norm
+(`0xE54B`), copy engines, tail dispatch (last code `0xE923`).
+`0x7C00-0x8674`: 059E-family subs, 066E dispatcher
+(`0x810A`, zero callers, provisional), twins `0x82D4/0x82FF`.
+`0x9004-0x9216`: ACS kernels + butterfly/postscale chain
+(`0x62`-caller claim falsified: 62 is word-length, census = 2).
+Tables: `0xAE6C` (4-word jump), `0xAEAD` (44-word data),
+`0x4433` (6-word dispatch + 4 arms, consumed by `0x43EA`).
+All-paths upgrades on 10 longest routines (no redraft).
+Standing negatives: `0x2F61/0x2F62` writer, ROM FIR taps,
+`0x3EBD` (portw code), `0x56BD` (data block).
+
 ## D→M (DSP reports)
 
 | code | layout | status | evidence |

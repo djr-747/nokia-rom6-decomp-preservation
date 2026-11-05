@@ -2,6 +2,29 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-05 — night-two span survey: high region is code
+
+- 8 teams + critic + follow-up + synthesis; 101 new symbols after
+  parent validation (264 total). Every entry/RET pair re-verified
+  against image bytes; 9 bounds SHRUNK after entry-linear decode
+  exposed interior retd exits the FC00-only scans missed (0xCEB4,
+  0xE06A, 0xE38A, 0xE4DD, 0xE526, 0x7E4D, 0x7FC6, 0x807F, 0x90F8);
+  2 claimed bounds confirmed against operand traps (0x9004,
+  0x918C: interior FC00 words are immediates, not exits).
+- All-paths exit upgrades: 0x62F2 ends retd 0x63D7 (FC00 0x643D
+  belongs to 0x63DA), 0x676A 4 exits, 0xA4DE head rcd + downstream
+  chain exits. STATE_WORKER 0xC851 has no own RET (0xC85C is E900;
+  falls through into 0xC85D).
+- Killed: mopup 0x9F42 (duplicate of existing AUDIO_ENGINE_9F42).
+  Ruled out: D3BE as single routine (interior true-called entries
+  D447/D55E/D571 break it; left undrafted).
+- Negative results standing: 0x2F61/0x2F62 writer (no direct store
+  in image), ROM-resident FIR taps 0x3400-0x4000 (true taps are
+  data-space 0x3EBD+), F000-FBFF (data tables, code ends E9C7).
+- Open: mid-routine F274/F072/FB labels, 26 undrafted D-span
+  entries, inner labels 0x7E88/0x7F95, C7A4+ tails (no FC00 to
+  0xC851), D3BE overlap, E9C8-E9D5/F000-FBFF table semantics.
+
 ## 2026-11-05 — night-one span survey: 13.5% bounded (was 5.3%)
 
 - 9 span teams + critic + follow-up + synthesis (workflow); 46 new
