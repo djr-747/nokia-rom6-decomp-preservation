@@ -171,6 +171,20 @@ spaces:
         note: BACC jump-table dispatch, pa1/pa2 transactions, pa54 poll, two CALL 0x4007, CALLD chain, RET at 0xC91B. Entry corrected from 0xC86C.
         evidence:
           - roms/rom6/ivt.md
+      - address: 0x54BB
+        name: MSG_PRODUCER_CONVERGE
+        confidence: static
+        backing: code
+        note: Producer-switch convergence. Zero-fill envelope, RPTBD clear loop at 0x54B5, RET at 0x54BA.
+        evidence:
+          - roms/rom6/messages.md
+      - address: 0x54A4
+        name: MSG_FETCH_ROUTINE
+        confidence: static
+        backing: code
+        note: Called after LD *(0x3FC7/0x3FC9) on every taken producer path. Body open.
+        evidence:
+          - roms/rom6/messages.md
         evidence:
           - roms/rom6/ivt.md
       - address: 0x2BA1

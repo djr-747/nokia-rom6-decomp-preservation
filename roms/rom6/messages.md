@@ -54,3 +54,32 @@ Boot dispatch (latch `==0`): jump table `0x2EDB48`, sub-ids
 Disassemble block01 from `build/rom6/blocks/`. Extract it with
 `tools/extract_blocks.py` from 3310 v5.79 `@0x300CD8`. Enumerate its
 MDISND dispatch table. Promote each code with a capture reference.
+
+## DSP-side producer switch (mask `0x53F0+`, objdump-verified)
+
+Message-ID compares on `*(0x573)` select builder chains. Observed
+selectors: `0xAF57` (→ `0x5409`, else `B 0x54BB`), `0xA249`
+(→ `0x5420`). Taken paths call ordered builder chains —
+`CALL 0x8641`, `CALL 0x864E`, `CALL 0xB6E6`, `CALL 0xC717`,
+`CALL 0x9FA8` — then `LD *(0x3FC7/0x3FC9)`, `CALL 0x54A4`
+(fetch), `B 0x54BB`. Head shapes flags first: `ANDM *(0x51D)`,
+`ANDM *(0x263A)`, `MVDK 0x3F12→*(0x57B)`, `LD *(0x2477)`,
+`*(0x51C)` RMW with `XC`, `CMPM *(0x573)`.
+
+Convergence `0x54BB`: `CALL 0x6E6`, zero-fill envelope
+(`ST #11264 → *(0x1F3/0x243)`, `ADD #11264,a` →
+`*(0x54A/0x54B)`), BRC-631 `RPTBD 0x54B9` clear loop
+(`AR1=0x2C00`, `STL *ar1+`), `RET` at `0x54BA`.
+
+Mask-side producers reach the same builders from `0xA7xx`
+(stitched-low mask code, no setB block contains it):
+`ANDM *(0x243)`, `MVMD ar3,0x243`, `CALL 0x8641`,
+`ST #12854 → *(0x337C/0x337D)` (round-robin reset, same
+`0x3236` constant as `STATE_RR_PTR`), `CALL 0xBA56`,
+`CALLD 0xAB78/0x8BDE`, `CALL 0x8C0A/0x867E`, `MVDK 0x2799→*ar4+`
+(RPT-75). So builder routines `0x8641/0x864E/0x9F28/0x9F35`
+serve three producer groups: dispatcher switch (`0x54xx`),
+mask code (`0xA7xx`), and the ISRs (`COBBA_WORKER`,
+`STATE_DISPATCH_WORKER`). Opcode-to-identity mapping
+(MSID/SIMLOCK/IMEI/tune) stays open: the `0x573` selector
+values are the next attribution target.
