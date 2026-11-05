@@ -852,6 +852,8 @@ spaces:
           (calls A2C3/A3A3/A3F0/A5C6/A4DE/A482/E64C/A2B9, rc bneq, joins A281/A28F/A291/A2A9, RET@A2AB),
           A2AC-A2B8 arm (calls A2C3/A3A3/A2B9, rc, RET@A2B8); no call entry into A25F-A2B8 (BACC-reached,
           confirmed); F981@B03C/B0A7/B0EE->A260 are FCALL sites (recorded, not counted per convention).
+          Bounds A249-A254 + A255-A259 (head entry + arm table; arms A25A/A25F/A264 separate frags, long arms
+          A269-A2AB/A2AC-A2B8 wave-3 walks).
       - address: 0xA2B9
         name: MSG_PRIMITIVE_A2B9
         confidence: static
@@ -1776,19 +1778,19 @@ spaces:
         note: >-
           4 table words AE70 AE71 AE75 AE79 @AE6C-AE6F (bytes verified) between RET@AE6B and RET@AE70;
           consumer add #AE6C @ADDA + reada @ADDE + cala b @ADE0 (routine 0xAD0D driver); target range
-          AE70-AE79.
+          AE70-AE79. Bound AE6C-AE6F.
       - address: 0xAEAD
         name: DATA_TABLE_44
         confidence: static
         note: >-
           44 words AEAD-AED8 headed 000F 000B 0008 000C 000E 0009 (bytes verified); READA-consumed by AD0D
-          driver (ld #AEAD @AD20, reada *ar2 @AD26); AR5 sub-range walks observed.
+          driver (ld #AEAD @AD20, reada *ar2 @AD26); AR5 sub-range walks observed. Bound AEAD-AED8.
       - address: 0x4433
         name: DISPATCH_TABLE_6
         confidence: static
         note: >-
           6 words 4439 4439 4453 4444 446D 4474 @4433-4438 (bytes verified) between RET@4432 and code@4439;
-          consumer add #4433 @4402 + reada @4404 + cala b @4406 (routine 0x43EA).
+          consumer add #4433 @4402 + reada @4404 + cala b @4406 (routine 0x43EA). Bound 4433-4438.
       - address: 0x4439
         name: DISPATCH_TARGET_A
         confidence: static_branch
@@ -2125,7 +2127,7 @@ spaces:
           CODE not data: entry E800 80F8 294B 7710 297A EC17 8090 7710 241A EC2F 8090 8A09 8A08 F4E6 (ld #0,a
           / stl / stm / rpt-clear x2 / popm / fbacc a); clears 24w @0x297A + 48w @0x241A; sole exit fbacc F4E6
           @E9D5; entry after RET @E9C7; followed by 24 zero words E9D6-E9ED then table head 020F @E9EE;
-          HYPOTHESIS.
+          HYPOTHESIS. Bound E9C8-E9D5.
       - address: 0x56DE
         name: PORTXACT_ENTRY
         confidence: static_branch
@@ -2140,6 +2142,7 @@ spaces:
           432 words E9EE-EB9D data (0x1B0 words): hi 00-39 lo strictly 07-0F, runs 3907x7 @EA9E + all-0C
           ascending row @EB4E (both 16-aligned); ends EB9D=310F before EB9E ramp; full-image scan zero
           F074/F274 targets/words inside; row width unconfirmed (16x27 hypothesized, EA40 counter-case).
+          Bound E9EE-EB9D.
           Use-evidence (wave-2, objdump-verified): 6 STM consumer sites — head E9EE@D2CC/D2F1 (stm #-5650,ar1
           + brc#15 + RPTBD @D2DA/D308), interior EAFE@D31F (brc#7 loop), EA20@BC2F (stm #-5600,trn + brc#6 +
           RPTBD @BC45), EB3F@DB01/DB19 (stm #-5313,ar1 + brc#94 + RPTBD); no port ops in consumer windows
@@ -2151,7 +2154,7 @@ spaces:
           F000-FBFF 3072 words data (0xC00): full-image scan zero F074/F274 targets inside, zero
           F074/F274/FC00/FE00 words inside; mixed signed curves + unsigned ramps (FAA0 32w ramp, FB60 hump
           peak FD72/FD6D per weaken, FBA8 13w 0.05-step ramp from FBA9 per off-by-one weaken); sub-row widths
-          unconfirmed. Use-evidence (wave-2): 11 STM consumer sites loading AR1-5 with interior pointers
+          unconfirmed. Bound F000-FBFF. Use-evidence (wave-2): 11 STM consumer sites loading AR1-5 with interior pointers
           (FBD6@D171/D827 feeding calld E0B5 + neighbors DD3A/E532/E16C/DD77, FBB6@DCA6/DD06, FBA6@DD79,
           F1A8@DE65/DE72, F5A8@DEA4, F9A8@DEB3, FB5A@E510, FB9B@E512; E510 objdump-verified stm+brc#9+RPTBD);
           12 coincidental exit-class-like words (F981@F080, FB81@F1BD, 5xF97x, 2xF4xx, 3xF5xx) embedded in
@@ -2385,7 +2388,7 @@ spaces:
         confidence: static
         note: >-
           6 words AF6A/AF74/AF79/AF7E/AF83/AF88 @AF64-AF69 (bytes verified); each handler head with ret exit
-          (calld 0xa2b9 lanes objdump-verified); consumer is AF57 bacc dispatch.
+          (calld 0xa2b9 lanes objdump-verified); consumer is AF57 bacc dispatch. Bound AF64-AF69.
       - address: 0xC721
         name: CC_CALLER_OF_C7A4
         confidence: static_branch
@@ -3155,7 +3158,8 @@ spaces:
         confidence: static_branch
         note: >-
           Entry F074 B0F5 (byte-verified); bound AFAB-AFB4 (exit bacc F5E2@AFB4); 10-word jtab AFB5-AFBE
-          follows (AFBF AFF3 AFF9 B017 B04B B050 B062 B080 B0BD B0C2); third bacc dispatch (shared AR2/reada
+          follows (bytes verified: AFBF AFD3 AFF9 B017 B04B B050 B062 B080
+          B0BD B0C2); third bacc dispatch (shared AR2/reada
           *(0xb) selector idiom with AF57/B11C); HYPOTHESIS.
       - address: 0xAFBF
         name: HEAD_AFBF
@@ -4027,3 +4031,52 @@ spaces:
           Bound 33D8-33E7 (16w; exit F073@33E6->2E64 + operand 33E7); post-ret entry (FC00@33D7); zero
           refs/callers; head 69F8/054F/0040 + 2A86-lane; interior F074-call 2E2F@33E4 (slice-verified);
           HYPOTHESIS.
+      - address: 0xAFD3
+        name: FRAG_AFD3
+        confidence: static_branch
+        note: >-
+          Bound AFD3-AFF8 (38w, exit FC00@AFF8 objdump-verified); bacc-table arm entry (AFB5-table slot 1
+          lists AFD3; table bytes verified AFBF/AFD3/AFF9/B017/B04B/B050/B062/B080/B0BD/B0C2 — NOTE corrects
+          AFAB-table list AFF3->AFD3); post-ret head (after FC00@AFD2 of HEAD_AFBF); interior: cond joins
+          F820@AFDC/F830s/F844 all ->AFF4 (fall through per catalog BC), mid-entry AFF4 (branch-target, lane
+          continues via F074 A7B7/A7EB to ret), F981 tfcall pair (recorded, not counted), out-calls
+          0678/A2C3/A5E1/A8D4/9DF4/A7B7/A7EB; F94D cc belongs to AFBF span (before AFD3); zero F074/F274
+          entries (consistent with table-arm class); RESCUES killed no-entry span via table-entry evidence
+          (B12F-arm precedent); HYPOTHESIS.
+      - address: 0xA25A
+        name: FRAG_A25A
+        confidence: static_branch
+        note: >-
+          Bound A25A-A25E (5w, exit FC00@A25E byte-verified); bacc-table arm entry (A255-A259 table slot 0
+          lists A25A; DISPATCH_A249 table, bytes verified); body F274 A2B9 + stm + ret (calld-stub);
+          HYPOTHESIS.
+      - address: 0xA25F
+        name: FRAG_A25F
+        confidence: static_branch
+        note: >-
+          Bound A25F-A263 (5w, exit FC00@A263 byte-verified); bacc-table arm entry (table slot 1); body F274
+          A2B9 + stm + ret; HYPOTHESIS.
+      - address: 0xA264
+        name: FRAG_A264
+        confidence: static_branch
+        note: >-
+          Bound A264-A268 (5w, exit FC00@A268 byte-verified); bacc-table arm entry (table slot 2); body F274
+          A2B9 + stm + ret; HYPOTHESIS.
+      - address: 0xAFB5
+        name: TABLE_AFB5
+        confidence: static_branch
+        note: >-
+          Bound AFB5-AFBE (10w bacc-dispatch table of DISPATCH_AFAB; bytes verified:
+          AFBF/AFD3/AFF9/B017/B04B/B050/B062/B080/B0BD/B0C2 — AFD3 not AFF3); HYPOTHESIS table.
+      - address: 0xB129
+        name: TABLE_B129
+        confidence: static_branch
+        note: >-
+          Bound B129-B12E (6w bacc-dispatch table of DISPATCH_B11C; bytes verified:
+          B12F/B141/B146/B14B/B157/B15C); HYPOTHESIS table.
+      - address: 0xB177
+        name: TABLE_B177
+        confidence: static_branch
+        note: >-
+          Bound B177-B17C (6w bacc-dispatch table of DISPATCH_B16C; bytes verified:
+          B17D/B1ED/B21F/B26E/B308/B346); HYPOTHESIS table.
