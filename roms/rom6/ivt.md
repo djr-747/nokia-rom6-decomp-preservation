@@ -37,6 +37,18 @@ textbook 6+n). V18-V20 follow by +n; V24/V25 names stay
 conventional. LEAD pin wiring (which physical line each INTn is)
 still unconfirmed.
 
+Vendor corroboration: the 8210 service manual (PAMS NSM-3 System
+Module, Issue 1 12/1999, § Baseband Module) describes MAD2 WD1 as
+ARM + "TI Lead DSP core with peripherals: API (Arm Port Interface
+memory) for MCU-DSP communication, DSP code download, MCU
+interrupt handling vectors (in DSP RAM) and DSP booting",
+13 MHz in, 45.5 MHz DSP clock. Nokia's own words confirm the
+two load-bearing facts of this section: the working vector
+table lives in uploaded DSP RAM (our `0x0A00` image), and the
+mask ROM boots by delegating to MCU-uploaded code. No
+pin-level INTn wiring in the L1+L2 text preview; that stays
+open pending schematics.
+
 Run base per build, resolved for R5/R6: the vector image runs
 at `0x0A00` (`0x0800 + dest`, dest `0x200`) in 3310/R6 setB
 (block23), 8210/R6 setB (block21), and 8210/R5 setA (block21).
