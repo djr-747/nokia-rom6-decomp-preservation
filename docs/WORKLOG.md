@@ -371,6 +371,15 @@ plus inventoried.
   withholds honored; 2E2F dispatcher fan-in 53 callers counted. Data-kills honored (AED9/B948/BFB7/E855/E9D6-
   zeros/82D9/8329/8956/909F/95AA/9B6F-head/7EC5-head/9A50-weak/4B67-thin/4C29-cascade). Evidence-only, no
   draft: 9146-tail (BUTTERFLY), 9C99-lanes (MSG_STAGE_9F35). make test 6 pass.
+- Wave-6 landed (29 new + 3 upgrades, 828 total, 92.6% = 51,208/55,296w): tails, micros, withholds.
+  OVERTURNS with falsified premises: FRAG_9700 (9700-9707, kill premise "inside ROUTINE_9682" falsified —
+  parsed [9682-96B5]/[96BD-96FF] end before 9700) and FRAG_6657 (6657-6665 no-exit abut, kill premise
+  "overlaps-6666" falsified — [6666-6678] abuts). Parent-claimed notes upgraded with verified bounds:
+  STATE_WORKER C851-C85C, BUTTERFLY_9146 tail 9146-918A, CHAIN_HEAD_9C99 9C99-9CCE. Post-RET chains:
+  A9E9-AA2E + AA2F/AA41/AA56/AA69 (gap fully covered), C576, BCBA, A5D2 (thin-entry flagged). Mid-entries:
+  9B72, AF40 split-head (orphan AF3E-3F dark), 7C2C/7C2F, C806, B61F, CF01, DA32, 4AD8 (5 entries).
+  Micros promoted: 65A5/6928/6987/9AF4 (+delays)/9BF5/68B7/690E/6940. 7ED4-7F54 stays dark (no head entry).
+  make test 6 pass.
 
 ## Goal mapping
 
