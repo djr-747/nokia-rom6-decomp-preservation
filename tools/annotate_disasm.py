@@ -3,10 +3,13 @@
 #   python3 tools/annotate_disasm.py --image <program.be16> --objdump <tic54x-objdump>
 #       --symbols roms/rom6/symbols.yaml --base 0xB4F8 --words 64
 # BE words are byte-swapped to LE for the LE-hardwired BFD, matching
-# the decomp workflow. Output goes to stdout: `NAME:` labels plus
-# `;` notes ahead of the owning instruction, nothing else added, so
-# the listing stays recombination-clean (addresses verbatim).
+# the decomp workflow. Output goes to stdout. Labels: every symbol
+# address gets `NAME:  ; 0xADDR`; every in-window branch/call target
+# without a symbol gets `L_ADDR:`. Branch lines carry `; -> TARGET`
+# and data operands `*(0x..)` carry `; = NAME`. Addresses stay
+# verbatim, so listings stay recombination-clean.
 import argparse
+import re
 import struct
 import subprocess
 import sys
@@ -16,6 +19,12 @@ try:
     import yaml
 except ImportError:
     sys.exit("need pyyaml")
+
+ROW = re.compile(r"^\s*([0-9a-f]+):\t([0-9a-f]+)\s*(.*)$")
+BRANCH = {"b", "bc", "cc", "call", "calld", "fb", "bd", "banz",
+          "rptb", "trap"}
+DATAREF = re.compile(r"\*\(0x([0-9a-f]+)\)")
+HEXOP = re.compile(r"0x([0-9a-f]+)")
 
 
 def main():
@@ -31,6 +40,7 @@ def main():
     raw = open(args.image, "rb").read()
     img = struct.unpack(f">{len(raw) // 2}H", raw)
     window = img[base:base + args.words]
+    end = base + len(window)
 
     d = yaml.safe_load(open(args.symbols))
     names = {}
@@ -46,31 +56,57 @@ def main():
         tmp = f.name
     out = subprocess.run([args.objdump, "-b", "binary", "-m", "tic54x",
                           "-D", tmp], capture_output=True, text=True)
+
+    rows = []  # (addr, word, disasm, rawline)
     for line in out.stdout.splitlines():
-        # objdump section-relative rows look like `  ab:\t1234 \tmnem...`
-        # with the address in file-offset hex.
-        stripped = line.strip()
-        head = stripped.split(":")[0] if ":" in stripped else ""
-        try:
-            off = int(head, 16)
-        except ValueError:
-            print(line)
+        m = ROW.match(line)
+        if not m:
+            rows.append((None, None, None, line))
             continue
-        addr = base + off
-        if addr in names and "\t" in line:
+        off = int(m.group(1), 16)
+        rows.append((base + off, m.group(2), m.group(3), line))
+
+    # pass 1: collect branch/call targets
+    targets = {}  # target addr -> set of source addrs
+    for addr, word, dis, _ in rows:
+        if addr is None or not dis:
+            continue
+        parts = dis.split()
+        if not parts or parts[0] not in BRANCH:
+            continue
+        hm = HEXOP.search(dis)
+        if hm:
+            targets.setdefault(int(hm.group(1), 16), set()).add(addr)
+
+    def label(t):
+        return names.get(t, f"L_{t:04X}")
+
+    # pass 2: emit
+    for addr, word, dis, rawline in rows:
+        if addr is None:
+            print(rawline)
+            continue
+        if addr in targets and base <= addr < end:
+            print(f"{label(addr)}:  ; 0x{addr:04X}")
+        elif addr in names:
             print(f"{names[addr]}:  ; 0x{addr:04X}")
-            print(line)
-            continue
-        if "\t" in line:
-            # bare operand word row: tag it when it names a data cell
-            cell = line.split("\t")[-1].strip()
-            try:
-                if int(cell, 16) in data_names:
-                    print(f"{line}  ; *({cell}) = "
-                          f"{data_names[int(cell, 16)]}")
-                    continue
-            except ValueError:
-                pass
+        line = rawline
+        if dis:
+            parts = dis.split()
+            tag = None
+            if parts and parts[0] in BRANCH:
+                hm = HEXOP.search(dis)
+                if hm:
+                    t = int(hm.group(1), 16)
+                    tag = f"-> {label(t)}"
+            else:
+                dm = DATAREF.search(dis)
+                if dm:
+                    cell = int(dm.group(1), 16)
+                    if cell in data_names:
+                        tag = f"= {data_names[cell]}"
+            if tag:
+                line = f"{line}  ; {tag}"
         print(line)
 
 

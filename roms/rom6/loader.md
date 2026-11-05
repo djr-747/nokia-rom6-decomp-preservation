@@ -5,6 +5,24 @@ Two payloads share run address `0x0F00` in sequence. Phase 1
 223 words) re-inits, publishes the version, and takes over the
 upload loop. Same address, two phases; symbols carry the phase.
 
+## FLS source of the `0x0D00` staging (closed)
+
+The 421 words loader1 copies `0x0D00→0x0590` are the head of the
+block00 payload: first word `0xFC00` matches `block00.bin` word 0
+and the emulator's live observation `0xD00=0xFC00` (emulator
+`src/dsp/c54x/mad2_dsp_c54x.c`, reset-trace comment; placement
+note in `src/dsp/c54x/dct3_dsp54.c`). Same copy on 6110
+(`stm #0xD00,ar2 … mvdp *ar2+,0x590`, emulator
+`docs/dsp-blocks-re-3310.md`). Flash bytes: 3310 v5.79 FLS,
+DSP table `0x300CD8` block idx 0 at flash 3149016, first 421
+words of its 638-word payload. The HPI hardware boot stages
+that payload at DSP `0x0D00` before reset release (documented
+for 5110 in `docs/dsp-boot-upload-architecture.md` §6; on 3310
+inferred from identical loader code plus the `0xFC00` match —
+one clearly-marked inference step). No setB descriptor carries
+dest `0xD00` because the staging predates the descriptor-driven
+upload loop.
+
 ## Phase 1 — LOADER1_ENTRY `0x0F00-0x0F76` (block00, file off `0x200`)
 
 | addr | code | effect |
