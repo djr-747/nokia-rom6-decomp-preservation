@@ -352,6 +352,17 @@ plus inventoried.
 - Payload identity resolved (build idx → manifest → run range);
   upload is phased with overwrites (`0x0A00`, `0x0F00`, `0x0930`).
   Cross-phase static call graph needs the phase order (xrefs.md).
+- Wave-4 landed (37 symbols, 689 total, 79.7% bounded = 44,089/55,296w):
+  C7B1-reversal (FRAG_C7B1, single F073@C7E7->C878, noreturn stays disposition-open),
+  FRAG_C7E9/2AFC/2B45/7A4B/95A2(4 entries)/AC07/AC22/2ECD/6753(no-exit tail)/49B6-lane(6)/388C/389C,
+  ROUTINE_A815/A91C (CC-callers F94D/F944), ABD2/BF21/BF4D (F074/F274), 516A (F074@4D70, contains
+  provisional DISPATCH_MASK15 point), 7B72 (F074@4771), 7CB6 (F830@7C8E), 772F/774E, 87C3(6 BC)/87C7/87D3
+  (trimmed at retd@87E8)/8813, 5AAC (branch-tailed), 5DF4 (CC F920@5D7F), 29B1 (trimmed 29B1-29B8),
+  FRAG_4C41/4CB4 (chained-frag, entries F84C@4C3D/4C43 — broad-scan rescue over zero-ref kill), FILL trim
+  4BD7-4C28 (single-exit, parseable), FRAG_49B2 target corrected ->4AD8 (was ->49B6 misread, 4AD8 dark).
+  Evidence: op_cc mask FF80 (F9 = cond call, ti-c54x op_cc.c), F980-F9FF = FCALL (plan p3-s118),
+  cascade [4C29-4C40] decoded (F110 + F84C-skip + F073-exit per cell), 7CD8/F062 ghost, 5E4E negative.
+  Pre-existing overlap noted (RUN_FF40 x SUB_FF61, untouched, for wave-5). make test 6 pass.
 
 ## Goal mapping
 

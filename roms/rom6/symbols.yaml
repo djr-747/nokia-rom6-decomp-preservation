@@ -2402,8 +2402,12 @@ spaces:
         note: >-
           Branch-entered block (0x4BB0 F84C bc 0x4BD7; 0x4BD5 b is PRE-entry not interior, interior exit-
           branch is 0x4C27); staged fill 4C0D:7712 2F5C + 7692 0000 (stm AR2/st #0,*ar2+) + 7713 09C8 + EC0B
-          rpt 11 + E598 mvdd x12 writes 2F5D-2F68 incl 2F61/2F62; twin 4C89 rpt 6; bound 4BD7->ret 4D9C; DP-
-          independent static store mechanism; runtime VMA unmapped; HYPOTHESIS.
+          rpt 11 + E598 mvdd x12 writes 2F5D-2F68 incl 2F61/2F62; twin 4C89 rpt 6; Bound 4BD7-4C28 (238w;
+          TRIMMED from 4BD7-4D9C draft at first-outside B F073@4C27->4D9C + operand 4C28 per ordered-scan
+          rule; interior exit-class scan otherwise clean — single-exit block); exit tail-shares RET@4D9C
+          with FRAG_4C41/4CB4 (multi-frag tail-merge); followed by cascade test-chain [4C29-4C40] (F110 +
+          F84C-skip + F073-exit-to-0700/02/04/06 per cell, documented no symbol) chaining via F84C@4C3D->
+          4C41 into FRAG_4C41; DP-independent static store mechanism; runtime VMA unmapped; HYPOTHESIS.
       - address: 0xB750
         name: FILL112_RPTBD_B750
         confidence: static_branch
@@ -4093,8 +4097,9 @@ spaces:
         name: FRAG_49B2
         confidence: static_branch
         note: >-
-          Bound 49B2-49B5 (4w incl operand; exit B F073@49B4->49B6+op 49B5); entry bc F820@49A5 (taken-path);
-          head 81F8 2656; rest of 49B5-4A4A mesh (all B exits external) stays dark; HYPOTHESIS.
+          Bound 49B2-49B5 (4w incl operand; exit B F073@49B4->4AD8 + operand 49B5 byte-verified —
+          NOTE corrects earlier ->49B6 misread: w[49B5]=4AD8, not 49B6; 4AD8 dark/unclaimed, disposition open);
+          entry bc F820@49A5 (taken-path); head 81F8 2656; HYPOTHESIS.
       - address: 0x4A63
         name: FRAG_4A63
         confidence: static_branch
@@ -4375,4 +4380,284 @@ spaces:
           Bound 28A5-28CE (exit BACC F5E2@28CE byte-verified bacc-b; computed target unknown,
           28CE/STRETCH_2800-precedent caveat); entry bc F830@2897->28A5 byte-verified (backward cond, in
           FRAG_2875 span); no F073/RET/F074 in-span; out-calls 0732/0734; abuts FRAG_2875 (ends 28A4);
+          HYPOTHESIS.
+      - address: 0xC7B1
+        name: FRAG_C7B1
+        confidence: static_branch
+        note: >-
+          Bound C7B1-C7E8 (56w; REVERSAL of C7B1-C850 noreturn-negative: byte re-scan finds SINGLE F073 in
+          span at C7E7->C878 + operand C7E8, exit scan otherwise clean of RET/FE00/BD/BACC; C878 dark/unclaimed,
+          noreturn question stays open as disposition not mechanism); entries bc F84C@2817->C7B1 byte-verified
+          (cond) + post-RET head (FC00@C7B0); interior bc F84C@C7D0->C7F6 in-span join + bc F84C@2813->C806
+          interior-projection join (C806 in-span) + bc F830@C7D4->C7E9 exterior-fall to sibling FRAG_C7E9; no
+          F074/F274; HYPOTHESIS.
+      - address: 0xC7E9
+        name: FRAG_C7E9
+        confidence: static_branch
+        note: >-
+          Bound C7E9-C7F5 (13w; exit F073@C7F4->283D + operand C7F5, single exit-class word in span, byte-
+          verified); sole entry bc F830@C7D4->C7E9 byte-verified (cond, from FRAG_C7B1 interior); interior
+          F84D@C7F0 cond (fall-through, non-exit per BC convention); zero F074/F274; HYPOTHESIS.
+      - address: 0x2AFC
+        name: FRAG_2AFC
+        confidence: static_branch
+        note: >-
+          Bound 2AFC-2B44 (73w; exit F073@2B43->2E64 + operand 2B44, single exit-class word, byte-verified);
+          entry bc F84C@281F->2AFC byte-verified (cond, from WORKER_2E84-precursor zone); interior FA20@2B37
+          bcd (cond-delayed, fall-through per convention); zero F074/F274; HYPOTHESIS.
+      - address: 0x2B45
+        name: FRAG_2B45
+        confidence: static_branch
+        note: >-
+          Bound 2B45-2B52 (14w; exit F073@2B51->2E64 + operand 2B52, single exit-class word, byte-verified);
+          entries 2x bc F84C@282B/282F->2B45 byte-verified (cond pair); interior F84C@2B4A cond fall-through;
+          abuts FRAG_2AFC (ends 2B44); zero F074/F274; HYPOTHESIS.
+      - address: 0xA815
+        name: ROUTINE_A815
+        confidence: static_branch
+        note: >-
+          Bound A815-A842 (46w; exit RET FC00@A842 byte-verified, exit scan clean of BD/BACC/F073);
+          entries 2x cc F94D@AFCC + F944@B05B->A815 byte-verified (CC = cond call per op_cc mask FF80, far
+          backward refs from AE/B0 table-arm zone) + post-RET head (FC00@A814); interior cc pair (fall-
+          through, non-exit per CC convention); UPHELD as ROUTINE on CC-call entry (not branch-frag);
+          HYPOTHESIS.
+      - address: 0xA91C
+        name: ROUTINE_A91C
+        confidence: static_branch
+        note: >-
+          Bound A91C-A953 (56w; exit RET FC00@A953 byte-verified, exit scan clean); entries 2x cc F94D@B13A +
+          F944@B165->A91C byte-verified (far backward CC refs, AE/B0-arm zone) + post-RET head (FC00@A91B);
+          interior join F073@A939->A946 in-span; UPHELD as ROUTINE on CC-call entry; HYPOTHESIS.
+      - address: 0x7A4B
+        name: FRAG_7A4B
+        confidence: static_branch
+        note: >-
+          Bound 7A4B-7A5A (16w; exit F073@7A59->7A61 + operand 7A5A, single exit-class word, byte-verified);
+          entry bc F820@7A42->7A4B byte-verified (cond); interior clean of RET/FE00/BD/BACC; zero F074/F274;
+          HYPOTHESIS.
+      - address: 0x95A2
+        name: FRAG_95A2
+        confidence: static_branch
+        note: >-
+          Bound 95A2-95A9 (8w; exit BACC F5E2@95A9 byte-verified bacc-b); FOUR entries byte-verified:
+          B F073@955D/958F->95A2 + bc F820@955F/9593->95A2 (uncond + cond pair, mid-shape zone); interior
+          clean; zero F074/F274; HYPOTHESIS.
+      - address: 0xABD2
+        name: ROUTINE_ABD2
+        confidence: static_branch
+        note: >-
+          Bound ABD2-AC06 (53w; exit RET FC00@AC06 byte-verified, exit scan clean); entries 2x calld
+          F274@A50F/A610->ABD2 byte-verified + post-RET head (FC00@ABD1); interior F073-free; abuts FRAG_AC07
+          (starts AC07); HYPOTHESIS.
+      - address: 0xAC07
+        name: FRAG_AC07
+        confidence: static_branch
+        note: >-
+          Bound AC07-AC21 (27w; exit RETD FE00@AC1F + delay AC20-21, byte-verified, exit scan otherwise
+          clean); entry bc F84D@AC02->AC07 byte-verified (cond, pre-head exterior) + post-RET head
+          (FC00@AC06 = ROUTINE_ABD2 exit); interior calld 7067@AC17 (out-call, non-exit); abuts FRAG_AC22
+          (starts AC22); HYPOTHESIS.
+      - address: 0xAC22
+        name: FRAG_AC22
+        confidence: static_branch
+        note: >-
+          Bound AC22-AC4B (42w; exit RET FC00@AC4B byte-verified, exit scan clean); entry bccnd F844@ABE3->
+          AC22 byte-verified (cond, pre-head exterior); interior join F073@AC3A->AC41 in-span; abuts
+          FRAG_AC07 (ends AC21); zero F074/F274; HYPOTHESIS.
+      - address: 0xBF21
+        name: ROUTINE_BF21
+        confidence: static_branch
+        note: >-
+          Bound BF21-BF4C (44w; exit RET FC00@BF4C byte-verified, exit scan clean); entries call F074@BE22->
+          BF23 interior-projection (in-span, from head+2) + calld F274@BD25->BF21 byte-verified (head call) +
+          post-RET head (FC00@BF20); BE22/BF23 call pair suggests shared head-dispatch idiom with sibling
+          ROUTINE_BF4D (which callds BE22@BF7B); HYPOTHESIS.
+      - address: 0xBF4D
+        name: ROUTINE_BF4D
+        confidence: static_branch
+        note: >-
+          Bound BF4D-BF8B (63w; exit RET FC00@BF8B byte-verified, exit scan clean); entries call F074@BDFD->
+          BF4D byte-verified + post-RET head (FE00@BF4C retd of ROUTINE_BF21); interior calld BE22@BF7B
+          (in-span out-call to shared BE22 worker); abuts ROUTINE_BF21 (ends BF4C); HYPOTHESIS.
+      - address: 0x2ECD
+        name: FRAG_2ECD
+        confidence: static_branch
+        note: >-
+          Bound 2ECD-2ED5 (9w; exit BACC F4E2@2ED5 byte-verified, computed target unknown); entry bc
+          F84F@2EBC->2ECD byte-verified (cond, retro-jump from WORKER_2E84 tail zone); abuts FRAG_2EC6 (ends
+          2ECC, contiguous, no overlap); zero F074/F274; HYPOTHESIS.
+      - address: 0x6753
+        name: FRAG_6753
+        confidence: static_branch
+        note: >-
+          Bound 6753-6769 (23w; NO own exit: exit scan clean of RET/FE00/BD/BACC/F073, falls into SEG_676A
+          head — tail-frag abut, not a routine); entry bc F820@6742->6753 byte-verified (cond); zero
+          F074/F274; HYPOTHESIS.
+      - address: 0x516A
+        name: ROUTINE_516A
+        confidence: static_branch
+        note: >-
+          Bound 516A-518F (38w; exit RETD FE00@518D + delay 518E-8F, byte-verified, exit scan otherwise
+          clean); entry call F074@4D70->516A byte-verified (far forward call from 4D-worker zone); contains
+          provisional DISPATCH_MASK15@5170 point-label (4-bit mask gate note, no bound — no overlap, no
+          conflict); abuts LANE_36F@5190 (starts 5190); HYPOTHESIS.
+      - address: 0x49B6
+        name: FRAG_49B6
+        confidence: static_branch
+        note: >-
+          Bound 49B6-49F6 (65w; exit F073@49F5->49FA + operand 49F6, byte-verified); entry bc F820@49A0->
+          49B6 byte-verified (cond, sole exterior entry); interior join F073@49D6->49DE in-span; lane-head
+          of B-lane frag chain (49F7/4A01/4A12/4A19/4A46 siblings follow, each bc-entered); zero F074/F274;
+          HYPOTHESIS.
+      - address: 0x49F7
+        name: FRAG_49F7
+        confidence: static_branch
+        note: >-
+          Bound 49F7-4A00 (10w; exit F073@49FF->4A07 + operand 4A00, byte-verified); entry bc F820@49EB->
+          49F7 byte-verified (cond); abuts FRAG_49B6 (ends 49F6); B-lane chain link; HYPOTHESIS.
+      - address: 0x4A01
+        name: FRAG_4A01
+        confidence: static_branch
+        note: >-
+          Bound 4A01-4A11 (17w; exit F073@4A10->4A21 + operand 4A11, byte-verified); entry bc F820@49E6->
+          4A01 byte-verified (cond, backward from pre-lane zone); abuts FRAG_49F7 (ends 4A00); B-lane chain
+          link; HYPOTHESIS.
+      - address: 0x4A12
+        name: FRAG_4A12
+        confidence: static_branch
+        note: >-
+          Bound 4A12-4A18 (7w; exit F073@4A17->4A12 + operand 4A18 — self-loop exit to own head, byte-
+          verified); entries 2x bc F830@4A04/4A09->4A12 byte-verified (cond pair); abuts FRAG_4A01 (ends
+          4A11); B-lane chain link; HYPOTHESIS.
+      - address: 0x4A19
+        name: FRAG_4A19
+        confidence: static_branch
+        note: >-
+          Bound 4A19-4A45 (45w; exit F073@4A44->4A12 + operand 4A45, byte-verified, back-edge to FRAG_4A12
+          head — lane-loop close); entry bc F820@49E1->4A19 byte-verified (cond); interior joins F830@49F3/
+          4A0E/4A15->4A1E in-span; B-lane chain link; HYPOTHESIS.
+      - address: 0x4A46
+        name: FRAG_4A46
+        confidence: static_branch
+        note: >-
+          Bound 4A46-4A4A (5w; exit F073@4A49->4A3C + operand 4A4A, byte-verified, back-edge into FRAG_4A19
+          span); entry bc F820@4A3C->4A46 byte-verified (cond, from FRAG_4A19 interior — chained back-edge
+          pair); B-lane chain tail; HYPOTHESIS.
+      - address: 0x388C
+        name: FRAG_388C
+        confidence: static_branch
+        note: >-
+          Bound 388C-389B (16w; exit F073@389A->38AA + operand 389B — forward join into sibling FRAG_389C
+          span, byte-verified); entries 2x B F073@AE73/AE77->388C byte-verified (far uncond refs from AE
+          table-arm zone); interior clean of RET/FE00/BD/BACC; abuts FRAG_389C (starts 389C); HYPOTHESIS.
+      - address: 0x389C
+        name: FRAG_389C
+        confidence: static_branch
+        note: >-
+          Bound 389C-38C8 (41w; exit RET FC00@38C8 byte-verified, exit scan clean of BD/BACC/FE00/F073);
+          entry B F073@AE85->389C byte-verified (far uncond ref, AE-arm zone) + interior join F073@389A->
+          38AA (from FRAG_388C exit); interior cc pair F930@38AE->38FB + F930@38B3->38C9 (CC = cond call per
+          op_cc mask FF80 — in-span calls, non-exits, mesh-neutral either way); abuts FRAG_388C (ends
+          389B); HYPOTHESIS.
+      - address: 0x7B72
+        name: ROUTINE_7B72
+        confidence: static_branch
+        note: >-
+          Bound 7B72-7BF7 (134w; exit RET FC00@7BF7 byte-verified, exit scan clean of FE00/BD/BACC/F073);
+          entries call F074@4771->7B72 byte-verified (far forward call) + post-RET head (FC00@7B71); interior
+          join B F073@7BE1->7BEE in-span + branch-entered projections F073@7C2A/7C2D->7BEE (exterior joins
+          into interior, tail-merge idiom); HYPOTHESIS.
+      - address: 0x7CB6
+        name: FRAG_7CB6
+        confidence: static_branch
+        note: >-
+          Bound 7CB6-7D30 (123w; exit RET FC00@7D30 byte-verified); entry bc F830@7C8E->7CB6 byte-verified
+          (cond, exterior pre-head); interior joins bd F273@7CCA->7CF9 in-span (uncond-delayed per catalog,
+          target in-span = join) + B F073@7D12->7D2C in-span; 7CD8-tensor resolved NEGATIVE (w = F062 single-
+          word op, not F8/F9 class — ghost); zero F074/F274; w[7CB5]=FFFF (not post-RET — bc-entry stands
+          alone); HYPOTHESIS.
+      - address: 0x772F
+        name: FRAG_772F
+        confidence: static_branch
+        note: >-
+          Bound 772F-774D (31w; exit RET FC00@774D byte-verified, exit scan clean); post-RET head
+          (FC00@772E) + interior-projection call F274@749E->773B (in-span, calld into body — execution
+          evidence); abuts ROUTINE_774E (starts 774E); zero head-branch entry (post-RET convention per
+          FRAG_3267/33CE/351D precedent); HYPOTHESIS.
+      - address: 0x774E
+        name: ROUTINE_774E
+        confidence: static_branch
+        note: >-
+          Bound 774E-778F (66w; exit RET FC00@778F byte-verified, exit scan clean); entry call F074@74A2->
+          774E byte-verified + post-RET head (FC00@774D = FRAG_772F exit); abuts FRAG_772F (ends 774D);
+          HYPOTHESIS.
+      - address: 0x87C3
+        name: FRAG_87C3
+        confidence: static_branch
+        note: >-
+          Bound 87C3-87C6 (4w; exit RET FC00@87C6 byte-verified — minimal RET-terminated cell); SIX bc
+          entries byte-verified (cond fan-in: F820@8782/8789 + F84C@8794 + F843@87AD/87BB + F84E@87B7->87C3,
+          from 87xx dispatch zone) + post-RET head (FC00@87C2); abuts ROUTINE_87C7 (starts 87C7); HYPOTHESIS.
+      - address: 0x87C7
+        name: ROUTINE_87C7
+        confidence: static_branch
+        note: >-
+          Bound 87C7-87D2 (12w; exit RET FC00@87D2 byte-verified, exit scan clean); entries 2x calld
+          F274@87A7/87B1->87C7 byte-verified + post-RET head (FC00@87C6 = FRAG_87C3 exit); abuts FRAG_87C3
+          (ends 87C6) and ROUTINE_87D3 (starts 87D3); HYPOTHESIS.
+      - address: 0x87D3
+        name: ROUTINE_87D3
+        confidence: static_branch
+        note: >-
+          Bound 87D3-87E8 (22w; TRIMMED from 87D3-8820 draft at first-outside retd FE00@87E8 — retd is an
+          exit per convention, ordered-scan rule; 87E9-8812 stays dark); entry call F074@86BC->87D3 byte-
+          verified + post-RET head (FC00@87D2 = ROUTINE_87C7 exit); HYPOTHESIS.
+      - address: 0x8813
+        name: ROUTINE_8813
+        confidence: static_branch
+        note: >-
+          Bound 8813-8820 (8w; exit RET FC00@8820 byte-verified); entry call F074@8647->8813 byte-verified +
+          post-RET head (FC00@8812 = retd of dark 87E9-8812 cell); preceded by dark gap 87E9-8812 (contains
+          retd@87E8-exit cell + ret@8812 pre-word); HYPOTHESIS.
+      - address: 0x5AAC
+        name: ROUTINE_5AAC
+        confidence: static_branch
+        note: >-
+          Bound 5AAC-5AC7 (28w; branch-tailed exit B F073@5AC6->5ACA + operand 5AC7 — first-outside 5AC6, end
+          5AC7, no RET in span, exits forward into SEG_5AC8+2; exit scan otherwise clean); entry calld
+          F274@4CE4->5AAC byte-verified + post-RET head (FC00@5AAB); HYPOTHESIS.
+      - address: 0x5DF4
+        name: ROUTINE_5DF4
+        confidence: static_branch
+        note: >-
+          Bound 5DF4-5E7C (137w; exit RET FC00@5E7C byte-verified); entries cc F920@5D7F->5DF4 byte-verified
+          (CC = cond call per op_cc mask FF80) + post-RET head (FC00@5DF3); interior joins bd F273@5E16->
+          5E3A + B F073@5E41->5E6A + bd F273@5E5B->5E6D + B F073@5E6B->5E6E (all in-span, mesh-rule joins);
+          5E4E-tensor resolved NEGATIVE (not exit-class — BD-alignment holds); HYPOTHESIS.
+      - address: 0x29B1
+        name: FRAG_29B1
+        confidence: static_branch
+        note: >-
+          Bound 29B1-29B8 (8w; TRIMMED from 29B1-2A72 draft at first-outside B F073@29B7->2A8A + operand 29B8
+          per ordered-scan rule; remaining outside-targeting F073s 29D1-2A71 fall in dark zone); entries 2x
+          bc F846@29A7 + F84E@29AB->29B1 byte-verified (cond pair); abuts FRAG_2983 (ends 29B0); dark
+          remainder 29B9-2A72 (DARK_2AFC entry-open question recorded); HYPOTHESIS.
+      - address: 0x4C41
+        name: FRAG_4C41
+        confidence: static_branch
+        note: >-
+          Bound 4C41-4CB3 (115w; exit B F073@4CB2->4D9C + operand 4CB3 — forward tail-share to FRAG_4CB4 end
+          RET, byte-verified); entry bc F84C@4C3D->4C41 byte-verified (cond, skips cascade-exit B@4C3F->
+          0706 — cascade test-chain [4C29-4C40] falls through cell-to-cell on pass: F110 test + F84C skip +
+          F073 exit-to-0700/02/04/06 per cell, documented no symbol); interior forward branch F84C@4C43->
+          4CB4 (exterior to this span, chains into sibling FRAG_4CB4 head — chained-frag idiom); FILL linkage
+          (follows trimmed FILL_2F5D_4BD7 + cascade); HYPOTHESIS.
+      - address: 0x4CB4
+        name: FRAG_4CB4
+        confidence: static_branch
+        note: >-
+          Bound 4CB4-4D9C (233w; exit RET FC00@4D9C byte-verified); entry bc F84C@4C43->4CB4 byte-verified
+          (cond, from FRAG_4C41 interior — chained-frag head entry); interior joins F073@4CD6/4CE2/4CE9->
+          4CFE + F073@4CF5->4CF9 + B F073@4D87->4D9C (tail self-join); end-RET shared tail converged from
+          FILL exits B@4BD5(PRE-entry)/4C27->4D9C + FRAG_4C41 exit B@4CB2->4D9C (multi-frag tail-merge);
           HYPOTHESIS.
