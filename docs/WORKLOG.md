@@ -433,6 +433,16 @@ plus inventoried.
   +1w mid-cut + FRAG_62B4 fall-through, table/data E795/AED9/3EBD, repeat-forms 8329/91EF/2FFF, sub-word/DATA
   slivers, post-exit
   orphans. make test 6 pass.
+- Wave-12 opened (oracle mining + BACC-table hunt, both negative for ROM6 entries): all-firmware-set
+  scanner (/tmp/oracle_all.py) finds 67 dark-gap targets hit from 5190/6190/3210/5110/8210-setA uploaded
+  code (ROM3/4/5 call sites: 2F70 15x, 3175/317F/318E/3195/3198, 37B0 18x, 7F07/7F12/7F22/7F24/7F2D, 90A9,
+  3906) — cross-ROM homology corroboration (shared layout hypothesis supported), ZERO new ROM6 entries
+  (only ROM6-era sets 8210-setB/3310 count per discriminator; their only dark hits are FCALL-only E795/E8BD
+  which confer no entry). BACC@2ED5 pointer trace: AR1 = A-0x4FBF with A<=87 gives ROM[0xB041+A] but 0xB041
+  is claimed code (FRAG_B036) not a table; negative-A base 0xAFEA-0xB040 also code — table hunt refuted,
+  2ED6 kill stands with mechanism documented. FBD (FAFx) sweep: all targets far-space, irrelevant. 909F
+  kernel-boundary question deferred (KERNEL_9042 rptb block overrun needs kernel revalidation, not a
+  drive-by edit). F remaining: trace or second-firmware oracle for dispatcher fields.
 
 ## Goal mapping
 
