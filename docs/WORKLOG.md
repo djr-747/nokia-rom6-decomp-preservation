@@ -458,6 +458,10 @@ plus inventoried.
   and audited with coverage.ranges_in across all spaces: every span already claimed (JTAB/DISPATCH/SUB
   symbols), zero extensions, zero new overlaps. Lesson: audit all symbols.yaml spaces (data_word holds
   the wave-3..13 claims); program_word alone under-reports. Static surface unchanged at 96.9%.
+- Wave-15 (+80w, 97.0% = 53,647/55,296w): exhaustive claimed-to-gap edge scan (41 gap targets, 40
+  gap-internal, sole exterior edge F980 fcall E770->E86D from EXT_DISPATCH_BIG) yields SUB_E86D
+  E86D-E8BC (far min/max clamp routine, fbacc b exit, interior join E898->E8AC); E8BD-E8C6 post-exit
+  orphan stays dark. make test 6 pass, no new overlaps.
 
 ## Goal mapping
 

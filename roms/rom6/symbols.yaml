@@ -289,6 +289,17 @@ spaces:
           address as LOADER1_ENTRY by phased overwrite, not by alias.
         evidence:
           - roms/rom6/loader.md
+      - address: 0xE86D
+        name: SUB_E86D
+        confidence: static_branch
+        note: >-
+          Bound E86D-E8BC (80w; far routine, exit fbacc b F5E6@E8BC after frame 3 + popm bh/bl;
+          exit scan clean); entry fcall F980@E770->E86D byte-verified (from EXT_DISPATCH_BIG; sole
+          claimed-to-gap edge in ROM); head call 071A (below floor, exterior) + frame -3 + rsbx ovb;
+          body min/max clamp loop (banz E879, rptb E88B/E8A3, delay lanes) with interior join b
+          F073@E898->E8AC; tail E8BD-E8C6 (post-exit orphan epilogue, no refs) stays dark; HYPOTHESIS.
+        evidence:
+          - build/rom6/branch.lst
   data_word:
     description: C54x CPU data-space address; use data_read routing
     symbols:
