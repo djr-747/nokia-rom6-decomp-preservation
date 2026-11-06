@@ -5682,6 +5682,103 @@ spaces:
           micro-span, retd-headed); entry bc F845@DA29->DA32 byte-verified (gap-sibling span DA21-DA31
           zone, exterior to this span); fall-through continuation of FRAG_DA21 delay tail, branch-entered;
           HYPOTHESIS.
+      - address: 0x3A8E
+        name: FRAG_3A8E
+        confidence: static_branch
+        note: >-
+          Bound 3A8E-3AB5 (40w; exit RET FC00@3AB5 byte-verified, exit scan clean); entries bc F84D@3A87->
+          3A8E byte-verified (from ROUTINE_3A81 [3A81-3A8D] tail, chained edge) + post-RET head (FC00@3A8D);
+          HYPOTHESIS.
+      - address: 0x3AB6
+        name: FRAG_3AB6
+        confidence: static_branch
+        note: >-
+          Bound 3AB6-3ADD (40w; exit RET FC00@3ADD byte-verified, exit scan clean); post-RET head
+          (FC00@3AB5 = FRAG_3A8E exit, CODE); sole exterior ref calld F274@8085->3AB6 is dark-src
+          (unclaimed 807F-80A2 sliver, not counted); thin entry per C576 precedent; HYPOTHESIS.
+      - address: 0x4557
+        name: FRAG_4557
+        confidence: static_branch
+        note: >-
+          Bound 4557-4566 (16w; exit RET FC00@4566 byte-verified, exit scan clean); post-RET head
+          (FC00@4556 = SUB_454F exit, CODE); interior out-call F074@4563->052A (code signature — overturns
+          data-kill for THIS cell only; texture STM/RPT forms noted); remainder cells drafted below
+          (FRAG_456A/4578) + dark sliver 4567-4569 (3w, below minimal bar); HYPOTHESIS.
+      - address: 0x456A
+        name: FRAG_456A
+        confidence: static_branch
+        note: >-
+          Bound 456A-4577 (14w; exit RET FC00@4577 byte-verified, exit scan clean); post-RET head
+          (FC00@4569, CODE cell); zero exterior refs — thin entry per 3AB6 precedent; HYPOTHESIS.
+      - address: 0x4578
+        name: FRAG_4578
+        confidence: static_branch
+        note: >-
+          Bound 4578-457E (7w; exit RET FC00@457E byte-verified, exit scan clean; minimal cell per A3CE
+          precedent); post-RET head (FC00@4577 = FRAG_456A exit, CODE); zero exterior refs; HYPOTHESIS.
+      - address: 0x2D8B
+        name: FRAG_2D8B
+        confidence: static_branch
+        note: >-
+          Bound 2D8B-2D8E (4w; exit RET FC00@2D8E byte-verified, exit scan clean; micro-span); entries bc
+          F844@2D80->2D8B byte-verified (from ISR_2D5E [2D5E-2D8A] tail — abuts at 2D8A|2D8B, chained edge) +
+          post-RET head (FC00@2D8A); HYPOTHESIS.
+      - address: 0xBA08
+        name: FRAG_BA08
+        confidence: static_branch
+        note: >-
+          Bound BA08-BA29 (34w; exit retd FE00@BA29 byte-verified, delays BA2A-BA2B spill onto FRAG_BA2A head
+          (shared words, coverage-merged — 8AA5 precedent); exit scan otherwise clean); entries bc F847@
+          B9F5->BA0A byte-verified (from FRAG_B948 [B948-BA07] interior, chained edge) + post-RETD head
+          (FE00@BA07); HYPOTHESIS.
+      - address: 0xBA2A
+        name: FRAG_BA2A
+        confidence: static_branch
+        note: >-
+          Bound BA2A-BA31 (8w; exit retd FE00@BA2F + delays BA30-BA31 included per convention; exit scan
+          clean); entries bc F846@B964->BA2C byte-verified (from FRAG_B948 interior, chained edge) +
+          post-RETD head (FE00@BA29); pre-head BA2A-BA2B shared as FRAG_BA08 delays (noted); HYPOTHESIS.
+      - address: 0x4007
+        name: ROUTINE_4007
+        confidence: static_branch
+        note: >-
+          Bound 4007-4054 (78w; exit RET FC00@4054 byte-verified; interior scan clean of exit-class
+          (B@4071 lies past 4054, in sibling span); exit scan verified); entries 4x
+          call F074@30C7/3269/3AF7->4007 + calld F274@3AFC->4007 byte-verified head-exact (3AF7/3AFC from
+          FRAG_3AB6) + post-RET head (FC00@4006 = ROUTINE_3FFA exit); F074@3AFA->4055 targets sibling
+          ROUTINE_4055 (noted); HYPOTHESIS.
+      - address: 0x4055
+        name: ROUTINE_4055
+        confidence: static_branch
+        note: >-
+          Bound 4055-40A0 (72w; exit RET FC00@40A0 byte-verified; interior join B F073@4071->4095 in-span;
+          exit scan otherwise clean); entries call F074@3AFA->4055 byte-verified head-exact (from FRAG_3AB6
+          [3AB6-3ADD], chained edge) + post-RET head (FC00@4054 = ROUTINE_4007 exit); abuts ROUTINE_4007
+          (ends 4054); HYPOTHESIS.
+      - address: 0xDBD4
+        name: ROUTINE_DBD4
+        confidence: static_branch
+        note: >-
+          Bound DBD4-DBD9 (6w; exit RET FC00@DBD9 byte-verified, exit scan clean; micro-routine); entries
+          calld F274@DD01->DBD4 byte-verified head-exact (from FRAG_DCE6 [DCE6-DD39] interior, chained edge);
+          call-entered, hence ROUTINE; pre-word FC00@DBD3 noted (dark sliver, entry is call-based);
+          HYPOTHESIS.
+      - address: 0x4B67
+        name: FRAG_4B67
+        confidence: static_branch
+        note: >-
+          Bound 4B67-4B80 (26w; exit RET FC00@4B80 byte-verified, exit scan clean; STM-heavy straight-line
+          immediates, zero calls/branches/refs — data-like texture FLAGGED); post-RET head (FC00@4B66 =
+          SUB_4B2C exit, CODE); drafted on post-RET + clean single-exit bar (C576 precedent) — overturns
+          central data-kill for this cell on bar-consistency grounds, texture question recorded, falsifiable
+          by trace; HYPOTHESIS.
+      - address: 0xA3CE
+        name: FRAG_A3CE
+        confidence: static_branch
+        note: >-
+          Bound A3CE-A3D4 (7w; exit RET FC00@A3D4 byte-verified, exit scan clean; minimal cell per 3616
+          precedent); post-RET head (FC00@A3CD = ROUTINE_A3C5 exit, CODE); zero exterior refs; A3CE-stub
+          open question closed as minimal frag; HYPOTHESIS.
       - address: 0x3D3D
         name: ROUTINE_3D3D
         confidence: static_branch

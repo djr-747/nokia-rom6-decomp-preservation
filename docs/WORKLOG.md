@@ -410,6 +410,13 @@ plus inventoried.
   (calld pair, abutting chain). Rejected with reasons: 2FFF (F071 rptz repeat-count phantom, not a branch —
   repeat-form aliasing class); E795/E8BD (F980 FCALL-only refs, fcall-tension convention holds — entry-weak,
   island kill stands). make test 6 pass.
+- Wave-10 landed (13 new, 868 total, 94.7% = 52,341/55,296w): systematic cell scan of all dark gaps
+  (post-RET head + single-exit cells). FRAG_3A8E/3AB6 (40w chain, 3A81-linked); FRAG_4557/456A/4578 (cell
+  chain, interior call overturns data-kill for 4557-cell only); FRAG_2D8B (ISR-chained micro);
+  FRAG_BA08/BA2A (retd chain, delay-spill shared words — 8AA5 precedent); ROUTINE_4007/4055 (150w zone
+  closed, 4+1 calls); ROUTINE_DBD4 (calld micro); FRAG_4B67 (thin + texture flag — data-kill overturned on
+  bar-consistency, falsifiable); FRAG_A3CE (7w minimal, stub closed). Rule teeth demonstrated: BFD2/DAD0/
+  BFB7/E795/8329/45FA stay dark (dark-src entry or entry-less + signature-less). make test 6 pass.
 
 ## Goal mapping
 
