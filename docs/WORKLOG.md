@@ -451,6 +451,13 @@ plus inventoried.
 - Wave-13 (+30w, 96.9% = 53,567/55,296w): KERNEL_9042 len 47->72 through rptb@9074 block-end 90B6 + rsbx
   (byte-verified; abuts KERNEL_9071; pre-existing 9004-overlap unchanged, no new overlap); FRAG_45FA
   [45FA-45FE] (post-RET + RET, 2 out-calls). 8907 kill confirmed (B-operand orphan). make test 6 pass.
+- Wave-14 verification (no new words): independent re-derivation of the six reada-dispatchers
+  (8335/A249/AF57/AFAB/B11E/B16C) from the ti-c54x reference core — READA writes Smem (Smem<-PROG[A],
+  program address from accumulator A), MMR 0x0B is BL, so B<-PROG[base+index] then BACC B is a ROM
+  table jump. All six tables, 41 case bodies, six dispatcher prologues, and 27 shared callees rebounded
+  and audited with coverage.ranges_in across all spaces: every span already claimed (JTAB/DISPATCH/SUB
+  symbols), zero extensions, zero new overlaps. Lesson: audit all symbols.yaml spaces (data_word holds
+  the wave-3..13 claims); program_word alone under-reports. Static surface unchanged at 96.9%.
 
 ## Goal mapping
 
