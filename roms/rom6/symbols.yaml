@@ -724,7 +724,8 @@ spaces:
           #64 *AR0); BITF *(0x2628)/0x051E/0x054F; CMPM *AR6 #80/#82; EXIT CORRECTED by all-paths walk:
           true end retd @0x63D7 (2 exits: rc aneq 0x63D4, retd 0x63D7), 34 internal branch sites inside;
           FC00 @0x643D belongs to downstream routine ~0x63DA (entry 0x4481), NOT this span; no PORTR/PORTW
-          in 0x62F2-0x63D7; role hypothesis only.
+          in 0x62F2-0x63D7; role hypothesis only. Bound 63D8-63D9 (RETD@63D7 delay slots, executed
+          words — wave-11 spill fix).
       - address: 0x613F
         name: BRANCH_TAIL_613F
         confidence: static_branch
@@ -1199,7 +1200,9 @@ spaces:
         confidence: static_branch
         note: >-
           CORRECTED exit: entry F074 0606; RPT #14 + SUBC *AR4,A loop; exit RETD FE00 @0x434C with delay slot
-          (objdump retd), NOT FC00 -- synthesis FC00 claim falsified by byte check; bound 0x4348-0x434D; 7
+          (objdump retd), NOT FC00 -- synthesis FC00 claim falsified by byte check; bound 0x4348-0x434E
+          (wave-11 correction: RETD delays are 434D-434E — old bound cut mid-instruction, and@434D operand
+          434E belongs to the span, recombination-clean); 7
           callers 4E39 4FDF 50D0 7788 77A0 78DF 78FD; HYPOTHESIS divide step.
       - address: 0x4384
         name: DIV_CORE_4384
@@ -1630,7 +1633,9 @@ spaces:
         name: LEAF54_82FF
         confidence: static_branch
         note: >-
-          Entry F6BE EA00 7715 0006 E900 6F86; RET @8334 len 54; 4 callers F274 @82C2/82CF/83C2/83DC; no inner
+          Entry F6BE EA00 7715 0006 E900 6F86; RET @8334 len 56 (wave-11 correction: len-54 arithmetic
+          cut the orm@8369 operands 836A-836B mid-instruction; +2w to complete, recombination-clean); 4
+          callers F274 @82C2/82CF/83C2/83DC; no inner
           calls; twin of 0x82D4; HYPOTHESIS.
       - address: 0x8335
         name: SUB56_8335
@@ -1966,7 +1971,8 @@ spaces:
         confidence: static_branch
         note: >-
           Entry 7669 3214 7712 0B6A; first exit retd FE00 @D8F3 +delays 8059 805A (survey 0xD9C6 shrunk,
-          critic-confirmed); caller F274 @D979 calld verified; retd opcodes F4E6@E794 FB81 199C fcalld
+          critic-confirmed); caller F274 @D979 calld verified; Bound D8F4-D8F5 (RETD@D8F3 delay slots,
+          executed words — wave-11 spill fix); retd opcodes F4E6@E794 FB81 199C fcalld
           clarified; HYPOTHESIS.
       - address: 0xDAFD
         name: SUB_DAFD
@@ -1978,7 +1984,8 @@ spaces:
         name: SUB_D9FC
         confidence: static_branch
         note: >-
-          Entry 7712 0A5E E807 8092; first exit retd FE00 @DA15 entry-linear; caller F274 @D9BF verified;
+          Entry 7712 0A5E E807 8092; first exit retd FE00 @DA15 entry-linear; Bound DA16-DA17 (RETD@DA15
+          delay slots — wave-11 spill fix); caller F274 @D9BF verified;
           HYPOTHESIS.
       - address: 0xDA48
         name: SUB_DA48
@@ -2001,7 +2008,8 @@ spaces:
         name: SUB_DC2E
         confidence: static_branch
         note: >-
-          Entry 771A 009F 7713 0008; first exit retd FE00 @DC40; caller F274 @DFE6 verified; HYPOTHESIS.
+          Entry 771A 009F 7713 0008; first exit retd FE00 @DC40; Bound DC41-DC42 (RETD@DC40 delay slots
+          — wave-11 spill fix); caller F274 @DFE6 verified; HYPOTHESIS.
       - address: 0xDC43
         name: SUB_DC43
         confidence: static_branch
@@ -2023,7 +2031,8 @@ spaces:
         name: SUB_D970
         confidence: static_branch
         note: >-
-          Entry 4A07 7707 0740 EA16; first exit retd FE00 @D9C6 entry-linear; callers F074 @5477 + @5490
+          Entry 4A07 7707 0740 EA16; first exit retd FE00 @D9C6 entry-linear; Bound D9C7-D9C8 (RETD@D9C6
+          delay slots — wave-11 spill fix); callers F074 @5477 + @5490
           verified; HYPOTHESIS.
       - address: 0xDA18
         name: SUB_DA18
@@ -2040,7 +2049,8 @@ spaces:
         name: SUB_DB76
         confidence: static_branch
         note: >-
-          Entry 7210 0A5B 605B 001B; first exit retd FE00 @DB7E; callers F074 @DCE2 + F274 @DD2B verified;
+          Entry 7210 0A5B 605B 001B; first exit retd FE00 @DB7E; Bound DB7F-DB80 (RETD@DB7E delay slots
+          — wave-11 spill fix); callers F074 @DCE2 + F274 @DD2B verified;
           HYPOTHESIS.
       - address: 0xE532
         name: SUB25_E532
@@ -2076,7 +2086,9 @@ spaces:
           bound shrunk to interior F073 b @7FB3->7F54 incl operand 7FB4 len 32, tail-merges to FC00 @7F54
           ahead of existing 7F55; callers 8x F274 @8357/61/76/80/94/A8/F0/8407 verified (12x F273 bd not
           calls); HYPOTHESIS shared-target. Pre-head Bound 7F95-7FB2 (wave-5: 8 F274 callers; exit branch
-          F073@7FB3->7F54 shared as SUB32 head, 1w 7FB3 outside bound — adjacent claim, no overlap).
+          F073@7FB3->7F54 shared as SUB32 head, 1w 7FB3 outside bound — adjacent claim, no overlap; Bound
+          7FB3-7FB3 (exit-B opcode word, operand 7FB4 shared with 7FB4-7FD3 span per 8AA5 precedent —
+          wave-11 spill fix, recombination owns every word).
       - address: 0x643E
         name: SUB13_643E
         confidence: provisional
@@ -2106,34 +2118,39 @@ spaces:
         name: D3BE_CLAMP_STORE_SUB
         confidence: static_branch
         note: >-
-          Entry bitf *(0xA60) min/max lane; interior calld 0xD39E @D3D4; first exit retd FE00 @D3EE +2 delays;
+          Entry bitf *(0xA60) min/max lane; interior calld 0xD39E @D3D4; first exit retd FE00 @D3EE +2 delays
+          (Bound D3EF-D3F0, executed delay slots — wave-11 spill fix);
           caller F274 @D834 calld verified; block A of D-span (no path into D447+); single-routine D3BE-D5D5
           REJECTED (interior true-called entries break it); HYPOTHESIS.
       - address: 0xD3F1
         name: D3F1_TSCALE_SUB
         confidence: static_branch
         note: >-
-          Entry mpy #5462 T-scale, stores DP+0x01/0x05; first exit retd FE00 @D444 +2 delays; caller F274
+          Entry mpy #5462 T-scale, stores DP+0x01/0x05; first exit retd FE00 @D444 +2 delays (Bound
+          D445-D446, executed delay slots — wave-11 spill fix); caller F274
           @D818 verified; block B of D-span; HYPOTHESIS.
       - address: 0xD499
         name: D499_SHARED_TAIL
         confidence: static_branch
         note: >-
           Entered only via 0xD45A bc bneq (intra-span); interior calld 0xD39E @D49D + call 0xDB81 @D4C4; cond
-          rc @D4CA; first exit retd FE00 @D4CB +2 delays; zero fall-through; HYPOTHESIS shared tail (routine-
+          rc @D4CA; first exit retd FE00 @D4CB +2 delays (Bound D4CC-D4CD, executed delay slots —
+          wave-11 spill fix); zero fall-through; HYPOTHESIS shared tail (routine-
           vs-label left to owner per method).
       - address: 0xD4CE
         name: D4CE_ENERGY_TAIL
         confidence: static_branch
         note: >-
           Entered only via 0xD49B bc ntc; rpt-37 squra/macr loop; interior calld 0xE56D/0xE583/0xDB81; first
-          exit retd FE00 @D55B +2 delays; zero fall-through; HYPOTHESIS.
+          exit retd FE00 @D55B +2 delays (Bound D55C-D55D, executed delay slots — wave-11 spill fix);
+          zero fall-through; HYPOTHESIS.
       - address: 0xD581
         name: D581_NORM_TAIL
         confidence: static_branch
         note: >-
           Entered only via 0xD57A bc bneq; norm/exp/subc chain; interior calld 0xE54B @D5A7; rptbd fill; first
-          exit retd FE00 @D5C7 +2 delays; zero fall-through; HYPOTHESIS.
+          exit retd FE00 @D5C7 +2 delays (Bound D5C8-D5C9, executed delay slots — wave-11 spill fix);
+          zero fall-through; HYPOTHESIS.
       - address: 0xD5CA
         name: D5CA_MAC_TAIL
         confidence: static_branch
@@ -2323,7 +2340,8 @@ spaces:
         name: EXP_NORM_DB8C
         confidence: static_branch
         note: >-
-          Entry E721 770E 0010 771A 0027 F4B9; caller F274 @D23F verified; first exit retd FE00 @DBC0 +delays
+          Entry E721 770E 0010 771A 0027 F4B9; caller F274 @D23F verified; first exit retd FE00 @DBC0
+          +delays (Bound DBC1-DBC2, executed delay slots — wave-11 spill fix)
           F495/F48F abutting existing DBC3; interior bd DB9C->DB92 loopback; HYPOTHESIS.
       - address: 0xDC77
         name: ENERGY_MATCH_DC77
@@ -2342,7 +2360,8 @@ spaces:
         confidence: static_branch
         note: >-
           Entry 7712 0062 7713 FBA6 (FBA6 = stm -1114 immediate, not branch -- operand trap avoided); caller
-          F074 @D183 verified; first exit retd FE00 @DD98 +delays abutting DD9B; branch-free; HYPOTHESIS.
+          F074 @D183 verified; first exit retd FE00 @DD98 +delays (Bound DD99-DD9A, executed delay slots
+          — wave-11 spill fix) abutting DD9B; branch-free; HYPOTHESIS.
       - address: 0xDD9B
         name: VEC_CHAIN_DD9B
         confidence: static_branch
@@ -2899,7 +2918,8 @@ spaces:
         name: BKMAX_BA56
         confidence: static_branch
         note: >-
-          Entry F074 06A6 7719 0278 881A 8810; bound BA56-BABF retd +2 (106w); callers
+          Entry F074 06A6 7719 0278 881A 8810; bound BA56-BAC1 retd +2 (108w — wave-11 correction: old
+          bound ended at RETD opcode, delays BAC0-BAC1 now included); callers
           F074@A69F/A6BF/A722/A875/A9BB; head call 06A6 + BK=632 rptbd abs/max + calls 4007x2@BAAE/BABB;
           HYPOTHESIS.
       - address: 0xBB16
@@ -3010,8 +3030,9 @@ spaces:
         name: FRAG_4FF6
         confidence: static_branch
         note: >-
-          Bound 4FF6-5008 (exit bd@5007->0x1000 OUT, uncond branch-out; delay words 5009/500A unowned, not
-          claimed by R3/R4); post-retd abut, zero callers; cmpm/bitf lane; HYPOTHESIS fragment.
+          Bound 4FF6-500A (exit bd@5007->0x1000 OUT, uncond branch-out; delay words 5009/500A now included
+          — wave-11 spill fix, old note left them unowned); post-retd abut, zero callers; cmpm/bitf lane;
+          HYPOTHESIS fragment.
       - address: 0x500B
         name: FRAG_500B
         confidence: static_branch
@@ -4677,7 +4698,8 @@ spaces:
         confidence: static_branch
         note: >-
           Bound 87D3-87E8 (22w; TRIMMED from 87D3-8820 draft at first-outside retd FE00@87E8 — retd is an
-          exit per convention, ordered-scan rule; 87E9-8812 stays dark); entry call F074@86BC->87D3 byte-
+          exit per convention, ordered-scan rule; Bound 87E9-87EA (RETD@87E8 delay slots — wave-11 spill
+          fix, delays execute with the exit); 87EB-8812 stays dark); entry call F074@86BC->87D3 byte-
           verified + post-RET head (FC00@87D2 = ROUTINE_87C7 exit); HYPOTHESIS.
       - address: 0x8813
         name: ROUTINE_8813
@@ -6131,6 +6153,191 @@ spaces:
           abut, not a routine); entry bc F845@7ACA->7ADE byte-verified (cond aeq, exterior from FRAG_7AB1
           [7AB1-7ADD] interior, CODE); interior cond out-branch bc@7AE1->7AE5 (bounded head, no split);
           zero F074/F274; HYPOTHESIS.
+      - address: 0xDAD2
+        name: ROUTINE_DAD2
+        confidence: static_branch
+        note: >-
+          Bound DAD2-DAFC (43w; exit RETD FE00@DAFA + delays DAFB-DAFC (rpt/sth 2w), byte-verified; exit scan
+          clean); entry ccd FB45@D2A7->DAD2 byte-verified (cond aeq call — CCD confers entry per 5DF4
+          precedent; exterior from LEAF_D29E [D29E-D2B9] interior, CODE) — call-entered, hence ROUTINE;
+          wave-11 CCD-audit find (F274/F074-only scan missed cond-call entries); interior joins bcd FA45@
+          DAD4->DADD + @DADF->DAEF (cond aeq, mesh interior joins); rpt/mvkd lanes; zero F074/F274;
+          HYPOTHESIS.
+      - address: 0xC7F6
+        name: FRAG_C7F6
+        confidence: static_branch
+        note: >-
+          Bound C7F6-C805 (16w; exit B F073@C804->283D + operand C805, byte-verified (283D hub, CODE); exit
+          scan clean); entry B F073@C7D0->C7F6 byte-verified (exterior from FRAG_C7B1 [C7B1-C7E8] interior,
+          CODE); interior hub C7F8 with 4x CODE refs (bc F84D@C7E4->C7F8 from FRAG_C7B1 + bc@C7F0->C7F8 from
+          FRAG_C7E9 [C7E9-C7F5] + B@C8ED/C8F6->C7F8 from STATE_DISPATCH_WORKER [C85D-C91B], all
+          byte-verified); interior cond out-branch bcd FA46@C7FE->283D (agt, delays C800-C801 mvmd 2w, no
+          split); HYPOTHESIS.
+      - address: 0x8F1C
+        name: FRAG_8F1C
+        confidence: static_branch
+        note: >-
+          Bound 8F1C-8F1F (4w micro: st DP+0x42 + st DP+0x43 lane, NO own exit — runs into 8F20's span;
+          tail-frag abut, not a routine); entry bcd FA4D@8F07->8F1C byte-verified (cond beq, exterior from
+          WORKER_8E88 [8E88-8F1B] interior, CODE — wave-11 BCD-audit find); abuts 8F20 span (starts 8F20);
+          zero F074/F274; HYPOTHESIS.
+      - address: 0x4238
+        name: FRAG_4238
+        confidence: static_branch
+        note: >-
+          Bound 4238-423A (3w micro: RETD FE00@4238 + delays 4239-423A (mvdd 2w), byte-verified; exit scan
+          clean); entry bcd FA30@4233->4238 byte-verified (cond tc, exterior from SWEEP_PROC_4146
+          [4146-4237] interior, CODE — wave-11 BCD-audit find) + post-RET head (FC00@4237 = SWEEP_PROC tail);
+          zero F074/F274; HYPOTHESIS.
+      - address: 0x3D3B
+        name: FRAG_3D3B
+        confidence: static_branch
+        note: >-
+          Bound 3D3B-3D3C (2w micro: out-call F074 063A@3D3B + falls into ROUTINE_3D3D head — tail-frag abut,
+          not a routine); entry cc F920@7AE8->3D3B byte-verified (cond ntc call, exterior from
+          PORT_PROGRAMMER_7AE5 [7AE5-7B71] interior, CODE — wave-11 CCD-audit find, overturns wave-9
+          split-head stub kill); abuts ROUTINE_3D3D (starts 3D3D); HYPOTHESIS.
+      - address: 0x96B6
+        name: FRAG_96B6
+        confidence: static_branch
+        note: >-
+          Bound 96B6-96BC (7w; exit RETD FE00@96BA + delays 96BB-96BC (stl 2w), byte-verified; exit scan
+          clean); entries 2x bc F82x@969E/96A2->96B6 byte-verified (both cond tc, exterior from ROUTINE_9682
+          [9682-96B5] interior, CODE); abuts ROUTINE_9682 (ends 96B5); zero F074/F274; HYPOTHESIS.
+      - address: 0xAB25
+        name: FRAG_AB25
+        confidence: static_branch
+        note: >-
+          Bound AB25-AB2B (7w; exit RETD FE00@AB29 + delays AB2A-AB2B (add 2w), byte-verified; exit scan
+          clean); entry bc F84x@AB1F->AB25 byte-verified (cond alt, exterior from SEQ_AAC7 [AAC7-AB24]
+          interior, CODE); abuts SEQ_AAC7 (ends AB24); interior cond early-return rc FC42@AB27 (ageq, no
+          split); zero F074/F274; HYPOTHESIS.
+      - address: 0x9453
+        name: FRAG_9453
+        confidence: static_branch
+        note: >-
+          Bound 9453-9458 (6w; NO own unconditional exit: calld-lane runs into 9459's span — tail-frag
+          abut, not a routine); entry bc F830@9440->9453 byte-verified (cond tc, exterior from
+          COBBA_VERIFY_LOOP [942E-9452] interior, CODE); interior out-calld F274 9A50@9453 (targets
+          ROUTINE_9A50 — corroborates it); interior cond out-branch bc@9457->942E (loop head, no split);
+          abuts 9459 span (starts 9459); HYPOTHESIS.
+      - address: 0x9708
+        name: FRAG_9708
+        confidence: static_branch
+        note: >-
+          Bound 9708-970A (3w micro: RETD FE00@9708 + delays 9709-970A (orm 2w), byte-verified; exit scan
+          clean); entry bc F820@9702->9708 byte-verified (cond ntc, exterior from FRAG_9700 [9700-9707]
+          interior, CODE); abuts FRAG_9700 (ends 9707); zero F074/F274; HYPOTHESIS.
+      - address: 0x9B6F
+        name: FRAG_9B6F
+        confidence: static_branch
+        note: >-
+          Bound 9B6F-9B71 (3w micro: ld + mar + RETD FE00@9B71, byte-verified; exit scan clean; RETD delays
+          9B72-9B73 belong to FRAG_9B72 head — shared words per 8AA5 precedent, coverage-merged);
+          entry banz 6C84@9B67->9B6F byte-verified (cond *ar4, exterior from ROUTINE_9B67 [9B67-9B6E] interior,
+          CODE); abuts FRAG_9B72 (starts 9B72); zero F074/F274; HYPOTHESIS.
+      - address: 0x399E
+        name: FRAG_399E
+        confidence: static_branch
+        note: >-
+          Bound 399E-39A3 (6w; exit RET FC00@39A3 byte-verified, first and only unconditional exit-class;
+          exit scan clean); entry = fall-through abut from CMD_DISPATCH_PORT15 [3986-399D] tail (CODE; cond
+          bc@399D backward taken-path, straight fall-through when not taken); rsbx/andm lane; zero
+          F074/F274; HYPOTHESIS.
+      - address: 0x9B63
+        name: FRAG_9B63
+        confidence: static_branch
+        note: >-
+          Bound 9B63-9B66 (4w micro: or + RETD FE00@9B64 + delays 9B65-9B66, byte-verified; exit scan clean);
+          entry = fall-through abut from MSG_LEAF_9B5C [9B5C-9B62] tail (CODE, ends stl-instruction, no
+          exit); zero F074/F274; HYPOTHESIS.
+      - address: 0x44AF
+        name: FRAG_44AF
+        confidence: static_branch
+        note: >-
+          Bound 44AF-44B1 (3w micro: portw pa13 2w + RET FC00@44B1, byte-verified; exit scan clean); entry
+          = post-RET head (RET@44AE = FRAG_44A6 [44A6-44AE] exit, CODE — thin entry per 3AB6 precedent);
+          zero F074/F274; HYPOTHESIS.
+      - address: 0x4450
+        name: FRAG_4450
+        confidence: static_branch
+        note: >-
+          Bound 4450-4452 (3w micro: mvdp 2w + RET FC00@4452, byte-verified; exit scan clean); entry =
+          post-RET head (RET@444F = DISPATCH_TARGET_B [4444-444F] exit, CODE); abuts DISPATCH_TARGET_C
+          (starts 4453); zero F074/F274; HYPOTHESIS.
+      - address: 0x863A
+        name: FRAG_863A
+        confidence: static_branch
+        note: >-
+          Bound 863A-8640 (7w; NO own unconditional exit: DSP add-lane (7x adds) runs into MSG_BUILDER_8641
+          head — tail-frag abut, not a routine); entry = post-RET head (RET@8639 = SUB_8627 [8627-8639]
+          exit, CODE); abuts MSG_BUILDER_8641 (starts 8641); zero F074/F274; HYPOTHESIS.
+      - address: 0x4313
+        name: FRAG_4313
+        confidence: static_branch
+        note: >-
+          Bound 4313-4314 (2w micro: ld #0,a + RET FC00@4314, byte-verified; exit scan clean); entries B
+          F073@42DA->4313 byte-verified (exterior from ROUTINE_42B8 [42B8-4312] interior, CODE) + post-RET
+          head (RET@4312 = ROUTINE_42B8 exit); zero F074/F274; HYPOTHESIS.
+      - address: 0x7140
+        name: FRAG_7140
+        confidence: static_branch
+        note: >-
+          Bound 7140-7141 (2w micro: rsbx st0,tc + RET FC00@7141, byte-verified; exit scan clean); entries B
+          F073@713A->7140 byte-verified (exterior from FLAG_GATE_712D [712D-713F] interior, CODE) + post-RET
+          head (RET@713F = FLAG_GATE_712D exit); zero F074/F274; HYPOTHESIS.
+      - address: 0x7DB3
+        name: FRAG_7DB3
+        confidence: static_branch
+        note: >-
+          Bound 7DB3-7DB4 (2w micro: ld #4096,b 2w, NO own exit — runs into FRAG_7DB5 head; tail-frag abut,
+          not a routine); entry B F073@7DAE->7DB3 byte-verified (exterior from SUB_7D74 [7D74-7DB2]
+          interior, CODE); abuts FRAG_7DB5 (starts 7DB5); zero F074/F274; HYPOTHESIS.
+      - address: 0xACF3
+        name: FRAG_ACF3
+        confidence: static_branch
+        note: >-
+          Bound ACF3-ACF3 (1w micro: ld #80,a single word, NO own exit — runs into ROUTINE_ACF4 head;
+          tail-frag abut, not a routine); entry B F073@ACE2->ACF3 byte-verified (exterior from FRAG_ACBB
+          [ACBB-ACF2] interior, CODE); abuts ROUTINE_ACF4 (starts ACF4); zero F074/F274; HYPOTHESIS.
+      - address: 0x649D
+        name: FRAG_649D
+        confidence: static_branch
+        note: >-
+          Bound 649D-649E (2w micro: stl + exit B F073@649E->676A + operand 649F (shared with SUB85_644B
+          head per 8AA5 precedent), byte-verified; 676A = BRANCH_TAIL_676A head, CODE; exit scan clean);
+          entry = fall-through from call@649B (F074 call site in bounded code, returns); zero F074/F274;
+          HYPOTHESIS.
+      - address: 0xDFFE
+        name: ROUTINE_DFFE
+        confidence: static_branch
+        note: >-
+          Bound DFFE-DFFF (2w micro: st #1,DP+0x63 2w, NO own exit — runs into FIR_KERNEL_A head; tail-frag
+          abut, not a routine); entry call F074@DFF6->DFFE byte-verified (exterior from PORT_DISPATCH_DFCF
+          [DFCF-DFFD] interior, CODE) — call-entered; abuts FIR_KERNEL_A (starts E000); zero F074/F274;
+          HYPOTHESIS.
+      - address: 0x3266
+        name: FRAG_3266
+        confidence: static_branch
+        note: >-
+          Bound 3266-3266 (1w lone RET pad, FC00 byte-verified; exit scan trivially clean); entry B
+          F073@3260->3266 byte-verified (exterior from WORKER_3199 [3199-3265] interior, CODE — thin single
+          entry per 7F54 precedent); HYPOTHESIS.
+      - address: 0x3905
+        name: FRAG_3905
+        confidence: static_branch
+        note: >-
+          Bound 3905-3906 (2w micro: 0000 word + RET FC00@3906, byte-verified; exit scan clean); entry =
+          fall-through abut from FRAG_38FB [38FB-3904] tail (CODE, ends or-accumulate, no exit); 0000 word
+          flagged (possible nop/padding, falsifiable by trace); zero F074/F274; HYPOTHESIS.
+      - address: 0x3BFE
+        name: FRAG_3BFE
+        confidence: static_branch
+        note: >-
+          Bound 3BFE-3BFF (2w micro: ssbx st0,tc + RET FC00@3BFF, byte-verified; exit scan clean); entries
+          5x B F073@3BE7/3BEC/3BF1/3BF6/3BFB->3BFE byte-verified (all from CMPM_GATE_CHAIN [3BE4-3BFD]
+          interior, CODE — wave-11 triage find, strengthens post-RET entry) + post-RET head (RET@3BFD =
+          CMPM_GATE_CHAIN exit); zero F074/F274; HYPOTHESIS.
       - address: 0xBADB
         name: ROUTINE_BADB
         confidence: static_branch
@@ -6276,9 +6483,10 @@ spaces:
         note: >-
           Bound 3D3D-3D78 (62w; exit RET FC00@3D78 byte-verified, exit scan clean; head F074 063A call
           idiom); entries 2x calld F274@DC/111->3D3D byte-verified (from 8210-setB block01 uploaded code,
-          head-exact; call-only entry, pre-word 063A not post-RET); 2w stub 3D3B-3D3C (F074 063A call-stub,
-          zero entries) stays dark — split-head per AF16/BAC2/DB81/AF40 precedent; 8210-setB is the ROM6
-          oracle (52.3% head-hit vs 2.6% setA); HYPOTHESIS.
+          head-exact; call-only entry, pre-word 063A not post-RET); 2w stub 3D3B-3D3C wave-11 CLOSED as
+          FRAG_3D3B (cc F920@7AE8->3D3B from PORT_PROGRAMMER_7AE5 found — CCD-audit overturns zero-entries
+          verdict); abuts FRAG_3D3B (starts 3D3B); 8210-setB is the ROM6 oracle (52.3% head-hit vs 2.6%
+          setA); HYPOTHESIS.
       - address: 0x92BB
         name: ROUTINE_92BB
         confidence: static_branch
