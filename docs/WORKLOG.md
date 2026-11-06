@@ -403,6 +403,13 @@ plus inventoried.
   Stays dark, ruled: 8329 (rptb non-entry), E795 (entry-less), 361C-remainder, 9708-orphan, DA40-47, 38FB-
   remainder, 3905-06, 4007-zone (checked), sub-word orphans, all zero-entry/data/weak zones per standing
   kills. make test 6 pass.
+- Wave-9 landed (3 new, 855 total, 94.3% = 52,139/55,296w): 8210 block sets as ROM discriminator + oracle.
+  Method: raw-scanned both sets for ROM targets, scored against validated ROM6 heads — setB 52.3% hit vs
+  setA 2.6%: setB = ROM6 blocks, setA = ROM5 blocks (independent discriminator, recorded for census).
+  SetB dark-zone targets: ROUTINE_3D3D (2x calld, split-head stub 3D3B-3C dark), ROUTINE_92BB + ROUTINE_92D7
+  (calld pair, abutting chain). Rejected with reasons: 2FFF (F071 rptz repeat-count phantom, not a branch —
+  repeat-form aliasing class); E795/E8BD (F980 FCALL-only refs, fcall-tension convention holds — entry-weak,
+  island kill stands). make test 6 pass.
 
 ## Goal mapping
 

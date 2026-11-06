@@ -5682,6 +5682,30 @@ spaces:
           micro-span, retd-headed); entry bc F845@DA29->DA32 byte-verified (gap-sibling span DA21-DA31
           zone, exterior to this span); fall-through continuation of FRAG_DA21 delay tail, branch-entered;
           HYPOTHESIS.
+      - address: 0x3D3D
+        name: ROUTINE_3D3D
+        confidence: static_branch
+        note: >-
+          Bound 3D3D-3D78 (62w; exit RET FC00@3D78 byte-verified, exit scan clean; head F074 063A call
+          idiom); entries 2x calld F274@DC/111->3D3D byte-verified (from 8210-setB block01 uploaded code,
+          head-exact; call-only entry, pre-word 063A not post-RET); 2w stub 3D3B-3D3C (F074 063A call-stub,
+          zero entries) stays dark — split-head per AF16/BAC2/DB81/AF40 precedent; 8210-setB is the ROM6
+          oracle (52.3% head-hit vs 2.6% setA); HYPOTHESIS.
+      - address: 0x92BB
+        name: ROUTINE_92BB
+        confidence: static_branch
+        note: >-
+          Bound 92BB-92D6 (28w; exit RET FC00@92D6 byte-verified; interior clean — second RET@92F3 belongs
+          to sibling ROUTINE_92D7; exit scan otherwise clean; head F074 0594 call idiom); entries calld
+          F274@454->92BB byte-verified (from 8210-setB block08 uploaded code, head-exact) + post-RET head
+          (FC00@92BA); abuts ROUTINE_92D7 (starts 92D7); HYPOTHESIS.
+      - address: 0x92D7
+        name: ROUTINE_92D7
+        confidence: static_branch
+        note: >-
+          Bound 92D7-92F3 (29w; exit RET FC00@92F3 byte-verified, exit scan clean; head F074 0594 call
+          idiom); entries calld F274@494->92D7 byte-verified (from 8210-setB block08) + post-RET head
+          (FC00@92D6 = ROUTINE_92BB exit); abuts ROUTINE_92BB (ends 92D6); HYPOTHESIS.
       - address: 0x970B
         name: FRAG_970B
         confidence: static_branch
