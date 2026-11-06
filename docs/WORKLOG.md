@@ -443,6 +443,11 @@ plus inventoried.
   2ED6 kill stands with mechanism documented. FBD (FAFx) sweep: all targets far-space, irrelevant. 909F
   kernel-boundary question deferred (KERNEL_9042 rptb block overrun needs kernel revalidation, not a
   drive-by edit). F remaining: trace or second-firmware oracle for dispatcher fields.
+- Wave-12 overlap audit (real parser, not Bound-only): 98 pairs, nearly all self-pairs (one symbol, several
+  patterns) or pre-existing cross-symbol touches. Sole wave-11 overlap was ROUTINE_4007/4055 vs PORT0_TXN
+  prose-derived span — resolved by making PORT0_TXN non-bounding (functional parent, halves carry the
+  bounds; quoting the old pattern text re-matched RET_AT, fixed by rewording). No new overlaps from
+  wave-11/12. Lesson: Bound-only overlap checks under-report; audit with coverage.ranges_in.
 
 ## Goal mapping
 

@@ -124,8 +124,10 @@ spaces:
           Port-0 transaction in two pa0-strobe phases (OR 12, RPT-22
           wait), each gated on *(0x3EB5) bit 1. Phase one: SUB #7
           check, PORTW pa40, CALL 0x40A1 worker, pa45 poll
-          (AND #4096), PORTW pa45/pa44, RC, RET at 0x40A0. Single
-          routine; 0x4055 is the phase-two label inside it.
+          (AND #4096), PORTW pa45/pa44, RC, RET FC00 ending the second strobe phase. Single
+          routine; 0x4055 is the phase-two label inside it. Wave-11 refinement: bounded halves
+          ROUTINE_4007 + ROUTINE_4055 (call at 3AFA into 4055, 4 calls into 4007,
+          byte-verified alternate entries; this note is the functional parent, non-bounding).
         evidence:
           - roms/rom6/ivt.md
       - address: 0x4055
