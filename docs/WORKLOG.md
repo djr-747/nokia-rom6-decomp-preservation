@@ -417,6 +417,22 @@ plus inventoried.
   closed, 4+1 calls); ROUTINE_DBD4 (calld micro); FRAG_4B67 (thin + texture flag — data-kill overturned on
   bar-consistency, falsifiable); FRAG_A3CE (7w minimal, stub closed). Rule teeth demonstrated: BFD2/DAD0/
   BFB7/E795/8329/45FA stay dark (dark-src entry or entry-less + signature-less). make test 6 pass.
+- Wave-11 landed (86 new + 17 spill fixes + 2 upgrades, 954 total, 96.8% = 53,537/55,296w): vestibule-chain
+  harvest + BCD/CCD-audit + delay-spill class fix. 8-arm 29B9 chain (bc@29A0 entry overturns entry-less
+  verdict, FRAG_2983 interior census corrected); 11-arm 3802 chain (FRAG_37D8 entries); 4-arm 3753 chain +
+  FRAG_37C0; 3-arm 36C2 + 5-arm 6693 chains; 95AA 6-arm vestibule (thin dark-src, 9667 census match);
+  shared tails FRAG_7F54/9A70/66C5/694D/7ADE/82D9/4C29-lane; dispatcher thin-arms 35A0/333C; routines
+  ROUTINE_9A50/BADB/D9E1/99E6/DAD2/DFFE (call/ccd-entered); 10 retd + 7 micro-cells (6867, DA40, 399E, 9B63,
+  44AF, 4450, 863A, 3905, 3BFE+5B-upgrade, 4313, 7140, 7DB3, ACF3, 649D, 3266, 8F1C, 4238, 3D3B, 9708, 9B6F,
+  9453); 17 spill fixes (14 RETD +2w incl 87D3-trim correction, BD@5007 +2w, orm@8369 +2w, LOOP_628C/
+  DIV_STEP_4348/LEAF54 mid-cuts, SUB32_7FB3 opcode word, D9C7-8 delays). BCD-audit (all FAxx = bcd) overturns
+  BFB7 kill + finds 8F1C/4238; CCD-audit (FBxx/F9xx cc) finds DAD2 + 3D3B (overturns wave-9 stub kill, 3D3D note
+  updated). 37DF corrected to FRAG_37D8 interior. DAD0 reconciled as RETD delays. 3EBD carve-out stands
+  (wave-3 FIR/data ambiguity, needs trace). Kills stand with reasons: dispatcher fields 2ED6/28CF/33E8/3273/
+  7EC5-thunks/3538/E855/315F (post-BACC/B-or-entryless), kernel-boundary 909F (mid-rptb-block), LOOP_628C
+  +1w mid-cut + FRAG_62B4 fall-through, table/data E795/AED9/3EBD, repeat-forms 8329/91EF/2FFF, sub-word/DATA
+  slivers, post-exit
+  orphans. make test 6 pass.
 
 ## Goal mapping
 
