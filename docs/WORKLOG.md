@@ -462,6 +462,13 @@ plus inventoried.
   gap-internal, sole exterior edge F980 fcall E770->E86D from EXT_DISPATCH_BIG) yields SUB_E86D
   E86D-E8BC (far min/max clamp routine, fbacc b exit, interior join E898->E8AC); E8BD-E8C6 post-exit
   orphan stays dark. make test 6 pass, no new overlaps.
+- Wave-16 (+14w, 97.0% = 53,661/55,296w): gap-boundary fall-through audit over all 33 gaps — every gap
+  follows an exit except nine candidates; delay-slot analysis kills five (8BD3/95BF/95F3/9613/AEA8 sit
+  behind retd/bd exits, not fall-through; D9C9 behind RETD@D9C6 delays; AED9 ambiguous data/code,
+  AE70 1w post-table ret). Two annexations land: LEAF43_82D4 len 43->54 (fall-through tail 8329-8333,
+  banzd-loop interior, abuts ret@8334) and WINDOW_918C len 50->53 (rptb@91EE operand + body 91EF-91F1
+  per block-end precedent). WINDOW/BUTTERFLY_9146 overlap pre-exists (91BD-91D0 inside old bound);
+  added words clean. make test 6 pass.
 
 ## Goal mapping
 

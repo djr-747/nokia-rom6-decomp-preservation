@@ -1640,8 +1640,10 @@ spaces:
         name: LEAF43_82D4
         confidence: static_branch
         note: >-
-          Entry F6BE EA00 6DEA 0007 E721 7715 0006 E900; RET @82FE len 43; 4 callers F274
-          @82C2/82CB/8351/8370; no inner calls; HYPOTHESIS.
+          Entry F6BE EA00 6DEA 0007 E721 7715 0006 E900; RET @82FE len 54; 4 callers F274
+          @82C2/82CB/8351/8370; no inner calls; extended 8329-8333 (fall-through tail from neg@8328:
+          stl/mar/ld/ror/rol/sfta/banzd-loop@8318 interior/or/stl/ssbx, no exit, abuts ret@8334 claimed);
+          HYPOTHESIS.
       - address: 0x82FF
         name: LEAF54_82FF
         confidence: static_branch
@@ -1751,7 +1753,8 @@ spaces:
         confidence: static_branch
         note: >-
           Entry F074 0610 7713 30BE; BOUND CONFIRMED entry-linear (interior 0x91AE FC00 is operand trap, not
-          exit); rptb copy + rpt zero-fill; first-RET FC00 @0x91BD len 50; 2x F074 @91D8/9204; HYPOTHESIS.
+          exit); rptb copy + rpt zero-fill; first-RET FC00 @0x91BD len 53 (extended through rptb@91EE
+          block-end: operand 91EF + body 91F0-91F1 per block-end precedent); 2x F074 @91D8/9204; HYPOTHESIS.
       - address: 0x91BE
         name: DRIVER_91BE
         confidence: static_branch
