@@ -448,6 +448,9 @@ plus inventoried.
   prose-derived span — resolved by making PORT0_TXN non-bounding (functional parent, halves carry the
   bounds; quoting the old pattern text re-matched RET_AT, fixed by rewording). No new overlaps from
   wave-11/12. Lesson: Bound-only overlap checks under-report; audit with coverage.ranges_in.
+- Wave-13 (+30w, 96.9% = 53,567/55,296w): KERNEL_9042 len 47->72 through rptb@9074 block-end 90B6 + rsbx
+  (byte-verified; abuts KERNEL_9071; pre-existing 9004-overlap unchanged, no new overlap); FRAG_45FA
+  [45FA-45FE] (post-RET + RET, 2 out-calls). 8907 kill confirmed (B-operand orphan). make test 6 pass.
 
 ## Goal mapping
 

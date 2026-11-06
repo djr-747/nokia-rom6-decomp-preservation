@@ -1686,7 +1686,9 @@ spaces:
         name: KERNEL_9042
         confidence: static_branch
         note: >-
-          Entry F074 060C F7B7 F072 906E; rptb ACS block; RET @9070 len 47; 8x F074
+          Entry F074 060C F7B7 F072 906E; rptb ACS block; RET @9070 len 72 (wave-13 correction: len-47
+          stopped mid rptb-block — rptb@9074 block-end 0x90B6 byte-verified, span runs through block tail +
+          rsbx@90B7, abuts KERNEL_9071; no exit contradicted, no new overlap); 8x F074
           @9256/5C/72/78/8B/91/E1/E7; HYPOTHESIS kernel.
       - address: 0x9071
         name: KERNEL_9071
@@ -6274,6 +6276,14 @@ spaces:
           Bound 863A-8640 (7w; NO own unconditional exit: DSP add-lane (7x adds) runs into MSG_BUILDER_8641
           head — tail-frag abut, not a routine); entry = post-RET head (RET@8639 = SUB_8627 [8627-8639]
           exit, CODE); abuts MSG_BUILDER_8641 (starts 8641); zero F074/F274; HYPOTHESIS.
+      - address: 0x45FA
+        name: FRAG_45FA
+        confidence: static_branch
+        note: >-
+          Bound 45FA-45FE (5w; exit RET FC00@45FE byte-verified, first and only unconditional exit-class;
+          exit scan clean); entry = post-RET head (RET@45F9 = FRAG_45C2 [45C2-45F9] exit, CODE — thin entry
+          per 3AB6/44AF precedent); interior out-calls F074 06F4@45FA + 2E2F@45FC (dispatcher-entry call);
+          HYPOTHESIS.
       - address: 0x4313
         name: FRAG_4313
         confidence: static_branch
