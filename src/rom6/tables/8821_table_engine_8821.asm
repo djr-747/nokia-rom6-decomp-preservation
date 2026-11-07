@@ -1,0 +1,59 @@
+; ROM6 0x8821 TABLE_ENGINE_8821 -- 51w, symbols.yaml data_word.
+; Evidence: Entry F074 0592 E9FF 7712 119C 771A 000B F272; EXIT CORRECTED by all-paths walk: sole exit bacc F4E2 @8853 (true end 8853, span 51 not 152); caller A76B; calls 0x86FB+0x86E3; STM x
+; ORIGIN 0x8821
+	.sect ".text"
+	.mmregs
+	.global _start
+_start:
+; FORM .word (data table)
+	.word 0xF074
+	.word 0x0592
+	.word 0xE9FF
+	.word 0x7712
+	.word 0x119C
+	.word 0x771A
+	.word 0x000B
+	.word 0xF272
+	.word 0x882F
+	.word 0x7714
+	.word 0x2F32
+	.word 0x1082
+	.word 0x9AA8
+	.word 0xF280
+	.word 0x8092
+	.word 0x7715
+	.word 0x0060
+	.word 0x6FF8
+	.word 0x3083
+	.word 0x0C42
+	.word 0x6FF8
+	.word 0x3082
+	.word 0x0D41
+	.word 0xF2A0
+	.word 0x1AF8
+	.word 0x09C6
+	.word 0xE90B
+	.word 0xF487
+	.word 0xE900
+	.word 0xF486
+	.word 0x7714
+	.word 0x051E
+	.word 0x6184
+	.word 0x0006
+	.word 0xF120
+	.word 0xB38C
+	.word 0xF820
+	.word 0x884E
+	.word 0x6184
+	.word 0x0002
+	.word 0xF120
+	.word 0xB3A4
+	.word 0xFF30
+	.word 0xF120
+	.word 0xB398
+	.word 0xF600
+	.word 0x8811
+	.word 0x7719
+	.word 0x0000
+	.word 0x1081
+	.word 0xF4E2

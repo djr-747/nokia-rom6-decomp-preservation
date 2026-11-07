@@ -469,6 +469,795 @@ plus inventoried.
   banzd-loop interior, abuts ret@8334) and WINDOW_918C len 50->53 (rptb@91EE operand + body 91EF-91F1
   per block-end precedent). WINDOW/BUTTERFLY_9146 overlap pre-exists (91BD-91D0 inside old bound);
   added words clean. make test 6 pass.
+- Wave-17 (+555w, 98.0% = 54,216/55,296w): first emulator-trace oracle. 8210 v5.31
+  headless boot to REGISTERED (250M steps, co-sim, ~205M DSP insns) with app-edge
+  64K PC histogram (`DSP54_PCHISTFILE`; first-install-wins guard + core getter;
+  emu diff saved in evidence dir). 262 executed gap words in 12 gaps -> 15 trace-entry
+  claims (28CF/2917 COBBA-poll head+body; 2F51 RAM-table target block; 3273 split at
+  interior b32B2; 3306; 3779 split; 7EEC lane run; 3179; 3557 frag; 3115; AE70 stub;
+  AE71 prologue; AEA8 leaf refuting post-retd kill) + 345B-345F annex into
+  DISPATCH_CMP_3460 (trace refutes "345F is data": ADD head via mid-instruction
+  computed entry; also fixes its inverted 3460-34FF bound). Duplicate SUB_35A0
+  withdrawn (FRAG_35A0 pre-exists, trace-corroborated instead). make test 6 pass,
+  no new overlaps.
+- Wave-18 (+100w, 98.2% = 54,316/55,296w): 3310 mixed-chain attempt (MT leg fails
+  at 0 transitions — the ROM6 wall holds on both phones, but SMS-adapter/3310-MCU
+  stimulus executes 4,677 new DSP PCs). Three chain-trace claims: SUB_2FD3A/B
+  (2FD3-3021 continuation past 2FD1 dispatch tail, hot 2FFF lane x4) + FRAG_8907
+  (full 21w bitf/brc repeat-minmax gap). make test 6 pass, no new overlaps.
+
+- Wave-19 (recompilation seed): DSP-arch source tree (`src/rom6/<boot|kernel|
+  modem|audio|rf|msg|tables>/`, `src/common/include/`, `src/rom6/link/rom6.cmd`
+  MEMORY/PAGE per docs/01-memory-map.md). Assembler `tic54x-as` built from
+  binutils 2.42 (`tools/build_tic54x_as.sh`, installed to ~/.local/bin).
+  `tools/recombine.py` + `make recombine`: 6 kernel modules MATCH, 69 words
+  (absolute calls, bc, calld, xc, retd+spill all encode exact). C intent layer:
+  2 files with ORIGIN/EXPECT, `tools/check_c.py` binds them to ROM bytes.
+  `make test` green (table_walk 6, verdict 6, recombine floor 69, c_spec).
+  Gap: TI cl500 absent, no FSF/LLVM C54x backend; .asm stays the verified
+  encoding until cl500 closes codegen. Doc: `docs/09-recompilation.md`.
+- Wave-19b (+573w, 642w recombining): bulk import of 34 anchor
+  (`program_word`) spans via listing miner (`/tmp/gen_spans.py`, kept out
+  of tree). 40/40 MATCH after two gas rules (`.mmregs`, numeric ports).
+  Floor raised 69 to 642. `make test` green.
+- Wave-19c (+46,720w, 47,362w recombining = 85.6% of window): `data_word`
+  bulk import with keep-or-delete verify + per-line `.word` fallback
+  engine. 962/962 MATCH. Gas rule set closed: `-mfar-mode` global,
+  MMR(n) raw (`|0x80` when <16), DP-direct rewrite, long RPT/LD forcing,
+  XC forcing, leading-bare `.word`, `rsbx` verified. 949 pure mnemonic,
+  1 forced module, 12 data tables. ~184 exotic spans dropped for hand
+  review (`*+ARx` forms, far-call targets). `make test` green.
+- Wave-19d (+7,255 module-words, 54,617w = 96.6% unique): oversize cap to
+  4096 (C9E3, SPANHEAD, 2 data tables), listing-tail completion (drom to
+  FC77 + zero-fill rule for objdump-elided runs; vectors tail), XC/`rcd`
+  condition forcing, `-w` (byte-compare is the gate), whole-span `.word`
+  last resort. 968/968 MATCH: 952 pure mnemonic, 1 line-forced, 3
+  whole-word, 12 data-majority. Below-floor DARAM claims (~613w) and
+  unclaimed dark gaps (~980w) are not statically recombinable. Floor
+  54617. `make test` green.
+- Wave-19e (C intent 2 to 5 files, 39 words): `daram_save_restore`,
+  `div_step` (extern helper + subc_step pattern for opaque callees),
+  `6f79_fill` (memset shape). Vacuous-match guard in recombine
+  (0-word modules FAIL); hollow `e59d` refilled (29w). Floor 54646,
+  unique 53,466w = 96.7%. `make test` green.
+- Wave-19f (C intent 5 to 9 files, 54 words): constant fill/zero/copy
+  leaves (`3616`, `4313`, `a8b9`, `aea8`). Straight-line stm/rpt/stl
+  shapes transliterate directly; calls stay extern. `make test` green.
+- Wave-19g (C intent 9 to 12 files, 92 words): cross-subsystem pattern
+  proof. `a255` is a const pointer table (all 5 entries are fragment
+  symbols), `9b5c` a null-check gate with chained continuation,
+  `9414` a COBBA-status bit-test dispatch with extern callees
+  (`99A4` header builder, `96BD` RSSI poster). `make test` green.
+- Wave-19h (C intent 12 to 14 files, 139 words): `a109` audio path
+  select (bit-test cascade, 32-bit dld/dst swap either direction,
+  in-span A120/A126 arms mapped), `bfaa` modem normalize gate
+  (fract-mode setup, delayed-branch chaining to `BFB7`).
+  `make test` green.
+- Wave-19i (C intent 14 to 16 files, 156 words): boot coverage.
+  `2e2f` dispatcher head (flag-gated mvdk), `28cf` COBBA bring-up
+  head (hottest boot entry, 10,681 trace hits, chains to `2917`).
+  All six subsystems now have C presence. `make test` green.
+- Wave-19j (C intent 16 to 19 files, 210 words): tables as const
+  arrays (`ae6c` 4-way jump table with AD0D-driver consumer,
+  `af64` 6-way handler table, `aead` 44-word coefficient table).
+  Pattern: code tables become `static const` data, not functions.
+  All seven source dirs now carry C. `make test` green.
+- Wave-19k (C intent 19 to 20 files, 240 words): `698b` scaled
+  divide (50-gate to `69A6`, DIV_CORE with fixed 9484/12049 cells,
+  negate + conditional 0x250C offset, spill to 0x563).
+  Delay-slot setup modeled as pre-call state. `make test` green.
+- Wave-19l (C intent 20 to 21 files, 307 words): `96bd` RSSI poster
+  (67w: status-gated port reads, INTM-locked COBBA program path,
+  delay slots modeled as pre-branch state, rete context noted).
+  `make test` green.
+- Wave-19m (C intent 21 to 22 files, 448 words): `7ae5` COBBA port
+  programmer (141w: conditional init, ports 5/7/8 program, 7B0A
+  setup vs 7B1B compare/copy lanes, PORT0 transaction, range-picked
+  burst base 4816/4944, INTM-locked burst). In-span arms mapped
+  from the listing address map. `make test` green.
+- Wave-19n (C intent 22 to 23 files, 514 words): `99a4` message
+  builder (66w: length-delta header, flag select, AR0/saved-B
+  stores, rptb XOR checksum, odd tail, end-pointer writeback
+  to 0x21FC). Address-mapped L_99C4/99D8/99E2 arms. `make test`
+  green.
+- Wave-19o (C intent 23 to 24 files, 523 words): `a4d5` setup gate
+  (helper, zero-test cell 9771, conditional call 0x4944). Rule set:
+  40-bit accumulator fold chains (e.g. `85ad` XOR chain) stay
+  asm-only -- 16/32-bit C cannot express SFTL/SUBC wrap exactly,
+  extern-per-op is noise; they wait for `cl500` intrinsics.
+  `make test` green.
+- Wave-19p (C intent 24 to 26 files, 600 words): `a2b9` computed-call
+  table walker (cala with 255 terminator -- the identity dispatch
+  mechanism) and `a269` identity dispatcher (extern worker stages,
+  A281/A28F/A291/A2A9 arms, AR5 presets). `make test` green.
+- Wave-19s (C intent 29 to 31 files, 750 words): `84af`
+  clock-gated idle/wake (CLKMD is data cell 0x58, spin loops,
+  IDLE 3) and `84cf` measurement init (flag-gated andm, calld
+  delay slots as pre-call state, fixed-point mpy/sfta scale).
+  `make test` green.
+- Wave-19t (C intent 31 to 34 files, 802 words): fanout trio.
+  `853b` driver (BANZ grounded in ti-c54x core: tests the AR
+  register with post-decrement, `while (ar0-- != 0)` exact),
+  `8555` orchestrator, `8577` 32-bit OR-combine (AR3 lane stores
+  swapped). check_c caught two EXPECT transcription slips in the
+  new files -- the gate works as designed. `make test` green.
+- Wave-19u (C intent 34 to 36 files, 816 words): `85f6` bitwise
+  combine leaf (cmpl/or/xor, exact 16-bit) and `8501` fanout
+  launcher (high-buffer setup, 853B call). Skip rule extended:
+  ROR/ROL rotate chains (e.g. `85fd`) stay asm-only like folds.
+  `make test` green.
+- Wave-19v (C intent 36 to 38 files, 853 words): `56de`
+  accumulate-and-post port transaction (INTM lock, conditional
+  port-16 sample, timed port-14 write; ports as extern ops) and
+  `8507` second fanout launcher (leading ret belongs to `8501`
+  fall-through). `make test` green.
+- Wave-19r (toolchain hunt): TI CGT needs myTI registration, no
+  anonymous URL (TI site + archive.org checked). Handoff recorded in
+  `docs/09-recompilation.md`: user installs C5000 CGT (`cl500`),
+  session then compiles each `.c` and diffs EXPECT. C5500 (`cl55`)
+  explicitly excluded (wrong ISA).
+- Wave-19q (C intent 26 to 29 files, 668 words): SIMLOCK feeders.
+  `8588` rolling crypto-block schedule (register stream, side
+  spill, three folds), `85e4` 12-cell build plus 6 sub-rounds,
+  `8611` 32-bit XOR combine (unsigned-long model, bit-exact low
+  32 bits). `make test` green.
+- Wave-19w (C intent 38 to 42 files, 899 words): RC-family gate
+  leaves. `a3be` flag-gated calld (delay slots always execute),
+  `a3d5` OR-combine with zero-reload plus retd-slot mask,
+  `a3e1` single-instruction rc skip (tail always runs),
+  `b110` rcd-delayed return plus rc bneq second gate.
+  RC settled as conditional-skip per symbols.yaml B115/B118
+  (objdump-verified conditional returns); emulator-core RC
+  handler location still open. `make test` green.
+- Wave-19x (C intent 42 to 54 files, 926 words): micro-leaf
+  sweep. Four 1w RET pads (`3266` `4adf` `7f54` `ae70`), TC
+  set/clear presets (`3bfe` `5823` set, `7140` clear, hardware
+  state as comment-only), cell presets (`6928` `87c3`),
+  `3905` reserved-word tail, `4450` mvdp overlay-patch point,
+  `2d8b` ISR-tail call wrapper (B = 17 to `4590`).
+  `make test` green.
+- Wave-19y (C intent 54 to 67 files, 989 words): wrapper-family
+  sweep. Ten `calld A2B9` primitive wrappers (`a25a` `a25f`
+  `a264` `af74` `af79` `af7e` `af83` `b04b` `b0bd` `b141`,
+  AR5 presets -8676 to -8869, same family as `a269` call
+  sites), `45fa` dispatcher-entry wrapper, `38f6` status-OR
+  plus B-to-A move, `9b6f` post-increment load (retd delay
+  slots fall through out of span, documented). `make test`
+  green.
+- Wave-19z (C intent 67 to 80 files, 1076 words): mixed-leaf
+  sweep. Two more `calld A2B9` wrappers (`b146` `b157`),
+  `9dd7` rc-beq double call, `a3ce` ccd-delayed call on the
+  `a3d5` measure (delay slot always runs), `56b7` producer
+  converge step into `56de`, `454f` computed-call dispatch
+  loop (banz as `while (ar6-- != 0)` per ti-c54x op_banz),
+  `4578` helper-call store, `45a0`/`45a9` dispatcher plus
+  flag set/clear call pair, `43cd` dispatcher call wrapper,
+  `b5ff` cell preset call, `399e` INTM-unlock mask clear.
+  `make test` green.
+- Wave-19aa (C intent 80 to 92 files, 1192 words). Twelve
+  more: `8529` copy-plus-fanout launcher (callee register
+  mapping flagged unverified), `a3c5` ccd-delayed call on
+  the `a3d5` measure, `af88` rc-gated primitive, `af6a`
+  producer step, `a89b`/`a8a5` compare-and-fanout pair
+  (CMPM TC-on-equal grounded in ti-c54x op_cmpm; tail-call
+  model), `643e` measure gate plus save, `44b2`
+  dispatcher plus byte extract, `446d` helper-call clear,
+  `7c9e` mod-4 counter, `82cb` twin delayed-call launcher,
+  `db76` indexed store plus tick (retd slots out of span).
+  One EXPECT overrun into the next module caught by
+  check_c, fixed. `51d0`/`da18` deferred (out-of-span
+  branch targets). `make test` green.
+- Wave-19ab (C intent 92 to 107 files, 1369 words).
+  Deferred pair resolved: `51d0` inlines its 51CC target
+  bytes (B = 0 plus delayed return, byte-cited), `da18`
+  tail-enters DA21 mid-span via forward extern (DA21 has
+  no C binding yet, per convention). Thirteen more:
+  `b14b` twin primitive, `3609` flag preset plus tail-call
+  into `3616`, `44a6` accumulator-restore nibble store,
+  `9d0b` scaled-index call, `a2ac` gated producer step,
+  `a5c6` cell test call, `b0e8` far-call pair plus
+  primitive, `80fc` helper pair with zero-fill trap edge
+  (0x6F8 reads all-zero, modeled non-returning), `9c8f`
+  XOR-fold, `a5d2` measure-delta flag, `a806` delta plus
+  bit move, `ff69` triple-call driver, `4439` two-lane
+  dispatch gate. `3a81` deferred (branch past span to
+  unbound 3A8E). `make test` green.
+- Wave-19ac (C intent 107 to 119 files, 1557 words).
+  Twelve more: `2e52` bit-test chain (BITF any-bit TC
+  grounded in ti-c54x op_bitf), `712d` flag gate with
+  tail-call into `7140`, `b12f` worker chain with dead
+  gate (cc beq never fires, B = 1 per A4DE tail bytes),
+  `b15c` worker chain with live gate (cc aneq always
+  fires, same citation), `456a` two-lane gate with
+  reversed move, `6973` modulo-by-subtraction self-loop,
+  `6871`/`687f` range-flag pair, `44d7` shifted-OR store,
+  `4590` shifted-store pair, `9f0a` sign-bit OR, `a5e1`
+  measure setup. `3a81` still deferred (needs `3a8e`
+  loop-capable modeling: portr/rptb/xc). `make test`
+  green.
+- Wave-19ad (C intent 119 to 121 files, 1610 words).
+  Deferred `3a81`/`3a8e` pair closed. `3a8e` port-driven
+  gain-ramp plus table tap modeled as C loop (BRC = 14,
+  rptb block mapped word-exact from ROM; xc as if;
+  PORTR Smem-only per ti-c54x op_portr so B is live-in;
+  STH high word src(31:16) per ti-c54x op_sth).
+  `3a81` measure router tail-enters it with B = 0.
+  `make test` green.
+- Wave-19ae (C intent 121 to 131 files, 1789 words).
+  Small-leaf pool exhausted. Ten more: `838c`/`83a0`/
+  `83ff` triple-calld launcher family, `afbf`/`b050`
+  worker chains with dead/live A4DE-tail gates (same
+  B = 1 citation as `b12f`/`b15c`), `b346` straight
+  worker chain into audio workers, `aa2f` bit-test call
+  chain, `71d8` scaled product (MPYA Smem = Smem x
+  A-high overwriting B per ti-c54x op_mpya_smem),
+  `7ea7` XOR-fold bit merge (XOR_ACC_SHIFT = dst ^
+  shifted-src per ti-c54x op_logical; retd slots out of
+  span), `b39e` preset call sandwich. One EXPECT
+  transcription slip (dropped calld pair) caught by
+  check_c, fixed. `make test` green.
+- Wave-19af (C intent 131 to 150 files, 2006 words).
+  Widened sweep: rpt/rptz/xc loop-capable routines.
+  MMR-alias correction: DATA 0x8/0xB alias AL/BL, so
+  `portr 56,*(0x8)` writes A-low (the 3ADE poll loop
+  only terminates under this reading; fixed `3a8e` to
+  take B from the port, A-low from the port). New:
+  `3ade` PA56 poll, `2c75` port-2 handshake, `3ffa`
+  port snapshot plus DST LONG32 store, `6867` port-bit
+  gate, `44af` port write, `3cc9` port write plus
+  delay, `dbd4` MAC dot-product (MPYA dst overwrites),
+  `57fe` block copy plus call, `e380`/`c7a4` fill and
+  table-copy pair, `4444` program-table broadcast
+  (MVPD absolute = same word x3, flagged), `397b`
+  split store plus conditional move, `ff61` audio
+  copy plus ABDST distance-sum (B += |A-high| per
+  ti-c54x op_distance_dual), `45b2`/`45ba`/`3115`/
+  `33ce`/`da40` xc-gated presets with fall-through
+  tail-calls into abutting spans. DST = 32-bit store
+  per ti-c54x op_dst. `make test` green.
+- Wave-19ag (C intent 150 to 164 files, 2264 words).
+  Fourteen more: `83e8` fourth launcher, `3be4`
+  compare/bit-test chain with shared FRAG_3BFE tail,
+  `33bc` two-bit flag pack (nested xc gates), `a8bf`
+  cell test with shared A8CD tail (TC/B live-in
+  params, CMPM TC-only grounded in ti-c54x op_cmpm),
+  `b036` far-call chain with byte-identical B046 tail
+  branch, `aa56`/`aa69` bit-test chains plus far
+  store (calld delay slot executes first), `a99a`
+  table copy plus conditional clear, `4b9a`
+  field-merge loop (SXM-on-entry flagged unknown),
+  `7bf8` clamp plus zero-fill (MAX/MIN per
+  ti-c54x op_compare), `8813`/`9ddd` table fills,
+  `457f` shifted test plus copy-call, `cfae`
+  triple fill plus ST1 restore. `make test` green.
+- Wave-19ah (C intent 164 to 177 files, 2559 words).
+  Thirteen more: `b41c` preset sandwich, `44e7`
+  dispatcher plus shifted-OR store, `4557` program
+  broadcast with dead loads noted, `855f` XOR-fold
+  fanout into the C `block_copy_8588`, `86cf`
+  zero-fill plus AR0-stepped store (`*ar2+0` by AR0
+  convention, flagged), `d8f6` ST1/BK mode-switch
+  call pair, `e7ef` zero-block plus call pair,
+  `a7eb` audio worker B (A803 stub inlined from ROM
+  bytes; no standalone .asm so no C file for it),
+  `2e39` flag setup plus tail chain (2E4A/2E52),
+  `580b` sieve with FRAG_5821/5823 tails plus new
+  `5821` TC-clear stub, `a639` preset swap with
+  in-span A64B skip, `3662` flag-cell copy with
+  in-span 3671 gate. One EXPECT slip (3B88/3B89)
+  caught by check_c, fixed. `make test` green.
+- Wave-19ai (C intent 176 to 185 files, 2753w).
+  Tooling: check_c now fails on missing stated .asm
+  spans and on EXPECT-range overlaps of 2+ words
+  (single shared boundary ret allowed, per the
+  8501/8507 pattern). The audit caught a misplaced
+  file (`a7eb` written to `rf/`, moved to `audio/`)
+  and a double-bind (`5821` was `580b`'s own tail;
+  file dropped, `580b` fixed to join its own tail).
+  Nine more: `af40` flag copy with in-span gate,
+  `56a2` producer gate (sftl logical-shift grounded
+  by barrel semantics; bc into xc block modeled),
+  `44bd` overlay patch plus readback (prom_write
+  extern added), `4ebc` shift-chain math loop
+  (40-bit long long flagged, ASM/AR0 live-ins),
+  `573b` delayed-branch cell test (bcd slots always
+  run), `68b7` range flag, `6961` modulo plus
+  accumulate (MPYA dst, B out-param), `7d60`
+  chained conditional stores, `5755` masked
+  compare with out-of-span gates. SUB dst = src
+  minus operand grounded in ti-c54x op_sub. Six
+  EXPECT transcription slips on `5755` caught one
+  by one by check_c (transcribe from ROM slices,
+  not mnemonics), fixed. `make test` green.
+- Wave-19aj (C intent 185 to 197 files, 3068w).
+  Twelve more: `9f19` push-preserved block copy
+  (rptb block with parallel st||ld sequentialized;
+  BRC live-in, ASM dead, popm hardware state),
+  `a4ba` cell test plus flag merge (A4CB fragment
+  away via forward extern), `a87f` worker plus
+  triple fanout (forward extern to FRAG_A8B1, which
+  has no exit and falls into A8B9, so its C waits),
+  `aff9`/`b062` gated lanes with byte-identical
+  shared B012/B07B tails, `b0a1` far-call chain
+  into audio workers `a7b7`/`a7eb`, `83b4`/`83ce`
+  preset call sandwiches with in-span skips (popped
+  AL = saved AR7 modeled live-in), `9233` block
+  preset plus fills (BK circular size noted),
+  `9268` constant spread plus triple call (BRC
+  presets feed callees, values cited not bound),
+  `acf4` three-way store select (STH high word
+  per ti-c54x op_sth), `a8fe` long call chain with
+  early return. One EXPECT slip (phantom mvdk from
+  a misattributed grep line) caught by check_c,
+  fixed from the verified .asm. `make test` green.
+- Wave-19ak (C intent 197 to 205 files, 3168w).
+  Eight more: `a8b1` twin test with fall-through
+  into A8B9 (second rc skips the stm, AR2 stays
+  live-in; 9-fill inlined, cites `frag_a8b9_zero`),
+  `40a1` port 45 poll plus port 44 strobe (AH/AL
+  aliases, two self-loops, bit-12 tests), `36f0`/
+  `36e1`/`375e` dispatcher-clause arms (AL compare,
+  forward externs to unbound `36fb`/`3775`/`2c88`/
+  `2e64`; far call modeled extern per b036),
+  `3802` vestibule arm, `4a12`/`4a46` B-lane chain
+  link plus tail (AR2-relative clear, tail into C
+  `frag_4ADF`). Deferred pool reconfirmed asm-only:
+  `85fd`/`8627`/`4f5f`/`8775` (rotates), `436c`
+  (ror plus addc carry), `99ff`/`43d3`/`8433`/
+  `3623`/`32ee`/`333c`/`3862` (bit-reversed `%`),
+  `5b18` (RPTB plus BANZ nesting), `c5c3`/`c5ea`/
+  `bcac` (MASR/MACR/parallel), `4883` (retd),
+  `9e2f`/`3199` (held for size). Symbols cleanup
+  flagged: 4A12/4A46 notes claim self-loop and
+  back-edge targets but ROM bytes verify 4A4B/4ADF
+  and the .asm files agree; ROM wins. `make test`
+  green.
+- Wave-19al (C intent 205 to 208 files, 3236w).
+  Three more: `3775` dispatcher tail (call plus
+  b into unbound `2e64`), `2e64` match-loop filter
+  (dark callees `05a0`/`942e`/`2e8f` as forward
+  externs, `942e` A live-out as int return; AR4
+  in-out; `xor #0,b` no-op pad kept; `sftl -8`
+  logical), `8413` index-halve gate (BRC write
+  cited not bound; `rc blt` signed; away tails to
+  dark `8436`/`843a` and asm-only `8433`). Held:
+  `2c88` (span review: .asm covers only the call
+  head, ROM runs on through `11F8 08E5`), `4a4b`
+  (bd delay slots run past the .asm end), `36fb`
+  (bitrev plus dynamic rpt), `9e2f`/`3199` (size).
+  `make test` green.
+- Wave-19am (C intent 208 to 213 files, 3336w).
+  Five more: `6666` threshold gate with save plus
+  retest (AGT/AGEQ per 6871; calls C
+  `daram_save_restore`), `9708` delayed-return bit
+  set (orm in retd delay slot), `8f1c` direct-store
+  pair with fall-through, `89f4` scaled round-trip
+  (MPY Smem,#lk per ti-c54x op_mpy_smem_lk; ADD
+  #lk,16 per op_add_lk_16; bcd/retd delays always
+  run; STH high word per op_sth; AR1 in-out),
+  `5e7d` masked merge plus ring stage (ALT per
+  6871; andm masks exact; mvdd AR2-fixed). `make
+  test` green.
+- Wave-19an (C intent 213 to 215 files, 3375w).
+  Two more: `7fc6` neighbor-merge filter (rptb
+  plus retd delays; AR2 threaded from both `83b4`/
+  `83ce` callers, signatures updated), `9591`
+  two-bit select with delayed away-branch (bd
+  delay orm always runs). Held: `2e84` (bitrev),
+  `9e85` (cc form plus size), `8b03`/`8ddb`/`9004`
+  (rptbd/parallel/double-precision). `make test`
+  green.
+- Wave-19ao (C intent 215 to 225 files, 3494w).
+  Ten more, all boot-chain strobes and gates:
+  `2867` port 2 set-bit strobe, `29b1`/`29d3`/
+  `2a02` preset gates (forward externs to unbound
+  `29e1`/`2a73`), `2a0e`/`2a5f` port 4 strobes
+  (idle loops exact counts), `2a57` clear gate
+  (tail calls C `frag_2A5F`), `2b45` port 1 strobe
+  plus flag, `95e2` shift store plus join,
+  `96b6` delayed-return preset (retd delay always
+  runs). `make test` green.
+- Wave-19ap (C intent 225 to 237 files, 3627w).
+  Twelve more: `3557`/`361c` flag tests,
+  `36a1` three-way fanout, `36b0` cell pair plus
+  report, `3753` arm 3 (36f0 shape with #10),
+  `37c0` dual-port relay with unlock (BL-only
+  observation, INTM hardware state), `381b`
+  byte-class dispatch (range tests proven exact
+  under both SXM states), `3827` masked store,
+  `382e` small-value dispatch (ldu exact),
+  `383f`/`3844`/`3849` cell presets (plus state
+  step). Held: `3691` (cc needs the 580b TC-out
+  contract). `make test` green.
+- Wave-19aq (C intent 237 to 245 files, 3701w).
+  Eight more: `2ec6` constant-B call chain (B
+  threaded into C `routine_4590`), `388c` flag
+  pair with B handoff (B live-out threaded),
+  `38fb` shift-merge with live-out A (long, int
+  return), `4238` delayed-return double move
+  (retd delays always run, pointers in-out),
+  `452c` shift-mode store (ASM hardware state),
+  `49b2` B store plus join, `49f7` clear-or-join
+  gate, `4a01` B-lane chain head (all tails
+  wired: C `frag_4A12`, unbound `4a1e`/`4a4b`).
+  Held: `2ecd` (bacc computed branch, no
+  convention), `4ad8` (calad delayed computed
+  call). `make test` green.
+- Wave-19ar (C intent 245 to 251 files, 3763w).
+  Six more: `4ae0` B-lane join (B threaded into
+  C `routine_4590`), `4af3` port 56 idle-poll
+  loop (INTM lock hardware state, `idle 1` extern
+  op, self-edge loop), `4c29`/`4c2f`/`4c35`/`4c3b`
+  compare-rung chain (SUB dst = src minus operand
+  per op_sub; dark equal-tails). check_c caught a
+  dropped rsbx/idle pair in the `4af3` EXPECT,
+  fixed from ROM. `make test` green.
+- Wave-19as (C intent 251 to 255 files, 3810w).
+  Four more: `4df0`/`4df6` delayed-branch BK
+  presets (bd delay always runs), `4ece`
+  conditional one-store (xc pair, retd delay),
+  `4ee0` counter-gated delayed branch (BANZ
+  post-decrement per branch_sind; bd delay B
+  dead). Held: `4dda`/`4de2`/`4dea` (mar-% is
+  reverse-carry update, consumer dark, needs
+  oracle), `4c41` (size plus rptbd), `4d9d`
+  (rptbd plus exotic store), `4e63` (rptbd plus
+  mpya). `make test` green.
+- Wave-19at (C intent 255 to 262 files, 3877w).
+  Seven more: `614f` flag-gated delayed store
+  (retd 2nd slot spills past span, flagged),
+  `4ff6` triple-flag chain (bd delay A dead),
+  `63d8` double store (no yaml bound, header
+  plus MATCH), `649d` B store plus join (shared
+  operand word per 8AA5), `6596` range gate,
+  `65a5` conditional cell add (xc 2nd slot
+  spills, flagged), `6657` conditional rebias
+  (MIN signed per op_compare, A/B out-params).
+  Held: `54bb`/`629f`/`644a` (decomp boundary
+  review). `make test` green.
+- Wave-19au (C intent 262 to 271 files, 3947w).
+  Nine more: `66a7` sum handoff, `690e` T-bit
+  test (BITT via T = A - 17, in-range noted;
+  calls C `frag_6928`), four message-converge
+  fragments (`569a` live-out A return, `569e`,
+  `5676`, `54f8` with live-A tail), three code-
+  address tables (`4433`, `b129`, `b177`, static
+  const arrays per aead precedent). Held: `a249`
+  (READA program-read direction plus bacc-to-zero
+  need oracle). `make test` green.
+- Wave-19av (C intent 271 to 275 files, 3972w).
+  Four more: `d5c8` tail store, `345b` compare-
+  operand setup (A/B out-params), `538d` branch
+  sled (four entries, one EXPECT, entry-function
+  convention), `52f7` decrement-or-join gate.
+  Deferred as a class: `afab`/`b16c`/`af57`
+  (READA plus bacc-to-zero, with `a249`),
+  `5355` (cc, with `3691`), `dbc1` (norm needs
+  40-bit plus TC). `make test` green.
+- Wave-19aw (C intent 275 to 277 files, 4011w).
+  Two more: `3460` masked compare fanout (TC
+  live-out noted as lane-consumer feed; SUB per
+  op_sub), `53d9` far-call chain with fetch
+  (extended fcalls extern per b036; A threaded
+  into unbound `54a4`). Held: `5362` (bacc with
+  computed A into uploaded-code region). `make
+  test` green.
+- Wave-19ax (C intent 277 to 282 files, 4085w).
+  Five more, the 66xx cluster: `6693` entry gate
+  (cmpm equality, AR1 preset, A/AR6 plus B/AR5
+  passthroughs), `66ac` min gate, `66b8` absorb
+  gate, `66c5` max join (fall-through abut as
+  tail call), `66cb` save-conditional (xc pair,
+  calld delay first, C `daram_save_restore`).
+  MAX/MIN signed per op_compare. `make test`
+  green.
+- Wave-19ay (C intent 282 to 286 files, 4129w).
+  Four more, the 69xx T-bit family: `691d`
+  (retd delay orm), `6940` difference gate (rc
+  bail plus tail to C `frag_6954`), `694d`
+  fall-through bail, `6954` cell bump (rc ageq
+  early return). BITT via T, in-range noted per
+  690e. Held: `687e`/`688c` (post-ret heads,
+  with 629f/644a). `make test` green.
+- Wave-19az (C intent 286 to 289 files, 4214w).
+  Three more, the message swap-store chain:
+  `5683` masked merge (A threaded to C `569a`/
+  `569e` and dark `569c`), `55d7`/`55b1`
+  T-scaled swap stores (MPYA register-only dst
+  per ti-c54x op_mpya_dst: A = T x A-high, T
+  known in-span; `and #-2,16,a` high-word math
+  exact). Held: `d5ca` (rptbd plus T-from-ST1).
+  `make test` green.
+- Wave-19ba (C intent 289 to 290 files, 4266w).
+  One more, 52w: `a7b7` audio path A. Absolute
+  offset mapping proved all six branch targets
+  in-span (A7E5 = st-7 word, A7E8 = call site,
+  A7D8 = st-8 word, A7C9/A7D2/A7DD interior
+  joins); single function with gotos, bcd
+  convergence modeled straight, no dark
+  externs. `make test` green.
+- Wave-19bb (C intent 290 to 293 files, 4292w).
+  Three more: `7a4b` cell-equality pair,
+  `7ade` step-plus-gate (tails into C
+  `port_programmer_7AE5` with AR1 in-out plus
+  AR3/AR4/AR5 passthrough; A live-out int
+  return), `7c2c` constant-A tail (A threaded
+  into dark `7bee`). `make test` green.
+- Wave-19bc (C intent 293 to 294 files, 4310w).
+  One more: `3850` register zigzag (ldm values
+  as int params, B lane-id threaded into unbound
+  `93ce`, sftl logical). Held: `3787` (4-operand
+  AND needs oracle grounding). `make test`
+  green.
+- Wave-19bd (C intent 294 to 298 files, 4406w).
+  Four more, all boot: `2bed` port 56/2 relay
+  segment (second segment of the split span),
+  `3028` post-return setup (SP hardware state,
+  far join to dark `2000`), `296a` port 1 strobe
+  with flag joins, `29b9` conditional stage (xc
+  pair, path-dependent store address noted,
+  tail calls C `frag_29D3`). `make test` green.
+- Wave-19be (C intent 298 to 301 files, 4508w).
+  Three more: `29e1` masked select (bcd delays
+  always run, plain sub form per .asm), `2a73`
+  port 49/50/4 sequence (bd delay mvmd always
+  runs), `2983` flag chain with arithmetic tails
+  (entry AR2 as param, not scaffolding; tails
+  call C `frag_2A73`/`frag_29B9`/`frag_29B1`).
+  `make test` green.
+- Wave-19bf (C intent 301 to 303 files, 4604w).
+  Two boot leaves in house style
+  (`<addr>_frag_<addr>.c`, ORIGIN/EXPECT header,
+  volatile cells, port externs): `2875` strobe-then-clock
+  gate (in-span rejoins at 0x2890/0x2899 via goto;
+  dark tails `frag_283D`/`frag_28A5`, dark call
+  `sub_05F6`) and `2ACC` masked RF-port program
+  (BC targets 0x2AE2/0x2AE6 proven in-span nops from
+  the recombined listing, not dark tails; full-flow
+  goto over the TC skip; CMPL grounded as full-40-bit
+  NOT per ti-c54x `op_cmpl.c:44-45`, C/TC preserved,
+  low16 exact). `2983` caller updated to pass A into
+  C `frag_2ACC(a)`. Misnamed `c_boot_*` drafts removed.
+  `make test` green (exit 0).
+- Wave-19bg (C intent 303 to 304 files, 4649w).
+  `2D5E` message-block post plus status-latch epilogue
+  (bitf-gated 0x2F00 block build around dark `sub_0626`
+  and unbound `frag_93CE`; in-span rejoin at 0x2D7F via
+  goto; C tail `frag_2D8B`; orm/andm bit3 stroke pair;
+  entry AR2/AR3 threaded as params; existing `56a2`
+  caller updated to pass `G_AR2/G_AR3`). `make test`
+  green (exit 0).
+- Wave-19bh (C intent 304 to 305 files, 4716w).
+  `2BAA` RF gate plus mode-lane select head (67w;
+  in-span joins at 0x2BCD/0x2BE4; provably-dead
+  `(x<<4)-1==0` re-tests folded with proof; C tail
+  `frag_2BAA_seg2`; dark subs `sub_39F0`/`sub_39A4`
+  per kernel precedent; transposition slip in EXPECT
+  caught by check_c, fixed from listing). `make test`
+  green (exit 0).
+- Wave-19bi (C intent 305 to 306 files, 4791w).
+  `2DE4` HPI word-drain plus classify-post worker
+  (all four BC targets proven in-span rejoins from the
+  listing, including `ret` at 0x2E2E; dark calls
+  `sub_0628`/`sub_2289`/`sub_B4F8`; `ldu` as unsigned
+  load and `stlm` per `2e64` precedent; `sfta -8` exact
+  on non-negative `ldu` value; 1024-header variant of
+  the `2D5E` 0x2F00 block). `make test` green (exit 0).
+- Wave-19bj (C intent 306 to 315 files, 10711w).
+  All 9 remaining unbound tables bound as read-only
+  C arrays via `/tmp/gen_tables.py` (pure `.word`
+  verified by grep; EXPECT transcribed from the
+  `.asm` words, not mnemonics): 56bd/33w, 8821/51w,
+  ad0d/316w, afb5/10w, bcc8/52w, e9ee/432w,
+  eb9e/1122w, f000/3072w, fc00/832w. `make test`
+  green (exit 0).
+- Wave-19bk (C intent 315 to 316 files, 10885w).
+  `5503` RF-tune converge chain (174w, first-try
+  EXPECT from the listing): rpt/mvdd loops,
+  single `xc 2,tc` with plain delay slots (4EBC
+  exact-skip precedent), mvdk idiom, SUB #lk SHFT-0
+  per ti-c54x `op_sub_lk`, `cmpm *(0x8)` on the
+  port-56 AL residue; tails into C `frag_55B1`
+  (AR1) / `frag_5683`, dark `sub_56FC`/`sub_06E6`,
+  unbound `frag_55EF` declared with B-live param
+  (its entry SUB reads B). `make test` green (exit 0).
+- Wave-19bl (C intent 316 to 317 files, 10941w).
+  `A482` tune-select setup (56w): SUB #lk lanes
+  (SHFT-0 per `op_sub_lk`, alt narrowing per 6871),
+  INTM-free; pshm/popm BL round-trip net preserve;
+  calld into void `sub_AB82` per A3E1 precedent
+  (delay presets dead in C); int status return
+  (0 early, 1 done). `make test` green (exit 0).
+- Wave-19bm (C intent 317 to 325 files, 11112w).
+  Six RF binds, all first-try EXPECT: `938C`
+  COBBA audio preamble (rc early-out per 2E64,
+  PORTR-to-plain-cell leaves A untouched per
+  `op_portr` Smem-only); `4474` port 4/49/50
+  strobe (pshd/andm/popd net preserve modeled
+  exactly; bc-to-self busy-wait as while loop;
+  AR4 param); `4453` guarded broadcast (mvpd via
+  `prom_read_word` per 4444; family par3/par4
+  signature); `5395` lane head plus `53BA/5420/546B/
+  5489` lane chain (AR2 params; interior join
+  `frag_546B` into `frag_5489`; A-threading into
+  `frag_54A4`/`frag_53CD` per 53D9). `make test`
+  green (exit 0).
+- Wave-19bn (C intent 325 to 328 files, 11255w).
+  `5301` copy sled, dual-entry `53EB` (53w: 53EB
+  lane plus 0x5409 lane, one file per 538D
+  convention) and `544A`: xc-gated slots with
+  TC-liveness analysis per lane (53EB threads
+  entry TC as param since its cmpm sits in the
+  skipped slots; 544A void since its cmpm runs
+  unconditionally; 5301 void, TC dead after);
+  `538D` slot1 updated to thread TC while slot2
+  stays a void forward extern (sled ROM bytes
+  target 0x5434, a separate span from the 0x5409
+  entry — listing-resolved, no conflation).
+  `make test` green (exit 0).
+- Wave-19bo (C intent 328 to 333 files, 11338w).
+  `A679` dual-entry measurement setup (53w, one
+  file per 53EB convention; retd delay slot
+  always runs; SUB #lk single-acc form; mvdk
+  dmad-destination); `4A4B` dual-subtract select
+  (bd delay slot stored before the C tail call
+  per 2A73; B threaded as param; 4A63 void extern
+  proven airtight from its entry path); three
+  entry-call stubs `3986`/`3EE1`/`54BB` defining
+  `sub_3986`/`port13_stable_read`/`frag_54BB` for
+  existing callers; `4007` stub withdrawn (446D
+  already contracts it with A/B params — a void
+  definer would conflict). `make test` green
+  (exit 0).
+- Wave-19bp (C intent 333 to 342 files, 11676w).
+  `44FD` triple-entry fanout (A-restore honesty
+  via saved local; calld dead presets; two
+  functions one EXPECT per 53EB); `3D1B` port
+  program (mvdk store-content fix: `*ar2++`, not
+  the pointer); `66E2` rebias pair (beq-skips-st
+  shape shared with 4474); `4A19` 4-param
+  threading into `frag_4A4B`/`frag_4A46`;
+  `6679`/`6753` save tails (calld delay-slot stm
+  IS the `daram_cell_store` src arg);
+  `692C`/`68F7` BITT gates (TC formula grounded
+  in `op_bitt_smem`, plain-offset reads);
+  `6693` caller updated to pass AR5 into C
+  `frag_66E2`. `make test` green (exit 0).
+- Wave-19br (C intent 352 to 358 files, 11780w).
+  Six more, all first-try: `9700` bit-test fork
+  (AR2 passthrough into unbound `frag_970B`);
+  `9AF4`/`9B63` retd leaves with int A-out
+  (delay slots always run; A482 precedent);
+  `BA2A` cell-bump return; `DAC9` zero gate into
+  C `frag_DACF`; `B942` delayed-call tail.
+  `make test` green (exit 0).
+- Wave-19bs (C intent 358 to 362 files, 11813w).
+  `8675` store return; `89EB` register gate
+  (ldm address-value test per 4444); `95B8`
+  negate tail into C `frag_9667`; `AEA0` cursor
+  rewind (plain mar offset, linear). Skipped as
+  dangling/mid-span: `C851`, sth/stl pairs,
+  rpt+sth fills, lone pshm/ld/add heads, `DB7F`
+  (dangling xc), `3EBD` (table length open).
+  `make test` green (exit 0).
+- Wave-19bt (C intent 362 to 365 files, 11855w).
+  `836D` AR7 dispatch (calld delay-slot presets
+  callee-visible, second AR6 preset rides tail);
+  `952E` init pair + port 1 kick (A = 256 dead at
+  tail, void precedent for dark `283D` tail);
+  `C7E9` masked compare (DROM lane, masks
+  `0xC600`/`0xF9FF`, void tails). New check_c
+  gate caught: `Verified encoding:` line required
+  in every C header. `make test` green (exit 0).
+- Wave-19bu (C intent 365 to 371 files, 12183w).
+  `32B4` nibble steering into `ROUTINE_423B`
+  (TC chain grounded: AND/OR preserve TC per
+  `op_logical.c`, `xc` reads the earlier `bitf`;
+  all three bc targets rejoin in-span). `3640`
+  AR0 class select (`3664/3667` dark voids,
+  `3652` a separate span inside the bound).
+  `3938` scaled port kick (literal double-`sub`
+  keeps a dead 20200 arm; AR2 bump rides out).
+  `38C9` scaled add/or (stale-Z gate: entry Z as
+  `z_live`, LDM/SFTA/BITF write no Z per oracle
+  deltas with PRESERVE = 0; TC4 chain grounded
+  through sub/sfta/stl/sftl/subs/ld/or/add;
+  bound `FRAG_38F6` returns A). `3FC4` RF prologue
+  (three dead `sub_4007` calls). `670D` quad
+  MIN-select (AR0 pinned 12253 after pass 1;
+  `alt` = A < 0, `min` signed 40-bit; `676A`
+  void per 6666). `make test` green (exit 0).
+- Wave-19bv (C intent 371 to 377 files, 12496w).
+  `C7B1` init gate (56w DROM; `C7E9` arm as
+  terminal call, spans abut with zero overlap;
+  `C7F6` escape as dark void; BK/AR4 dead noted).
+  `4B67` dual accumulate-store (Smem
+  zero-extension for OR grounded in
+  `op_or_smem.c`; audit flag: older `or/and`
+  Smem files modelled signed -- review queue).
+  `B605` cell-sum gate (arithmetic Smem
+  sign-extends under SXM = 1 per
+  `op_sub_smem.c`; `FRAG_B61F` takes live B).
+  `500B` mode-word build (NEG preserves TC per
+  `op_neg_acc.c`; dead `5052-5055` block noted;
+  goto-free via build-select + shared tail;
+  EXPECT slip caught by check_c -- transcribed
+  from ROM slice verbatim after). `4BA8` A-gated
+  fill chain (`9268` par3 = delay-slot AR3 =
+  12162; ASM = -9 unmodeled; B rides 0 per
+  callee-preservation convention, second bneq
+  dead in model). `978F` port strobe + poll
+  (entry-A gate; `9682` opaque void; 40-bit B
+  entry-live; poll hang risk noted). `make test`
+  green (exit 0).
+- Wave-19bw (C intent 377 to 380 files, 12612w
+  measured). `7FF4` copy-plus-select (RPTZ
+  zeroes B per `op_rptz.c`, 7 zero stores;
+  `802D`/`802F` B-live dark voids). `4986`
+  cell-gated store pair (stale defer note was
+  wrong -- no bcd in span; `49B2` in-span join;
+  `4AD8` calad opaque void). `687F` range flag
+  (6871 twin, cell `0x2FD9`/159, B-out int).
+  `688D` polled negate (rc-tc chain: bitf TC
+  survives xc/neg/add per oracle deltas; retd
+  single delay slot; authored exact 20w .asm --
+  sibling `688d_sub21` overclaims through
+  post-retd `max`; recombine 969/969 MATCH).
+  Tallies now measured from tree, not running
+  sums. `make test` green (exit 0).
+- Wave-19bx (codegen loop live; 383 C files).
+  `cl500` C5400 CGT 4.2.0 installed to
+  `~/ti/c5400_4.2.0` (`-v548` accepted; needs
+  CGT `bin/` on `PATH` for sub-tools; `-o`
+  unsupported, use bare `-c`; no TI disassembler
+  ships -- `.text` via `ofd500
+  --obj_display=rawdata`, reading via our
+  `disasm_c54x.py`). New `tools/codegen_diff.py`
+  (compile `-O2`, extract `.text`, diff vs
+  EXPECT) writes `build/codegen.json`. First
+  full sweep: 4 MATCH / 383 -- all four 1-word
+  `ret` pads (`3266/4ADF/7F54/AE70`), `.asm`
+  retired, `check_c` taught the codegen path
+  (MATCH record in `codegen.json` replaces the
+  `Verified encoding` line). 16 data-scope
+  (tables + `A255` jump table, no `.text`).
+  362 code mismatch: 361 diverge at word 0
+  (compiler prologue `PSHM` vs frameless hand
+  code), nearest `691D` (2 words match).
+  Median codegen 1.67x hand size. Dialect fixes
+  from compiler errors: 12 files `&G_AR5` to
+  local `int **pp5` + writeback (C89: decls at
+  block top); `44FD/53EB` implicit-decl
+  conflicts fixed with prototypes. `4EBc`
+  `long long` left failing (40-bit intent,
+  narrowing would falsify; recorded as cl500
+  gap). `make test` green (exit 0).
+- Wave-19by (prologue lever verdict). `cl500
+  -n` codegen read directly (`687F`: `STM
+  #12249,AR2` = absolute-cell access,
+  `PSHM AR1` frame, `SSBX SXM`, stack-passed
+  args, A-return, inverted branches). ROM ABI
+  is register-passed, B-returning, frameless.
+  Verdict: stock `cl500` cannot reach
+  byte-identity for most functions (no
+  naked/no-frame flag; `-r` only reserves
+  globals). `.asm` stays the byte-identical
+  source of truth (969/969 MATCH); C stays
+  intent plus tightening guide; codegen diff
+  guides opcode/order convergence only.
+- Wave-19bq (C intent 342 to 352 files, 11740w).
+  `423B` T-scale accumulate (MPY #lk.dst per
+  84CF); ten-file micro batch, all first-try:
+  entry-call stubs `8641`/`864E`/`8653`/`3D3B`
+  (define the 5420-lane callees), branch tails
+  `7FB3`/`965C` (into C `frag_7F54`/`frag_9667`),
+  step tail `9BF5` (plain mar), delayed-return
+  stores `DA32`/`DACF` (ROM-slice EXPECT, no
+  listing rows), guarded tail `9453` (calld dead
+  preset, agt on live-in A). Fragments skipped:
+  lone pshm/ld/sth/mvdk/add heads with no
+  control unit or unknown table length. `make
+  test` green (exit 0).
 
 ## Goal mapping
 
@@ -477,3 +1266,131 @@ handler inventory maps to ROM6 upper plus blocks understanding. RF and
 audio edges map to MCU driver plus §7a. Block↔ROM xrefs map to blocks
 understanding. DROM shapes map to `drom.txt`. Homology ports map to the
 ROM4 row.
+
+- Wave-19br (C intent 385 to 404 files; check_c
+  404 OK 0 FAIL; recombine MATCH, make test exit
+  0). Kernel remainder: `57A3` head (41w) abuts
+  existing `57CC` tail; new `57cc.c` holds six
+  entry functions sharing the rcd commit tail.
+  `5AAC/5AC8/5AFB` filter kernel (.c over existing
+  .asm): RPTB deinterleave scatter (stride 64 mod
+  BK = 456, 57 slots), mod-627 fold, re-bias, BANZ
+  test-then-dec (3-2-1 taken + fall = 4 passes).
+  `5B18` nibble unpacker. `5B26/5B5C/5B9E/5BD9`
+  region: computed baccd dispatch head, pshm/calld
+  twin tails, mod-4 dispatch `5BC6`, table scatter
+  `5BD9` (ASM-shift + DLD-step HYPOTHESIS). `5A68`
+  banzd triple nest (4 x 6 x 19). `5BF1` 8-call
+  hub + `5C34` neg-shift scatter. Deferred group
+  `3267/3691/3674/3779/33D8`: trampolines with
+  bitrev-advance noted unmodelable (AR live-out
+  unknown), RPT Smem = RC (op_rpt_smem) + 1 iters,
+  bare-extern tails per 361C. Msg: `A4DE` setup
+  chain, `93CE` TC-result classifier (dead-A fossil
+  noted: `ld/and` masked A never read after AR3 =
+  8 reassign), `A2C3` port worker. KEY FINDING:
+  `A2C3` bleq chain is dead under callee-preserved
+  A, fully live under 3EE1-A-out: `port13_reading`
+  HYPOTHESIS recorded; CONFLICTS with 2983.c which
+  assumes 3EE1 preserves A. Trace (or a 3EE3-3FC3
+  dark-body decomp) must decide; if A-out, 2983.c
+  needs rework. T-as-negative-shift HYPOTHESIS
+  (`5BD9/5C34/5A68`): effective barrel count for
+  wrapped T trace-confirmable. `and #-1,a` = A &=
+  0xFFFF (immediate zero-extended, op_logical).
+- Wave-19bs (encoding-pool disposition). Spans
+  that stay asm-only, reason recorded in each
+  .asm header + recombine MATCH (byte truth kept):
+  READA (`55EF`, `A249`, `AFAx/B16x` family);
+  bit-reversed addressing (`9A11`, `3623/32EE/
+  333C/3862/36FB/43D3/8433` family, `3779/3674`
+  loads noted); far returns (`9A11` retd/reted);
+  NORM/EXP single-steps (`71A3`, modem exp_norm);
+  dual-destination arithmetic (`71A3`, `C2D5`
+  sub-pair); SAT (`C2D5`); parallel MAC/MAS/MACD
+  (`9F42`, modem mac/rptbd/dual); DLD/DST 32-bit
+  (`9F42`, `5282/528F`); ROR/ROL rotate (`4F5F`,
+  `80F3`); BACC computed (`95A2`, `5362`, `2ECD`);
+  CALA/CALAD (`4AD8`); BRC-carry (`8775/87C7`);
+  BCD (`4986`); 233w monster (`4CB4`, staged).
+  Rule applied: a span gets C intent iff every op
+  has an oracle-grounded C form; otherwise .asm
+  stays the deliverable with the blocking op cited.
+- Wave-19bt (link audit). New `tools/link_audit.py`
+  checks all 965 recombine spans against
+  `src/rom6/link/rom6.cmd` regions; writes
+  `build/link_audit.json`. Result: 54662 span-words
+  (53462 unique), 0 spans fully outside the map (3
+  boundary-crossers: `AFF9` PROMLOW->PROMHIGH,
+  `FF78` BRANCH->VECS, `FC00`-table PROMHIGH->
+  BRANCH -- map-description notes, bytes verified),
+  87 overlap pairs (26 substantive: dual analyses
+  sub13/sub14/sub21/sub32/sub84/sub85 families +
+  abut variants; rest 1-word shared exits), 1834
+  gap words in 50 runs (dark gaps, expected).
+  Verdict (wave-12): per-span origins individually consistent;
+  overlap pairs zero (959 spans, 53682w, all unique);
+  a naive single-image link still needs generated
+  SECTIONS (959 sections); no link claimed.
+- Wave-19bu (3EE3-3FC3 dark body + A-out verdict).
+  New `3EE3` (16w stability loop: double-read port
+  13 masked to 14 bits, loop to agreement; exits A
+  = reading, B = 0) and `3EF3` (209w port-config
+  ladder: INTM-gated pa2 RMW, timed writes, mode
+  lane 680/640/1696, 4x SUB_4007 + ROUTINE_3FFA,
+  exterior exit to FRAG_3FC4 on bit 5 of 0x3EC8).
+  Both .asm + .c, recombine MATCH, check_c 406 OK.
+  CONFLICT SETTLED: A-OUT wins -- the loop rewrites
+  A and B unconditionally, so callee-preservation is
+  impossible for any caller of 0x3EE1. Fixed the
+  three wrong callers (C semantics otherwise
+  unchanged): 2983.c, 4474.c, a7b7.c now assign
+  `a = port13_stable_read()` (stub now int with
+  abut tail into STABLE_READ_3EE3); a2c3.c already
+  modeled A-out, updated to the shared int name.
+  check_c 406 OK, recombine 967/967, make test exit
+  0. Asm-only 3EE1 callers (aa7c/aac7/a361)
+  unaffected (byte truth). No new test file: change
+  is intent-documentation; existing gates
+  (EXPECT-vs-ROM, recombine, make test) verify byte
+  truth.
+- Wave-12 overlap ownership pass (one owner per word).
+  link_audit overlaps 57 -> 0 (959 spans, 53682w, all
+  unique). recombine 959/959 MATCH. check_c 579 OK,
+  0 FAIL. make test exit 0. coverage symbols 981
+  (897 bounded), merged 54172/55296 = 98.0%. gaps 53
+  runs / 1614w (dark, unchanged); outside 3
+  (pre-existing). test_recombine floor 54646 ->
+  53682 (dedup: same bytes, each counted once).
+  Method per site: objdump ground truth of the ROM
+  bytes; exit word belongs to the exiting span;
+  ret-first twins deleted; mis-origin drafts re-homed
+  to their true function bounds; giants split.
+  Sites: 7f74/821f/83b3/83cd/83e7/83fe/8412/
+  84ce/8500/8507/9041?/e54a/90d5?/90e6?/90f7? deleted
+  or re-homed (ret-abut dups); 81f1 232w split to
+  81f2 (46w C) + 82b7 (20w C) + 82d4-head (5w pool,
+  rsbx); 643e/644a ret@644A to 643e (644b file);
+  649d/649f operand@649F to 649d (64a0 file; bare
+  xc-blt word restored); 7fb4 trimmed to own lanes;
+  80fb trimmed to ret; 836c deleted, 836d extended
+  15w -> 31w (C, 837C lane + 8384 join in-span);
+  83xx chain ret-twins removed (83a0/83b4/83ce/
+  83e8/83ff own exits); 8449 cluster: 84ae giant +
+  84ce/8500/8507 twins deleted, lanes 8508 (asm +
+  8507 C head) + 8513/851E (11w C each) owned;
+  853B fanout re-homed (26w C) + 861F stub (8w C);
+  90xx: 9042 (47w pool) + 90b9 (29w) + 90d6/90e7
+  (17w pools) + 9071 (71w); a679 trimmed to 14w
+  (sled C keeps intent; retd unconditional, no
+  fall-through -- early C draft with tail-call
+  deleted); ff40 trimmed to 33w head; E-tile:
+  e42d-head 21w + e442 41w (delays restored) +
+  e46b 39w + e492, exact tiling, zero gaps added.
+  Corrections: OR Smem zero-extends per op_or_smem
+  (81f2 C; 82a5 sign-extended lane flagged for
+  review); 9042 dadst/dsadt order x2 (recombine
+  DIFF); e42d DP-dma bare-hex form (0x6c).
+  symbols.yaml: stale SUB85_644B entry rewritten
+  (split reality); added 64A0/8508/8513/851E/861F
+  entries; refreshed A679/E42D/FF40/853B/90xx.

@@ -1,0 +1,1059 @@
+diff --git a/src/dsp/c54x/dct3_dsp54.c b/src/dsp/c54x/dct3_dsp54.c
+index b75ce001..fe4f7ec5 100644
+--- a/src/dsp/c54x/dct3_dsp54.c
++++ b/src/dsp/c54x/dct3_dsp54.c
+@@ -4,6 +4,7 @@
+ #include "hw/arm/calypso/calypso_debug.h"
+ #include "dsp/host/dsp54_irq_contract_trace.h"
+ #include "dsp/host/dsp54_rf_edge_trace.h"
++#include "harness/rf_trace.h"   /* TEMP-DIAG edge port (hpi-read watch) */
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdio.h>   /* DSP54_PORTPC diagnostic */
+@@ -337,7 +338,7 @@ void dsp54_serial_receive_word(Dsp54 *d, unsigned port, uint16_t word) {
+ void dsp54_set_timer(Dsp54 *d, int on) { if (d && d->s) c54x_set_timer_enabled(d->s, on); }
+ 
+ /* Register a per-instruction PC histogram (see c54x_set_pc_histogram) — reliable at any RATIO. */
+-void dsp54_set_pc_histogram(Dsp54 *d, uint32_t *h) { (void)d; c54x_set_pc_histogram(h); }
++void dsp54_set_pc_histogram(Dsp54 *d, uint32_t *h) { (void)d; if (!c54x_get_pc_histogram()) c54x_set_pc_histogram(h); }
+ 
+ /* Seed the OVLY DARAM (api_ram) with the resident image's content for DSP addresses [lo,hi).
+  * The resident dispatch/overlay code (e.g. prog[0x2000..0x2800]) lives in the image but loader2's
+@@ -442,6 +443,31 @@ uint16_t dsp54_hpi_read(Dsp54 *d, uint32_t mcu_addr) {
+     if (!d || mcu_addr < 0x10000u || mcu_addr > 0x10fffu)
+         return 0;
+     uint32_t k = (mcu_addr - 0x10000u) >> 1;
++    /* TEMP-DIAG ROM6 HPI-delivery watch: the ROM6 DSP delivers L3 downlink
++     * via shared api_ram, not the MDI ring (ring is silent on 3310). Log
++     * first-sight cells and value changes seen by MCU reads: a polled cell
++     * changing value is a DSP->MCU delivery. 64-slot hash, print-only.
++     * Remove with the verdict. */
++    {
++        static uint32_t seen_k[64];
++        static uint16_t seen_v[64];
++        static int seen_init = 0;
++        if (!seen_init) {
++            seen_init = 1;
++            for (unsigned i = 0; i < 64; i++) seen_k[i] = 0xFFFFFFFFu;
++        }
++        unsigned slot = k & 63u;
++        uint16_t v = d->api_ram[k];
++        if (seen_k[slot] != k) {
++            seen_k[slot] = k; seen_v[slot] = v;
++            unsigned long long ic = (d->s) ? (unsigned long long)d->s->insn_count : 0ull;
++            rf_trace_hpi_cell("NEW", k, v, ic);
++        } else if (seen_v[slot] != v) {
++            seen_v[slot] = v;
++            unsigned long long ic = (d->s) ? (unsigned long long)d->s->insn_count : 0ull;
++            rf_trace_hpi_cell("CHG", k, v, ic);
++        }
++    }
+     return d->api_ram[k];                    // single store (= DSP 0x800+k)
+ }
+ 
+diff --git a/tests/test_boot_trace_config.c b/tests/test_boot_trace_config.c
+index 5c5c921d..6efce231 100644
+--- a/tests/test_boot_trace_config.c
++++ b/tests/test_boot_trace_config.c
+@@ -55,7 +55,7 @@ int main(void)
+     assert(count_occurrences(BOOT_TRACE_CONFIG_C, "getenv(", 0) == 1);
+ 
+     /* One row per knob; bump BOOT_TRACE_CONFIG_KNOB_COUNT with any new row. */
+-    assert(BOOT_TRACE_CONFIG_KNOB_COUNT == 219);
++    assert(BOOT_TRACE_CONFIG_KNOB_COUNT == 222);
+ 
+     /* Every known knob resolves through the table, set and unset. */
+     for (i = 0; i < BOOT_TRACE_CONFIG_KNOB_COUNT; i++) {
+diff --git a/third_party/c54x/calypso_c54x.c b/third_party/c54x/calypso_c54x.c
+index f90c9dfe..0031ec15 100644
+--- a/third_party/c54x/calypso_c54x.c
++++ b/third_party/c54x/calypso_c54x.c
+@@ -6335,6 +6335,9 @@ static void data_write(C54xState *s, uint16_t addr, uint16_t val)
+     if (addr == 0x17a9u && val == 0x1117u &&
+         s->insn_count > 400000000u)
+         return;
++    /* (TEMP-DIAG afc-log reverted: 3310/ROM6 shows only two early writes
++     * (0x0000 @boot, 0x0e20 @131k insns) — the ROM4 stale-grab mechanism
++     * does not fire here. See worklog.) */
+     /* Keep this admission test branch-local and side-effect free: callers
+      * which do not install a table retain the generic callback-on-every-store
+      * semantics, while filtered observers avoid both the indirect call and
+@@ -13937,6 +13940,44 @@ static int c54x_exec_one(C54xState *s, uint16_t prefetched_op)
+             data_write(s, addr, (uint16_t)(acc & 0xFFFF));
+             return consumed + s->lk_used;
+         }
++        /* 0x7800-0x79FF MACP Smem,pmad,src / 0x7A00-0x7BFF MACD Smem,pmad,src.
++         * Per tic54x-opc.c { "macp", 2,3,3, 0x7800, 0xFE00 } and
++         * { "macd", 2,3,3, 0x7A00, 0xFE00 } (opcode + pmad word, +1 for the
++         * long-Smem form) and SPRU172C 4-87/4-89. These had NO handler and
++         * fell into the 0x7800 "STH" catch-all below, which decoded them as
++         * 1-word STH src,Smem and fabricated a store of the accumulator high
++         * half. At the 3310 TCH bring-up the channel filter executes MACD
++         * (0x7BD7 = MACD *AR7+%,pmad,B); the fabricated STH stored B-high
++         * (0, with stale AR7=0) to MMR_IMR=0, masking every interrupt and
++         * parking the core in IDLE 1 at 0x3998 (MDI silence -> MCU wdog 104).
++         * Opcode bit 8 selects src (0=A,1=B) per the 0111_101S diagram
++         * (same bit-8 convention as the scalar MAC family: 0x78/0x7A = A,
++         * 0x79/0x7B = B). MACD additionally performs the FIR delay move
++         * (Smem -> Smem+1, T). */
++        if (hi8 == 0x78 || hi8 == 0x79 || hi8 == 0x7A || hi8 == 0x7B) {
++            int pm_src = (op >> 8) & 1;
++            bool pm_ind;
++            uint16_t pm_addr = resolve_smem(s, op, &pm_ind);
++            uint16_t pmad = prog_fetch(s, (uint16_t)(s->pc + 1 + (s->lk_used ? 1 : 0)));
++            /* SPRU172C: pmad seeds PAR; under RPT the hardware increments PAR
++             * each iteration (same first-pass protocol as READA/MVPD). */
++            if (!(s->rpt_active && s->par_set))
++                s->par = pmad;
++            if (s->rpt_active) s->par_set = true;
++            uint16_t pm_par = s->par;
++            if (s->rpt_active) s->par++;
++            int16_t pm_x = (int16_t)data_read(s, pm_addr);
++            int16_t pm_p = (int16_t)prog_fetch(s, pm_par);
++            int32_t pm_prod = (int32_t)pm_x * (int32_t)pm_p;
++            if (s->st1 & ST1_FRCT) pm_prod <<= 1;
++            int64_t *pm_acc = pm_src ? &s->b : &s->a;
++            *pm_acc = sext40((*pm_acc + (int64_t)(int32_t)pm_prod) & 0xFFFFFFFFFFULL);
++            s->t = (uint16_t)pm_x;
++            if (hi8 == 0x7A || hi8 == 0x7B)  /* MACD: FIR delay move */
++                data_write(s, (uint16_t)(pm_addr + 1u), (uint16_t)pm_x);
++            consumed = 2;  /* opcode + pmad ; long-Smem extra via lk_used */
++            return consumed + s->lk_used;
++        }
+         /* 0x7C00 MVPD pmad,Smem  (Smem = Pmem[pmad], program→data)
+          * 0x7D00 MVDP Smem,pmad  (Pmem[pmad] = Smem, data→program)
+          * Per tic54x-opc.c both are { ..,2,2,2, 0x7C00/0x7D00, 0xFF00,
+@@ -13948,7 +13989,8 @@ static int c54x_exec_one(C54xState *s, uint16_t prefetched_op)
+          * loader1's finalize (0xf67 `mvpd 0xff87,*(0x801)`, only reached at
+          * insn~482M when the cold upload completes) that desynced the stream
+          * into the CRC-seed routine → ret@0xf73 over-pop → cascade into run-mode
+-         * → 0x940d retd→0xf074 → AR5=0 → IMR=0. MUST precede the 0x7800 group. */
++         * → 0x940d retd→0xf074 → AR5=0 → IMR=0. (The 0x7800 STH catch-all that
++         * caused this was removed; 0x7800-0x7FFF is now fully decoded above.) */
+         if (hi8 == 0x7C || hi8 == 0x7D) {
+             addr = resolve_smem(s, op, &ind);   /* sets s->lk_used for long Smem */
+             uint16_t pmad = prog_fetch(s, (uint16_t)(s->pc + 1 + (s->lk_used ? 1 : 0)));
+@@ -13980,17 +14022,10 @@ static int c54x_exec_one(C54xState *s, uint16_t prefetched_op)
+             consumed = 2;  /* opcode + pmad ; long-Smem extra added via lk_used */
+             return consumed + s->lk_used;
+         }
+-        if ((op & 0xF800) == 0x7800) {
+-            /* 78xx-7Bxx (+ legacy 7C-7F before the MVPD/MVDP/READA/WRITA
+-             * handlers above): STH src, Smem.
+-             * Note: BANZ (0x78xx per doc) shares this range but is handled
+-             * via F84x (BANZ with condition) in the F8xx group. */
+-            int src_acc = (op >> 9) & 1;
+-            addr = resolve_smem(s, op, &ind);
+-            int64_t acc = src_acc ? s->b : s->a;
+-            data_write(s, addr, (uint16_t)((acc >> 16) & 0xFFFF));
+-            return consumed + s->lk_used;
+-        }
++        /* 0x7800-0x7FFF is fully decoded above (MACP/MACD/MVPD/MVDP/
++         * READA/WRITA). The former 1-word STH catch-all here misdecoded every
++         * MACP/MACD as a store (3310 IDLE-park root) and is removed; true STH
++         * lives at 0x82/0x86/0x9A per tic54x-opc.c. BANZ is 0x6C00 only. */
+         /* 0x6000-0x60FF: CMPM Smem, lk  (compare memory with long immediate)
+          * Per tic54x-opc.c: { "cmpm", 2,2,2, 0x6000, 0xFF00 }
+          * Sets TC = (data[Smem] == lk).
+@@ -16189,6 +16224,7 @@ uint32_t *g_pc_histogram = 0;
+  * armed), so a stale 1 merely runs the (cheap) inner checks. */
+ static int g_run_pc_latch = 0;
+ void c54x_set_pc_histogram(uint32_t *h) { g_pc_histogram = h; g_run_pc_latch = 1; }
++uint32_t *c54x_get_pc_histogram(void) { return g_pc_histogram; }
+ /* Zero the histogram in place (keeps the same buffer registered). Called at the
+  * loader1->run-mode warm reset so a PCHIST dump reflects RUN-MODE only — the
+  * one-time cold-upload loader1 CRC verification (~524k hits at 0x8031, dsp_steps
+@@ -20971,8 +21007,13 @@ skip_eqentry_dump: ;
+              *   (+ break après commit pc/delay = pas mid-instruction)
+              * Cap dur 4× : si INTM reste 1 anormalement, force le yield pour
+              * éviter la famine mainloop (cas "illégal" tracé ci-dessous). */
+-            if (dsp_yield > 0 && s->delay_slots == 0 && !s->rpt_active &&
+-                ((executed >= (unsigned)dsp_yield && !(s->st1 & ST1_INTM)) ||
++            /* Gate order: executed < dsp_yield on almost every retire
++             * (n_insns per call rarely reaches the 32768 quantum), so test
++             * the single numeric compare before the state loads. Pure
++             * predicates — identical semantics, ~4 fewer loads per insn. */
++            if (dsp_yield > 0 && executed >= (unsigned)dsp_yield &&
++                s->delay_slots == 0 && !s->rpt_active &&
++                ((!(s->st1 & ST1_INTM)) ||
+                  executed >= (unsigned)dsp_yield * 4u)) {
+                 /* Preuve du gate : log les premiers breaks + tout break "cap-forcé"
+                  * (INTM=1 = illégal toléré). Si on ne voit JAMAIS de cap-forcé sur
+diff --git a/third_party/c54x/calypso_c54x.h b/third_party/c54x/calypso_c54x.h
+index 3ce8fd59..80127396 100644
+--- a/third_party/c54x/calypso_c54x.h
++++ b/third_party/c54x/calypso_c54x.h
+@@ -585,6 +585,7 @@ int c54x_run(C54xState *s, int n_insns);
+ /* Register a 0x10000-entry PC histogram filled per executed instruction (NULL=off, default).
+  * Reliable at any DSP:MCU ratio (counts inside the run loop, not once per MCU tick). */
+ void c54x_set_pc_histogram(uint32_t *h);
++uint32_t *c54x_get_pc_histogram(void);
+ /* Zero the registered histogram in place (keeps the buffer). Called at the
+  * loader1->run-mode warm reset so a dump shows run-mode, not the cold-upload CRC. */
+ void c54x_reset_pc_histogram(void);
+diff --git a/tools/boot_trace.c b/tools/boot_trace.c
+index bac0a311..e1fe6406 100644
+--- a/tools/boot_trace.c
++++ b/tools/boot_trace.c
+@@ -21,6 +21,17 @@
+ #include <sys/stat.h>
+ #include <ctype.h>
+ #include <signal.h>
++/* TEMP-PROF Callgrind window hooks (post-warm profiling without snapshots).
++ * Client requests are no-ops outside valgrind; the __has_include fallback
++ * keeps non-valgrind hosts building. Remove with the TEMP-DIAG probes. */
++#if defined(__has_include) && __has_include(<valgrind/callgrind.h>)
++#include <valgrind/callgrind.h>
++#else
++#define CALLGRIND_ZERO_STATS do {} while (0)
++#define CALLGRIND_START_INSTRUMENTATION do {} while (0)
++#define CALLGRIND_STOP_INSTRUMENTATION do {} while (0)
++#define CALLGRIND_DUMP_STATS do {} while (0)
++#endif
+ 
+ #include "core/dct3_core.h"
+ #include "hw/mad2/mad2.h"
+@@ -37,11 +48,53 @@
+ #include "harness/snapshot.h"  // whole-machine SNAPSHOT_OUT/IN serialization (Phase 4)
+ #include "harness/provenance/provenance.h"  // timeline + replay + servewatch + verdict engine
+ #include "harness/provenance/registration_run.h"  // R0 census join (observation-only)
++#include "harness/provenance/registration_bts_observer.h"  // BTS-visible LU readiness (arming gate)
+ #include "harness/seccode.h"   // SECCODE=1 validation knob (firmware-oracle code reader)
+ #include "gui.h"               // optional SDL overlay (DCT3_SDL); NO-OP stubs otherwise
+ #include "cosim_console.h"     // caller-owned GUI RX/TX monitor provider
+ #include "mbus_bridge.h"       // optional host-serial MBUS service bridge (MBUSPORT/MBUSPTY)
+ #include "boot_trace_config.h" // BootTraceConfig: every env knob, one table (Phase-2 J)
++#include "calypso_c54x.h"     // c54x_set_pc_histogram (provisional ROM6-decomp oracle)
++
++/* Provisional ROM6-decomp full-bitmap oracle (uncommitted experiment).
++ * DSP54_PCHISTFILE=<path> installs an app-edge 64K PC histogram that the
++ * bridge leaves alone (first-install wins), then dumps nonzero
++ * "addr count" lines at process exit. No-op when unset. */
++static uint32_t *g_pchistfile_buf;
++static char g_pchistfile_path[1024];
++static void pchistfile_dump_on_exit(void)
++{
++    FILE *f;
++    uint32_t a;
++    if (!g_pchistfile_buf || !g_pchistfile_path[0])
++        return;
++    f = fopen(g_pchistfile_path, "w");
++    if (!f) {
++        fprintf(stderr, "[pchistfile] cannot open %s\n", g_pchistfile_path);
++        return;
++    }
++    for (a = 0; a < 0x10000u; a++)
++        if (g_pchistfile_buf[a])
++            fprintf(f, "%04x %u\n", a, g_pchistfile_buf[a]);
++    fclose(f);
++    fprintf(stderr, "[pchistfile] dumped to %s\n", g_pchistfile_path);
++}
++static void pchistfile_maybe_init(const char *p)
++{
++    size_t n;
++    if (!p || !*p)
++        return;
++    g_pchistfile_buf = (uint32_t *)calloc(0x10000u, sizeof *g_pchistfile_buf);
++    if (!g_pchistfile_buf)
++        return;
++    n = strlen(p);
++    if (n >= sizeof g_pchistfile_path)
++        n = sizeof g_pchistfile_path - 1u;
++    memcpy(g_pchistfile_path, p, n);
++    g_pchistfile_path[n] = 0;
++    c54x_set_pc_histogram(g_pchistfile_buf);
++    atexit(pchistfile_dump_on_exit);
++}
+ #include "services/identity_provision.h"   // REPROVISION=1 — EEPROM identity re-provisioning
+ #include "services/cobba_serial.h"       // modeled COBBA key for the identity edge
+ #include "services/rom6_identity.h"      // pre-boot COBBA/MSID decode + DSP provision (cosim)
+@@ -58,7 +111,7 @@
+ #include "gsm/radio/radio_ports.h"                    // WCRD guard deactivation ports
+ #include "harness/p1_stream.h"                           // sole native P1 event drain
+ #include "gsm/l3/gsm_sms_loopback.h"          // MO -> delayed self-addressed MT peer
+-#include "harness/mixed_chain.h"           // opt-in ten-leg ownership coordinator
++#include "harness/mixed_chain.h"           // opt-in four-leg ownership coordinator
+ #include "harness/mixed_chain_runner.h"    // per-step chain runner: SIM/LCD evidence + handoff (Phase-2 L)
+ #include "harness/sweep_runner.h"          // SWEEP=1 DSP MDI group-code sweep runner (Phase-2 L)
+ #include "harness/provenance/replay_runner.h" // per-step REPLAY timeline drive (Phase-2 L)
+@@ -228,10 +281,11 @@ static uint32_t g_sread_len = 8;   // SREADLEN: window size (default 8; widen to
+ static uint32_t rd32(DCT3Core* c, uint32_t a);
+ 
+ /* Firmware-owned serving-state byte, per model (FwAddrs.mmi_serving_state,
+- * sig-located over the loaded flash; 0 = unlocated for this build).  This is an
+- * observer-only host read: the call/SMS paths wait for the real registration
+- * path to publish 0x80 here, rather than treating the synthetic BTS timeline
+- * as a registration gate.  Fail-closed: an unlocated model never reports
++ * sig-located over the loaded flash; 0 = unlocated for this build).  This is a
++ * provenance-only host read: it is logged for correlation but never gates
++ * call/SMS adapter behavior — a real BTS cannot see handset MMI bytes. The
++ * arming gate is gsm_bts_registration_known() below (BTS-side LU accept on
++ * the current cell epoch).  Fail-closed: an unlocated model never reports
+  * registered (one stderr note, then silence).  Bound from h.mach.mad2.fw after
+  * each model_resolve() (boot + GUI warm-reboot paths below). */
+ static uint32_t g_mmi_serving_addr = 0;
+@@ -260,6 +314,54 @@ static uint8_t gsm_p1_serving_state(DCT3Core* c) {
+     return (uint8_t)((word >> shift) & 0xFFu);
+ }
+ 
++/* BTS-visible registration readiness for call/SMS adapter arming: a
++ * delivered, history-valid LU accept on the current cell epoch, sampled
++ * from the BTS registration ledger (snapshot-only; never mutates RF). Every
++ * input here is visible to a real BTS; the MMI serving byte above stays in
++ * the logs for provenance but no longer gates adapter behavior. */
++static int gsm_bts_registration_known(CobbaRfOwner *o)
++{
++    /* Hot arming check (Callgrind: the registration ledger snapshot is
++     * ~28% of a 20M-step boot, mostly the LU burst-bit memcpys).
++     * gsm_bts_registration_lu_current() reads exactly six scalars, so
++     * cache the verdict keyed on those scalars read straight from live
++     * BTS state. Equal key implies an identical verdict (pure function
++     * of the key); any change takes the full ledger path as before. */
++    const GsmBtsState *bts = (o && o->bts) ? o->bts : NULL;
++    const GsmBtsLuAccept *lu = bts ? &bts->lu_accept : NULL;
++    static uint32_t cached_epoch = 0u;
++    static unsigned cached_delivered = 0u;
++    static unsigned cached_history_valid = 0u;
++    static uint64_t cached_seq = 0u;
++    static uint64_t cached_source_seq = 0u;
++    static unsigned cached_cfg_epoch = 0u;
++    static int cached_verdict = 0;
++    static int have_cache = 0;
++    uint32_t epoch = bts ? bts->epoch : 0u;
++    unsigned delivered = lu ? lu->delivered : 0u;
++    unsigned history_valid = lu ? lu->history_valid : 0u;
++    uint64_t seq = lu ? lu->seq : 0u;
++    uint64_t source_seq = lu ? lu->source_seq : 0u;
++    unsigned cfg_epoch = lu ? lu->cfg_epoch : 0u;
++    GsmBtsRegistrationLedger reg_ledger;
++    if (have_cache && epoch == cached_epoch &&
++        delivered == cached_delivered &&
++        history_valid == cached_history_valid && seq == cached_seq &&
++        source_seq == cached_source_seq && cfg_epoch == cached_cfg_epoch)
++        return cached_verdict;
++    memset(&reg_ledger, 0, sizeof reg_ledger);
++    cobba_rf_registration_ledger(o, &reg_ledger);
++    cached_epoch = epoch;
++    cached_delivered = delivered;
++    cached_history_valid = history_valid;
++    cached_seq = seq;
++    cached_source_seq = source_seq;
++    cached_cfg_epoch = cfg_epoch;
++    cached_verdict = gsm_bts_registration_lu_current(&reg_ledger);
++    have_cache = 1;
++    return cached_verdict;
++}
++
+ /* R0 registration census join (observation-only; never mutates guest or RF
+  * state). The byte reader serves the profile-resolved MMI serving cell; the
+  * validity callback reuses the BTS contract state the call/SMS paths already
+@@ -294,19 +396,36 @@ static void boot_trace_reg_sink(const char *line, void *ctx)
+  * writer-backed handset state, stability and reset status decide with it. */
+ static int boot_trace_reg_gui_content(const DisplayState *d)
+ {
++    /* Memoized on the producer generation: every framebuffer mutation
++     * flows through lcd_data (which bumps data_writes) and init zeroes
++     * both sides, so an unchanged key means a bit-identical framebuffer
++     * and the verdict -- a pure function of fb bytes -- is exact.
++     * Saves a full ~6KB scan per ARM step during the long blank-screen
++     * boot (Callgrind: both scan lines ~11.5% each). */
++    static const DisplayState *last_d;
++    static uint64_t last_writes;
++    static int last_seen, have_last;
+     int seen_clear = 0, seen_set = 0;
+     size_t i;
++    int rv;
+     if (!d)
+         return 0;
++    if (have_last && d == last_d && d->data_writes == last_writes)
++        return last_seen;
+     for (i = 0; i < sizeof d->fb; ++i) {
+         if (d->fb[i] == 0x00u)
+             seen_clear = 1;
+         else
+             seen_set = 1;
+         if (seen_clear && seen_set)
+-            return 1;
++            break;
+     }
+-    return 0;
++    rv = (seen_clear && seen_set) ? 1 : 0;
++    last_d = d;
++    last_writes = d->data_writes;
++    last_seen = rv;
++    have_last = 1;
++    return rv;
+ }
+ /* NOTE: gsm_mixed_replay_leg_parse + gsm_mixed_parse_u64 moved to
+  * src/harness/provenance/provenance.c with the REPLAY timeline parser. */
+@@ -1566,16 +1685,37 @@ typedef struct BootTraceRun {
+ /* R0 census helpers needing the complete BootTraceRun type. The validity
+  * callback reuses the BTS contract state the call/SMS paths already gate
+  * on (timeline + lock + frozen config). */
++
++/* Per-step owner without the by-value copy (Callgrind: the 272B return
++ * copy runs 2x/step across the join + serving callback). The aggregate
++ * object lives at a stable address, so the built owner is cached keyed on
++ * that address; consumers dereference it live and use it immediately, so
++ * a same-address hit is exact. Single-threaded use only. */
++static const CobbaRfOwner *boot_trace_cached_owner(CobbaRfState *rf)
++{
++    static CobbaRfOwner slot;
++    static CobbaRfState *last_rf = NULL;
++    static const CobbaRfOwner *last_owner = NULL;
++    if (!rf)
++        return NULL;
++    if (rf != last_rf) {
++        slot = cobba_rf_owner_from_state(rf);
++        last_rf = rf;
++        last_owner = &slot;
++    }
++    return last_owner;
++}
+ static int boot_trace_reg_serving_valid(void *ctx, uint8_t *valid)
+ {
+     BootTraceRun *run = (BootTraceRun *)ctx;
+-    CobbaRfOwner cobba_owner;
+-    CobbaRfContractState cs;
++    const CobbaRfOwner *cobba_owner;
++    unsigned timeline = 0u, locked = 0u, frozen = 0u;
+     if (!run || !valid)
+         return 0;
+-    cobba_owner = cobba_rf_owner_from_state(&run->h.mach.cobba_rf);
+-    cobba_rf_contract_state(&cobba_owner, &cs);
+-    *valid = (uint8_t)((cs.bts_timeline && cs.bts_locked && cs.bts_cfg_frozen) ? 1u : 0u);
++    cobba_owner = boot_trace_cached_owner(&run->h.mach.cobba_rf);
++    cobba_rf_contract_serving_bits(cobba_owner, &timeline, &locked,
++                                   &frozen);
++    *valid = (uint8_t)((timeline && locked && frozen) ? 1u : 0u);
+     if (!*valid) {
+         /* ROM6 DSP-side SCH never takes the host lock commit, so the
+          * contract above stays false while the BTS demonstrably serves the
+@@ -1583,16 +1723,76 @@ static int boot_trace_reg_serving_valid(void *ctx, uint8_t *valid)
+          * observer bootstraps from (live cell + assigned channel +
+          * accepted LU). ROM4 locks before any LU exists, so its locked
+          * path above is unchanged. */
++        /* Hot fallback (Callgrind: the full registration ledger snapshot
++         * is ~9% of a 5M-step boot, mostly the cell/assignment/LU
++         * memcpys). served_cell_evident() below is a pure function of ten
++         * slow-moving scalars, so cache the verdict keyed on those
++         * scalars read straight from live BTS state, exactly like
++         * gsm_bts_registration_known() does for lu_current(). Equal key
++         * implies an identical verdict; any change takes the full ledger
++         * path as before. Read-only scalar loads: no new aggregate
++         * reachability beyond what the known() cache already uses. */
++        const GsmBtsState *fbts = (cobba_owner && cobba_owner->bts) ?
++                                      cobba_owner->bts : NULL;
++        const CobbaRadio *fradio = (cobba_owner && cobba_owner->radio) ?
++                                       cobba_owner->radio : NULL;
++        static uint32_t cached_epoch = 0u;
++        static uint16_t cached_arfcn = 0u;
++        static uint8_t cached_bsic = 0u;
++        static unsigned cached_timeline = 0u;
++        static uint8_t cached_assign_valid = 0u;
++        static uint32_t cached_assign_generation = 0u;
++        static uint64_t cached_lu_seq = 0u;
++        static int cached_evident = 0;
++        static int have_evident_cache = 0;
++        uint32_t key_epoch = fbts ? fbts->epoch : 0u;
++        uint16_t key_arfcn = fbts ? fbts->cfg.arfcn : 0u;
++        uint8_t key_bsic = fbts ? fbts->cfg.bsic : 0u;
++        unsigned key_timeline =
++            (cobba_owner && cobba_owner->bts_on && *cobba_owner->bts_on) ?
++                1u : 0u;
++        uint8_t key_assign_valid =
++            fradio ? fradio->rx_assignment.valid : 0u;
++        uint32_t key_assign_generation =
++            fradio ? fradio->rx_assignment.generation : 0u;
++        uint64_t key_lu_seq = fbts ? fbts->lu_accept.seq : 0u;
+         GsmBtsRegistrationLedger reg_ledger;
+-        cobba_rf_registration_ledger(&cobba_owner, &reg_ledger);
+-        *valid = (uint8_t)(gsm_bts_registration_served_cell_evident(
+-                               &reg_ledger) ? 1u : 0u);
++        int reg_ledger_fresh = 0;
++        if (have_evident_cache && key_epoch == cached_epoch &&
++            key_arfcn == cached_arfcn && key_bsic == cached_bsic &&
++            key_timeline == cached_timeline &&
++            key_assign_valid == cached_assign_valid &&
++            key_assign_generation == cached_assign_generation &&
++            key_lu_seq == cached_lu_seq) {
++            *valid = (uint8_t)(cached_evident ? 1u : 0u);
++        } else {
++            cobba_rf_registration_ledger(cobba_owner, &reg_ledger);
++            reg_ledger_fresh = 1;
++            cached_evident = gsm_bts_registration_served_cell_evident(
++                                 &reg_ledger) ? 1 : 0;
++            cached_epoch = key_epoch;
++            cached_arfcn = key_arfcn;
++            cached_bsic = key_bsic;
++            cached_timeline = key_timeline;
++            cached_assign_valid = key_assign_valid;
++            cached_assign_generation = key_assign_generation;
++            cached_lu_seq = key_lu_seq;
++            have_evident_cache = 1;
++            *valid = (uint8_t)(cached_evident ? 1u : 0u);
++        }
+         if (!*valid && run->reg_run.have_completion) {
+             /* The exchange already COMPLETED on this cell and the teardown
+              * consumed the live evidence above. Pin serving on the latched
+              * completion while the cell is unchanged so the handset
+              * stability window can converge post-registration. Barriers
+              * clear have_completion, so a reset starts over. */
++            /* A cache hit above leaves reg_ledger unfetched; the latched
++             * completion compares full cell identity, so fetch it here.
++             * Rare path (post-completion + unlocked): exactness first. */
++            if (!reg_ledger_fresh) {
++                cobba_rf_registration_ledger(cobba_owner, &reg_ledger);
++                reg_ledger_fresh = 1;
++            }
+             *valid = (uint8_t)((reg_ledger.config_epoch ==
+                                     run->reg_run.completion_config_epoch &&
+                                 reg_ledger.cell.arfcn ==
+@@ -2087,7 +2287,7 @@ static int boot_trace_phase_config(const BootTraceConfig *cfg, BootTraceRun *run
+     /* GSM_CALL_P1 is intentionally a host-only, opt-in harness.  It consumes
+      * physical COBBA ledger evidence after each completed platform tick; it
+      * never creates protocol bytes or mutates firmware/RAM. */
+-    /* GSM_MIXED_CHAIN is deliberately parsed/cached at setup.  The ten-leg
++    /* GSM_MIXED_CHAIN is deliberately parsed/cached at setup.  The four-leg
+      * coordinator owns stream admission, while the existing call/SMS blocks
+      * below remain the only protocol owners.  Their active-leg predicates
+      * ensure that one and only one adapter consumes each global P1/native
+@@ -2102,8 +2302,7 @@ static int boot_trace_phase_config(const BootTraceConfig *cfg, BootTraceRun *run
+             { *status = (2); return BT_EXIT; }
+         }
+         provenance_out("[gsm-mixed] sequence: mt-call-1 -> mo-call-1 -> mt-sms-1 -> "
+-               "mt-call-2 -> mo-sms-1 -> mo-call-2 -> mt-sms-2 -> mo-sms-2 -> "
+-               "mt-call-reject -> mt-call-noanswer\n");
++               "mo-sms-1\n");
+     }
+     run->gsm_p1.rf = &run->h.mach.cobba_rf;
+     memset(run->gsm_p1_imsi, 0, sizeof run->gsm_p1_imsi);
+@@ -2184,9 +2383,15 @@ static int boot_trace_phase_config(const BootTraceConfig *cfg, BootTraceRun *run
+     /* Mixed-chain MO legs are user-driven like the MT legs (dial, originate,
+      * hangup keys): the MMI must end the call itself to return to standby.
+      * Forced network-clear would race the hangup key and leaves the MMI
+-     * off-standby, so it stays off under the chain. */
++     * off-standby, so it stays off under the chain unless explicitly
++     * requested.  Exception (2026-11-01): the 5110 MO MMI never enters
++     * any call screen (proven via LCD captures — idle throughout a
++     * fully-signaled ACTIVE+voice call), so no MMI hangup is possible
++     * and neither objection materializes: there is no race (nothing to
++     * race) and the MMI is already in standby.  Opt-in only — default
++     * stays MMI-teardown-first, so a future MMI fix reverts by dropping
++     * the env. */
+     run->gsm_mo_network_clear = !run->gsm_live_peer_enabled &&
+-        !run->gsm_mixed_chain_enabled &&
+         (gsm_mo_network_clear_env && atoi(gsm_mo_network_clear_env) == 1);
+     run->gsm_mo_after = gsm_mo_after_env && *gsm_mo_after_env
+         ? strtoull(gsm_mo_after_env, NULL, 0) : 0u;
+@@ -3477,6 +3682,14 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+     uint64_t snap_out_at = cfg->snapshot_at ? strtoull(cfg->snapshot_at, 0, 0) : 0;
+     int snap_out_cont = cfg->snapshot_cont ? atoi(cfg->snapshot_cont) : 0;
+     int snap_out_done = 0;
++    /* TEMP-PROF Callgrind window (post-warm profiling without snapshots):
++     * CALLGRIND_WARM_STEP=<arm step> zeroes + starts collection there;
++     * CALLGRIND_WARM_WINDOW=<steps> dumps + stops after that many steps. */
++    uint64_t cg_warm_from = cfg->callgrind_warm_step
++        ? strtoull(cfg->callgrind_warm_step, 0, 0) : 0;
++    uint64_t cg_warm_until = cg_warm_from + (cfg->callgrind_warm_window
++        ? strtoull(cfg->callgrind_warm_window, 0, 0) : 5000000ULL);
++    int cg_warm_on = 0;
+ 
+     /* SNAPTRACE_EVERY=<steps> [SNAPTRACE_FROM=<step>] emits a compact,
+      * process-stable continuation fingerprint after each completed ARM step.
+@@ -4307,10 +4520,10 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+          * handset sample plus read-only BTS snapshot joined after the
+          * completed platform slice. */
+         if (run->reg_run_bound) {
+-            CobbaRfOwner reg_owner =
+-                cobba_rf_owner_from_state(&run->h.mach.cobba_rf);
++            const CobbaRfOwner *reg_owner =
++                boot_trace_cached_owner(&run->h.mach.cobba_rf);
+             GsmBtsRegistrationLedger reg_ledger;
+-            cobba_rf_registration_ledger(&reg_owner, &reg_ledger);
++            cobba_rf_registration_ledger(reg_owner, &reg_ledger);
+             registration_run_step(&run->reg_run, &reg_ledger,
+                                   boot_trace_reg_gui_content(
+                                       &run->h.mach.mad2.display),
+@@ -4368,6 +4581,60 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+             unsigned native_budget = 16u;
+             while (native_budget-- &&
+                    native_d2m_observer_pop(&run->h.mach, &native_report) > 0) {
++                /* TEMP-DIAG leg-3 vs leg-4 UA-upload A/B: every op=0x80/
++                 * len=33 ring record with its full body, tagged by active
++                 * leg. Bounded (1000 lines); revert before commit. */
++                /* TEMP-DIAG ROM6 census: also show non-0x80 records (first 200)
++                 * to learn the ROM6 MDI opcode set. Remove with the verdict. */
++                if (native_report.op != 0x80u || native_report.len != 33u) {
++                    static unsigned native_other_n = 0u;
++                    if (native_other_n < 200u) {
++                        ++native_other_n;
++                        printf("[native-other] leg=%d step=%ld seq=%llu fn=%u "
++                               "op=%02X len=%u\n",
++                               run->gsm_mixed_chain_enabled ?
++                                   (int)gsm_mixed_chain_leg(
++                                       &run->gsm_mixed_chain) : -1,
++                               run->steps,
++                               (unsigned long long)native_report.sequence,
++                               native_report.fn, native_report.op,
++                               native_report.len);
++                    }
++                }
++                if (native_report.op == 0x80u && native_report.len == 33u) {
++                    static unsigned native_census_n = 0u;
++                    if (native_census_n < 1000u) {
++                        ++native_census_n;
++                        printf("[native-census] leg=%d step=%ld seq=%llu "
++                               "fn=%u body=%02X%02X%02X%02X%02X%02X%02X%02X"
++                               "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X"
++                               "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X"
++                               "%02X%02X%02X%02X%02X%02X\n",
++                               run->gsm_mixed_chain_enabled ?
++                                   (int)gsm_mixed_chain_leg(
++                                       &run->gsm_mixed_chain) : -1,
++                               run->steps,
++                               (unsigned long long)native_report.sequence,
++                               native_report.fn,
++                               native_report.body[0], native_report.body[1],
++                               native_report.body[2], native_report.body[3],
++                               native_report.body[4], native_report.body[5],
++                               native_report.body[6], native_report.body[7],
++                               native_report.body[8], native_report.body[9],
++                               native_report.body[10], native_report.body[11],
++                               native_report.body[12], native_report.body[13],
++                               native_report.body[14], native_report.body[15],
++                               native_report.body[16], native_report.body[17],
++                               native_report.body[18], native_report.body[19],
++                               native_report.body[20], native_report.body[21],
++                               native_report.body[22], native_report.body[23],
++                               native_report.body[24], native_report.body[25],
++                               native_report.body[26], native_report.body[27],
++                               native_report.body[28], native_report.body[29],
++                               native_report.body[30], native_report.body[31],
++                               native_report.body[32]);
++                    }
++                }
+                 if (run->gsm_live_peer_enabled && run->gsm_live_peer_initialized) {
+                     (void)gsm_live_peer_service_native(&run->gsm_live_peer,
+                                                        &native_report);
+@@ -4468,10 +4735,15 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+             int wait_mask;
+             CobbaRfOwner cobba_owner = cobba_rf_owner_from_state(&run->h.mach.cobba_rf);
+             cobba_rf_contract_state(&cobba_owner, &cs);
++            /* Bit 8 is BTS-visible registration (LU accept on the current
++             * cell epoch); the MMI serving byte above is provenance only. */
++            const int mo_sms_bts_registered = gsm_bts_registration_known(&cobba_owner);
+             wait_mask = (!cs.bts_timeline ? 1 : 0) |
+-                (!cs.bts_locked ? 2 : 0) |
++                /* TEMP-DIAG BTS-readiness experiment: DSP SCH lock never
++                 * sets on ROM6; BTS-side registration is the readiness. */
++                (!(cs.bts_locked || mo_sms_bts_registered) ? 2 : 0) |
+                 (!cs.bts_cfg_frozen ? 4 : 0) |
+-                (serving != g_mmi_serving_value ? 8 : 0);
++                (!mo_sms_bts_registered ? 8 : 0);
+             if (wait_mask != 0 && wait_mask != run->gsm_mo_sms_last_wait_mask) {
+                 provenance_out("[gsm-mo-sms] wait after-lower-bound=%llu step=%llu "
+                        "timeline=%u locked=%u frozen=%u serving=%02X "
+@@ -4482,7 +4754,7 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                        !cs.bts_timeline ? "timeline " : "",
+                        !cs.bts_locked ? "locked " : "",
+                        !cs.bts_cfg_frozen ? "frozen " : "",
+-                       serving != g_mmi_serving_value ? "serving" : "");
++                       !mo_sms_bts_registered ? "serving" : "");
+             }
+             run->gsm_mo_sms_last_wait_mask = wait_mask;
+             /* Auto mode arms (and re-arms: should_arm covers the first
+@@ -4718,7 +4990,11 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                 (void)cobba_rf_bts_rx_assignment_state(&cobba_owner8, &assignment);
+                 CobbaRfOwner cobba_owner9 = cobba_rf_owner_from_state(&(run->h.mach.cobba_rf));
+                 cobba_rf_sdcch_dl_ledger(&cobba_owner9, &sdcch);
+-                wait_mask = (serving != g_mmi_serving_value ? 1 : 0) |
++                /* Bit 1 is BTS-visible registration; the MMI serving byte is
++                 * provenance only. */
++                const int mo_sms_rel_bts_registered =
++                    gsm_bts_registration_known(&cobba_owner8);
++                wait_mask = (!mo_sms_rel_bts_registered ? 1 : 0) |
+                     (native.valid ? 2 : 0) |
+                     (native.generation <= run->gsm_mo_sms.native_config_epoch ? 4 : 0) |
+                     (assignment.valid ? 8 : 0) |
+@@ -4913,7 +5189,11 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+             (void)cobba_rf_bts_rx_assignment_state(&cobba_owner12, &assignment);
+             CobbaRfOwner cobba_owner13 = cobba_rf_owner_from_state(&(run->h.mach.cobba_rf));
+             cobba_rf_sdcch_dl_ledger(&cobba_owner13, &sdcch);
+-            idle_mask = (gsm_p1_serving_state(run->c) != g_mmi_serving_value ? 1 : 0) |
++            /* Bit 1 is BTS-visible registration; the MMI serving byte is
++             * provenance only. */
++            const int loopback_bts_registered =
++                gsm_bts_registration_known(&cobba_owner11);
++            idle_mask = (!loopback_bts_registered ? 1 : 0) |
+                 (native.valid ? 2 : 0) | (assignment.valid ? 4 : 0) |
+                 (sdcch.pending || sdcch.air_pending ? 8 : 0);
+             if (idle_mask != 0) {
+@@ -4944,9 +5224,10 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+             }
+         }
+         /* Arm the SMS paging transaction only after the real BTS timeline is
+-         * locked/frozen and firmware-owned serving state reports registered.
+-         * This is a one-shot setup gate; all subsequent work is event/ledger
+-         * driven and therefore contains no environment reads. */
++         * locked/frozen and the BTS registration ledger shows an accepted LU
++         * on the current cell epoch. This is a one-shot setup gate; all
++         * subsequent work is event/ledger driven and therefore contains no
++         * environment reads. */
+         if (run->gsm_mt_sms_enabled && !run->gsm_mt_sms_armed && !run->gsm_mt_sms_arm_failed &&
+             (!run->gsm_mixed_chain_enabled || gsm_mixed_leg_is_mt_sms(gsm_mixed_active_leg)) &&
+             (!run->gsm_sms_loopback_enabled ||
+@@ -4956,10 +5237,15 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+             const uint8_t serving = gsm_p1_serving_state(run->c);
+             CobbaRfOwner cobba_owner14 = cobba_rf_owner_from_state(&run->h.mach.cobba_rf);
+             cobba_rf_contract_state(&cobba_owner14, &cs);
++            /* Bit 8 is BTS-visible registration; the MMI serving byte is
++             * provenance only. */
++            const int mt_sms_bts_registered =
++                gsm_bts_registration_known(&cobba_owner14);
+             const int wait_mask = (!cs.bts_timeline ? 1 : 0) |
+-                (!cs.bts_locked ? 2 : 0) |
++                /* TEMP-DIAG BTS-readiness experiment (see mo-sms). */
++                (!(cs.bts_locked || mt_sms_bts_registered) ? 2 : 0) |
+                 (!cs.bts_cfg_frozen ? 4 : 0) |
+-                (serving != g_mmi_serving_value ? 8 : 0);
++                (!mt_sms_bts_registered ? 8 : 0);
+             if (wait_mask != 0 && wait_mask != run->gsm_mt_sms_last_wait_mask) {
+                 provenance_out("[gsm-sms] wait after-lower-bound=%llu step=%llu "
+                        "timeline=%u locked=%u frozen=%u serving=%02X "
+@@ -4970,7 +5256,7 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                        !cs.bts_timeline ? "timeline " : "",
+                        !cs.bts_locked ? "locked " : "",
+                        !cs.bts_cfg_frozen ? "frozen " : "",
+-                       serving != g_mmi_serving_value ? "serving" : "");
++                       !mt_sms_bts_registered ? "serving" : "");
+             }
+             run->gsm_mt_sms_last_wait_mask = wait_mask;
+             if (wait_mask == 0) {
+@@ -5155,7 +5441,11 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                 (void)cobba_rf_bts_rx_assignment_state(&cobba_owner16, &assignment);
+                 CobbaRfOwner cobba_owner17 = cobba_rf_owner_from_state(&(run->h.mach.cobba_rf));
+                 cobba_rf_sdcch_dl_ledger(&cobba_owner17, &sdcch);
+-                wait_mask = (serving != g_mmi_serving_value ? 1 : 0) |
++                /* Bit 1 is BTS-visible registration; the MMI serving byte is
++                 * provenance only. */
++                const int mt_sms_rel_bts_registered =
++                    gsm_bts_registration_known(&cobba_owner16);
++                wait_mask = (!mt_sms_rel_bts_registered ? 1 : 0) |
+                     (native.valid ? 2 : 0) |
+                     (native.generation <= run->gsm_mt_sms.native_config_epoch ? 4 : 0) |
+                     (assignment.valid ? 8 : 0) |
+@@ -5249,11 +5539,15 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+ 
+             CobbaRfOwner cobba_owner18 = cobba_rf_owner_from_state(&run->h.mach.cobba_rf);
+             cobba_rf_contract_state(&cobba_owner18, &cs);
++            /* Bit 8 is BTS-visible registration; the MMI serving byte is
++             * provenance only. */
++            const int mo_bts_registered = gsm_bts_registration_known(&cobba_owner18);
+             wait_mask = wait_mask_base |
+                 (!cs.bts_timeline ? 1 : 0) |
+-                (!cs.bts_locked ? 2 : 0) |
++                /* TEMP-DIAG BTS-readiness experiment (see mo-sms). */
++                (!(cs.bts_locked || mo_bts_registered) ? 2 : 0) |
+                 (!cs.bts_cfg_frozen ? 4 : 0) |
+-                (serving != g_mmi_serving_value ? 8 : 0);
++                (!mo_bts_registered ? 8 : 0);
+             if (!run->gsm_mo_armed) {
+                 if (wait_mask != 0 && wait_mask != run->gsm_mo_last_wait_mask) {
+                     provenance_out("[gsm-mo] wait step=%llu timeline=%u locked=%u "
+@@ -5264,7 +5558,7 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                            !cs.bts_timeline ? "timeline " : "",
+                            !cs.bts_locked ? "locked " : "",
+                            !cs.bts_cfg_frozen ? "frozen " : "",
+-                           serving != g_mmi_serving_value ? "serving" : "");
++                           !mo_bts_registered ? "serving" : "");
+                 }
+                 run->gsm_mo_last_wait_mask = wait_mask;
+                 if (wait_mask == 0 &&
+@@ -5460,7 +5754,11 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                  * host/master time or a locally-derived frame number.  A
+                  * queue backpressure result owns the request once the adapter
+                  * publishes its immutable retry token; retry_response() then
+-                 * advances it on the next physical P1 event. */
++                 * advances it on the next physical P1 event.  Under the
++                 * chain the teardown is RR-only (CHANNEL RELEASE, no CC
++                 * DISCONNECT): the 5110 MO MMI never enters call UI, so a
++                 * CC clear addresses nobody and the phone reboots on it
++                 * (reason 0x6C); the RR release drops the link instead. */
+                 if (run->gsm_mo_network_clear && run->gsm_mo_cycle_pass &&
+                     !run->gsm_mo_network_clear_requested &&
+                     run->gsm_mo.call.state == GSM_MO_CALL_ACTIVE &&
+@@ -5468,8 +5766,14 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                     run->gsm_mo.sacch_anchor_source_seq != 0u &&
+                     run->gsm_mo.sacch_anchor_block_fn < GSM_UA_FN_MODULUS) {
+                     const uint32_t anchor_fn = run->gsm_mo.sacch_anchor_block_fn;
+-                    const int started = gsm_mo_call_p1_start_network_clear(
+-                        &run->gsm_mo, anchor_fn);
++                    /* TEMP-PROPERCC (wedge A/B, revert): proper CC DISCONNECT
++                     * under the chain.  RR-only was a workaround for a 0x6C
++                     * whose premise (MMI never enters call UI) is stale now
++                     * that CONNECT ACKs and traffic flow; RR-only leaves CC
++                     * ACTIVE and the phone never re-camps. */
++                    const int started =
++                        gsm_mo_call_p1_start_network_clear(
++                            &run->gsm_mo, anchor_fn);
+                     if (started || run->gsm_mo.retry_valid) {
+                         run->gsm_mo_network_clear_requested = 1;
+                         provenance_out("[gsm-mo] network-clear request %s anchor_fn=%u "
+@@ -5523,6 +5827,37 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                                run->gsm_mo_wcrd_guard_seq);
+                         run->gsm_mo_wcrd_guard_stamp = 0u;
+                     }
++                } else if (run->gsm_mo.call.state == GSM_MO_CALL_WAIT_DISC) {
++                    /* DISC-quiet guard (network RR-release path and silent
++                     * handset tail alike): after a channel release the peer
++                     * may drop the link without the final LAPDm DISC/UA
++                     * exchange.  Any contrary uplink evidence restarts the
++                     * guard, so a live UA exchange always wins; firing
++                     * performs the same network-side deactivation as WCRD.
++                     * Shares the WCRD stamp: the two states are exclusive. */
++                    if (!run->gsm_mo_wcrd_guard_stamp ||
++                        run->gsm_mo.call.source_sequence !=
++                            run->gsm_mo_wcrd_guard_seq) {
++                        run->gsm_mo_wcrd_guard_stamp = (uint64_t)run->steps + 1u;
++                        run->gsm_mo_wcrd_guard_seq =
++                            run->gsm_mo.call.source_sequence;
++                    } else if ((uint64_t)run->steps + 1u -
++                                   run->gsm_mo_wcrd_guard_stamp >=
++                               5000000u &&
++                               gsm_mo_call_admit_disc_quiet_guard(
++                                   &run->gsm_mo.call)) {
++                        run->gsm_mo.sacch_stream_on = 0u;
++                        CobbaRfOwner cobba_owner20 = cobba_rf_owner_from_state(&(run->h.mach.cobba_rf));
++                        cobba_rf_bts_rx_assignment_clear(&cobba_owner20);
++                        rf_native_channel_invalidate(
++                            &run->h.mach.cobba_rf.radio);
++                        provenance_out("[gsm-mo] disc-quiet-guard fire cycle=%u step=%llu "
++                               "stamp=%llu seq=%u\n",
++                               run->gsm_mo_cycle, (unsigned long long)(run->steps + 1),
++                               (unsigned long long)run->gsm_mo_wcrd_guard_stamp,
++                               run->gsm_mo_wcrd_guard_seq);
++                        run->gsm_mo_wcrd_guard_stamp = 0u;
++                    }
+                 } else {
+                     run->gsm_mo_wcrd_guard_stamp = 0u;
+                 }
+@@ -5587,7 +5922,11 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                  * on real hardware or here.  The strictly-newer-epochs
+                  * proof lives in the cycle-advance monotonic check below,
+                  * exactly like the MT rearm.  Bit 4 stays unassigned. */
+-                wait_mask = (serving != g_mmi_serving_value ? 1 : 0) |
++                /* Bit 1 is BTS-visible registration; the MMI serving byte is
++                 * provenance only. */
++                const int mo_rearm_bts_registered =
++                    gsm_bts_registration_known(&cobba_owner20);
++                wait_mask = (!mo_rearm_bts_registered ? 1 : 0) |
+                     (native.valid ? 2 : 0) |
+                     (assignment.valid ? 8 : 0) |
+                     (facch.pending || facch.air_pending ? 16 : 0) |
+@@ -5598,8 +5937,8 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                  * physical re-arm predicate as an additional idle checkpoint
+                  * (target=1 must not pass on ACTIVE evidence alone). */
+                 if (run->gsm_mo_network_clear &&
+-                    !gsm_mo_call_p1_can_rearm(&run->gsm_mo, serving,
+-                                              g_mmi_serving_value))
++                    !gsm_mo_call_p1_can_rearm(&run->gsm_mo,
++                                              mo_rearm_bts_registered))
+                     wait_mask |= 256;
+                 if (wait_mask != 0 && wait_mask != run->gsm_mo_last_wait_mask) {
+                     provenance_out("[gsm-mo] rearm-wait cycle=%u step=%llu serving=%02X "
+@@ -5674,8 +6013,8 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                             .done = &run->gsm_mo_verdict_done });
+                         run->gsm_mo_previous_source = source;
+                     } else if (run->gsm_mo_cycle_pass &&
+-                               gsm_mo_call_p1_rearm(&run->gsm_mo, serving,
+-                                                    g_mmi_serving_value)) {
++                               gsm_mo_call_p1_rearm(&run->gsm_mo,
++                                                    mo_rearm_bts_registered)) {
+                         run->gsm_mo_previous_source = source;
+                         run->gsm_mo_previous_assignment_generation =
+                             assignment_generation;
+@@ -5725,10 +6064,15 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                 const uint8_t serving = gsm_p1_serving_state(run->c);
+                 CobbaRfOwner cobba_owner24 = cobba_rf_owner_from_state(&run->h.mach.cobba_rf);
+                 cobba_rf_contract_state(&cobba_owner24, &cs);
++                /* Bit 8 is BTS-visible registration; the MMI serving byte is
++                 * provenance only. */
++                const int p1_bts_registered =
++                    gsm_bts_registration_known(&cobba_owner24);
+                 const int wait_mask = (!cs.bts_timeline ? 1 : 0) |
+-                    (!cs.bts_locked ? 2 : 0) |
++                    /* TEMP-DIAG BTS-readiness experiment (see mo-sms). */
++                    (!(cs.bts_locked || p1_bts_registered) ? 2 : 0) |
+                     (!cs.bts_cfg_frozen ? 4 : 0) |
+-                    (serving != g_mmi_serving_value ? 8 : 0);
++                    (!p1_bts_registered ? 8 : 0);
+                 const int rearm_dwell = run->gsm_p1_rearm_dwell_pending &&
+                     completed_step < run->gsm_p1_rearm_due_step;
+                 /* The lower-bound gate is sampled once per completed ARM step,
+@@ -5747,7 +6091,7 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                            !cs.bts_timeline ? "timeline " : "",
+                            !cs.bts_locked ? "locked " : "",
+                            !cs.bts_cfg_frozen ? "frozen " : "",
+-                           serving != g_mmi_serving_value ? "serving" : "");
++                           !p1_bts_registered ? "serving" : "");
+                 }
+                 run->gsm_p1_last_wait_mask = wait_mask;
+                 run->gsm_p1_last_serving = serving;
+@@ -5867,10 +6211,15 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                 CobbaRfOwner cobba_owner28 = cobba_rf_owner_from_state(&(run->h.mach.cobba_rf));
+                 cobba_rf_page_ledger(&cobba_owner28, &page);
+                 cobba_rf_native_channel_state(&run->h.mach.cobba_rf.radio, &native);
++                /* Bit 8 is BTS-visible registration; the MMI serving byte is
++                 * provenance only. */
++                const int p1_rearm_bts_registered =
++                    gsm_bts_registration_known(&cobba_owner25);
+                 wait_mask = (!rs.bts_timeline ? 1 : 0) |
+-                    (!rs.bts_locked ? 2 : 0) |
++                    /* TEMP-DIAG BTS-readiness experiment (see mo-sms). */
++                    (!(rs.bts_locked || p1_rearm_bts_registered) ? 2 : 0) |
+                     (!rs.bts_cfg_frozen ? 4 : 0) |
+-                    (serving != g_mmi_serving_value ? 8 : 0) |
++                    (!p1_rearm_bts_registered ? 8 : 0) |
+                     (rs.assignment_generation != 0u ? 16 : 0) |
+                     (rs.assignment_config_epoch != 0u ? 32 : 0) |
+                     (rs.assignment_native_config_epoch != 0u ? 64 : 0) |
+@@ -5997,9 +6346,16 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+         /* Mixed-chain scenario runner
+          * (src/harness/mixed_chain_runner.c): read-only SIM-persistence
+          * evidence, LCD UI evidence, then the centralized ownership
+-         * handoff.  The context below is the runner's whole footprint. */
++         * handoff.  The context below is the runner's whole footprint.
++         * PERF: all fields but steps/serving/chain_enabled are run-stable
++         * pointers — build once, refresh the three live scalars per step.
++         * Saves a ~700B memset + ~75 stores per ARM step. */
+         {
+-            GsmMixedRunnerCtx mixed_ctx = {
++            static int mixed_ctx_tpl_init = 0;
++            static GsmMixedRunnerCtx mixed_ctx_tpl;
++            if (!mixed_ctx_tpl_init) {
++                mixed_ctx_tpl_init = 1;
++                mixed_ctx_tpl = (GsmMixedRunnerCtx){
+                 .chain_enabled = run->gsm_mixed_chain_enabled,
+                 .gsm_mixed_chain = &run->gsm_mixed_chain,
+                 .gsm_p1 = &run->gsm_p1,
+@@ -6069,7 +6425,12 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                 .gsm_p1_release_seen = &run->gsm_p1_release_seen,
+                 .gsm_p1_service_unavailable = &run->gsm_p1_service_unavailable,
+                 .gsm_p1_verdict_done = &run->gsm_p1_verdict_done,
+-            };
++                };
++            }
++            GsmMixedRunnerCtx mixed_ctx = mixed_ctx_tpl;
++            mixed_ctx.steps = run->steps;
++            mixed_ctx.serving_value = g_mmi_serving_value;
++            mixed_ctx.chain_enabled = run->gsm_mixed_chain_enabled;
+             gsm_mixed_runner_sim_observe(&mixed_ctx);
+             gsm_mixed_runner_ui_observe(&mixed_ctx);
+             gsm_mixed_runner_handoff(&mixed_ctx);
+@@ -6231,15 +6592,18 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                         gsm_call_stage_name(run->gsm_p1.call.stage));
+                 { *status = (2); return BT_EXIT; }
+             }
+-            if (run->gsm_mo_enabled && run->gsm_mo_armed &&
+-                run->gsm_mo.call.state != GSM_MO_CALL_READY &&
+-                !gsm_mo_call_p1_can_rearm(&run->gsm_mo,
+-                                           gsm_p1_serving_state(run->c),
+-                                           g_mmi_serving_value)) {
+-                provenance_err("[gsm-mo] SNAPSHOT OUT rejected: non-quiescent state=%s "
+-                        "(MO state is host-owned)\n",
+-                        gsm_mo_call_p1_state_name(&run->gsm_mo));
+-                { *status = (2); return BT_EXIT; }
++            {
++                CobbaRfOwner snap_owner = cobba_rf_owner_from_state(&run->h.mach.cobba_rf);
++                const int snap_bts_registered = gsm_bts_registration_known(&snap_owner);
++                if (run->gsm_mo_enabled && run->gsm_mo_armed &&
++                    run->gsm_mo.call.state != GSM_MO_CALL_READY &&
++                    !gsm_mo_call_p1_can_rearm(&run->gsm_mo,
++                                              snap_bts_registered)) {
++                    provenance_err("[gsm-mo] SNAPSHOT OUT rejected: non-quiescent state=%s "
++                            "(MO state is host-owned)\n",
++                            gsm_mo_call_p1_state_name(&run->gsm_mo));
++                    { *status = (2); return BT_EXIT; }
++                }
+             }
+             if (machsnap_write(snap_out_path, run->c, &run->h.mach, (long)completed_steps) != 0)
+                 { *status = (2); return BT_EXIT; }
+@@ -6250,6 +6614,18 @@ static int boot_trace_phase_run(const BootTraceConfig *cfg, BootTraceRun *run, i
+                        (long)completed_steps, run->budget);
+             if (!snap_out_cont) { gui_shutdown(); { *status = (0); return BT_EXIT; } }
+         }
++        /* TEMP-PROF Callgrind window (setup-parsed above). Run under valgrind
++         * --tool=callgrind --instr-atstart=no. */
++        if (cg_warm_from && !cg_warm_on && completed_steps >= cg_warm_from) {
++            CALLGRIND_ZERO_STATS;
++            CALLGRIND_START_INSTRUMENTATION;
++            cg_warm_on = 1;
++        } else if (cg_warm_on && completed_steps >= cg_warm_until) {
++            CALLGRIND_STOP_INSTRUMENTATION;
++            CALLGRIND_DUMP_STATS;
++            cg_warm_on = 0;
++            cg_warm_from = 0;
++        }
+         // SOFTWDT_KEEPALIVE: clear the supervisor counter at the configured cadence.
+         // Done at the harness level (mad2_timers_tick has no RAM pointer). Uses the
+         // monotonic cycle accumulator so SLICE rebases don't trip the period check.
+@@ -6987,6 +7363,7 @@ int main(int argc, char** argv) {
+     BootTraceRun run;
+     boot_trace_run_init(&run);
+     const BootTraceConfig *cfg = &g_boot_trace_config;
++    pchistfile_maybe_init(cfg->dsp54_pchistfile);  // provisional ROM6-decomp oracle; no-op when unset
+     int status = 0;
+     int rc;
+     rc = boot_trace_phase_args(argc, argv, cfg, &run, &status);
+diff --git a/tools/boot_trace_config.c b/tools/boot_trace_config.c
+index e2bf50aa..4c87c36e 100644
+--- a/tools/boot_trace_config.c
++++ b/tools/boot_trace_config.c
+@@ -138,6 +138,8 @@ static const BootTraceConfigEntry boot_trace_config_entries[] = {
+     CFG_ROW("CALLAFTER", callafter),
+     CFG_ROW("CALLEVERY", callevery),
+     CFG_ROW("CALLFNLIST", callfnlist),
++    CFG_ROW("CALLGRIND_WARM_STEP", callgrind_warm_step),
++    CFG_ROW("CALLGRIND_WARM_WINDOW", callgrind_warm_window),
+     CFG_ROW("CALLLOG", calllog),
+     CFG_ROW("CALLLOGN", calllogn),
+     CFG_ROW("CALLN", calln),
+@@ -163,6 +165,7 @@ static const BootTraceConfigEntry boot_trace_config_entries[] = {
+     CFG_ROW("DSP54_PCMIN_FIXTURE", dsp54_pcmin_fixture),
+     CFG_ROW("DSP54_PCMIN_RATE", dsp54_pcmin_rate),
+     CFG_ROW("DSP54_PCMIN_RETURN", dsp54_pcmin_return),
++    CFG_ROW("DSP54_PCHISTFILE", dsp54_pchistfile),
+     CFG_ROW("DSP54_ROM6_RX_CONJUGATE_AFTER", dsp54_rom6_rx_conjugate_after),
+     CFG_ROW("DSP54_ROM6_RX_CONJUGATE_UNTIL", dsp54_rom6_rx_conjugate_until),
+     CFG_ROW("DSP54_SNAPSHOT_FIDELITY", dsp54_snapshot_fidelity),
+diff --git a/tools/boot_trace_config.h b/tools/boot_trace_config.h
+index 9fc75db3..61294439 100644
+--- a/tools/boot_trace_config.h
++++ b/tools/boot_trace_config.h
+@@ -40,6 +40,8 @@ typedef struct BootTraceConfig {
+     const char *callafter; /* CALLAFTER */
+     const char *callevery; /* CALLEVERY */
+     const char *callfnlist; /* CALLFNLIST */
++    const char *callgrind_warm_step; /* CALLGRIND_WARM_STEP */
++    const char *callgrind_warm_window; /* CALLGRIND_WARM_WINDOW */
+     const char *calllog; /* CALLLOG */
+     const char *calllogn; /* CALLLOGN */
+     const char *calln; /* CALLN */
+@@ -65,6 +67,7 @@ typedef struct BootTraceConfig {
+     const char *dsp54_pcmin_fixture; /* DSP54_PCMIN_FIXTURE */
+     const char *dsp54_pcmin_rate; /* DSP54_PCMIN_RATE */
+     const char *dsp54_pcmin_return; /* DSP54_PCMIN_RETURN */
++    const char *dsp54_pchistfile; /* DSP54_PCHISTFILE (provisional ROM6-decomp oracle) */
+     const char *dsp54_rom6_rx_conjugate_after; /* DSP54_ROM6_RX_CONJUGATE_AFTER */
+     const char *dsp54_rom6_rx_conjugate_until; /* DSP54_ROM6_RX_CONJUGATE_UNTIL */
+     const char *dsp54_snapshot_fidelity; /* DSP54_SNAPSHOT_FIDELITY */
+@@ -266,7 +269,7 @@ typedef struct BootTraceConfigEntry {
+     const char *dflt;      /* NULL for every knob (absent == NULL) */
+ } BootTraceConfigEntry;
+ 
+-#define BOOT_TRACE_CONFIG_KNOB_COUNT 219
++#define BOOT_TRACE_CONFIG_KNOB_COUNT 222
+ 
+ extern BootTraceConfig g_boot_trace_config;
+ 

@@ -1,0 +1,16 @@
+/* ROM6 0xAEAD DATA_TABLE_44 -- 44w.
+ * Verified encoding: src/rom6/tables/aead_data_table_44.asm (recombine MATCH).
+ * ORIGIN 0xAEAD
+ * EXPECT: 000F 000B 0008 000C 000E 0009 07D0 0834 0898 08FC 0960 04E2 0686 09D8 0C62 109A 0753 08F7 0C49 0C62 109A 04E2 0686 0C49 0C62 109A 04C1 04E9 0CB2 0CE4 1068 109A 0732 075A 0CB2 0CE4 1068 109A 02D5 02EE 0A28 0A41 0FF0 1009
+ *
+ * Intent: coefficient/length table (small counts then mid-range
+ * tuning-scale values). Read-only data, no code.
+ */
+static const unsigned int data_table_44[44] = {
+    0x000F, 0x000B, 0x0008, 0x000C, 0x000E, 0x0009, 0x07D0, 0x0834,
+    0x0898, 0x08FC, 0x0960, 0x04E2, 0x0686, 0x09D8, 0x0C62, 0x109A,
+    0x0753, 0x08F7, 0x0C49, 0x0C62, 0x109A, 0x04E2, 0x0686, 0x0C49,
+    0x0C62, 0x109A, 0x04C1, 0x04E9, 0x0CB2, 0x0CE4, 0x1068, 0x109A,
+    0x0732, 0x075A, 0x0CB2, 0x0CE4, 0x1068, 0x109A, 0x02D5, 0x02EE,
+    0x0A28, 0x0A41, 0x0FF0, 0x1009
+};
