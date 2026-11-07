@@ -15,7 +15,7 @@
  * reading A/B after call 0x3EE1 gets the reading/0, never live-ins.
  * RET @3EF2; bound 3EE3-3EF2.
  */
-extern int port_read_13(void);
+extern int port_read_13(void);                                        /* HW port 13 (RF stable-read per 3ee3 span); no ROM definition */
 
 int stable_read_3EE3(void)
 {

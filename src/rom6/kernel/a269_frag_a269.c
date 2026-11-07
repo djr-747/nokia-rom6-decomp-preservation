@@ -15,11 +15,11 @@
  */
 extern void msg_worker_A2C3(void);
 extern void sub_A3A3(void);
-extern void sub_A3F0(void);
-extern void sub_A5C6(void);
-extern void msg_setup_C_A4DE(void);
-extern void msg_setup_A_A482(void);
-extern void sub_E64C(void);
+extern void sub_A3F0(void); /* joins a3f0_measurement_a3f0; see docs/evidence/extern-triage.md */
+extern void routine_A5C6(void);
+extern void msg_setup_C(void);
+extern void msg_setup_A_A482(void); /* joins a482_msg_setup_a; see docs/evidence/extern-triage.md */
+extern void sub_E64C(void); /* joins e64c_ext_call_stub_a; see docs/evidence/extern-triage.md */
 extern void msg_primitive_A2B9(int ***ppp5);
 
 static int *G_AR5;
@@ -33,10 +33,10 @@ void frag_A269(int b_in, int ***ppp5)
         *(volatile int *)0x265B =
             *(volatile int *)0x22D;              /* mvdk */
     sub_A3F0();                                   /* call 0xa3f0 */
-    sub_A5C6();                                   /* call 0xa5c6 */
+    routine_A5C6();                                   /* call 0xa5c6 */
     if ((*(volatile int *)0x2615 - 3400) < 0)     /* ld, sub, bc blt */
         goto L_A281;
-    msg_setup_C_A4DE();                           /* call 0xa4de */
+    msg_setup_C();                           /* call 0xa4de */
     msg_setup_A_A482();                           /* call 0xa482 */
     goto L_A291;                                  /* b 0xa291 */
 L_A281:
@@ -46,7 +46,7 @@ L_A281:
         if ((*(volatile int *)0x2615 - 800) >= 0)/* ld, sub, bc blt */
             sub_E64C();                           /* call 0xe64c */
     }
-    msg_setup_C_A4DE();                           /* A28F: call 0xa4de */
+    msg_setup_C();                           /* A28F: call 0xa4de */
 L_A291:
     G_AR5 = (int *)-8787;                         /* calld delay slot */
     msg_primitive_A2B9(ppp5);                     /* calld 0xa2b9 */

@@ -12,7 +12,7 @@
  * ti-c54x opcode_catalog.def; execution stays deferred, flagged);
  * return (AR1 live-out dropped, flagged). Bound 54A4-54BA.
  */
-extern void sub_06E6(void);
+extern void sub_06E6(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void msg_fetch_routine_54A4(long a_live)
 {

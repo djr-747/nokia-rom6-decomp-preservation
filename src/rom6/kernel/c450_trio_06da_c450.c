@@ -14,7 +14,7 @@
  * execution stays deferred, flagged); return (ARs dead, flagged).
  * Bound C450-C45F.
  */
-extern void sub_06DA(void);
+extern void sub_06DA(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void trio_06DA_C450(int *ar2_in, int *ar3_in)
 {

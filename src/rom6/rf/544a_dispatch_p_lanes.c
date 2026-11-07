@@ -5,7 +5,7 @@
  *
  * Intent: P-lane store pair with unconditional compare. Runs dark SUB_06E4 (call). AND-masks cells; cell 0x57B = cell 0x3F14 (mvdk); A = cell 0x2477; AR2 = 0x51C, cell &= -129. A == 0 skips the store slots (xc 2,aeq over orm plus st: neither slot sets status, and the cmpm below runs unconditionally, so entry TC is dead and no param is needed). Mismatch runs C FRAG_546B with the 0x51C AR2 (bc ntc, C-bound, interior join); else tail-enters dark 0x54BB (b). Bound 544A-546A.
  */
-extern void sub_06E4(void);
+extern void sub_06E4(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_546B(int *par2);
 extern void frag_54BB(void);
 

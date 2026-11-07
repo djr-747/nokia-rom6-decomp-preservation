@@ -13,8 +13,8 @@
  * tail-branch FRAG_37DF (C: none yet -- void per the 381b/3850
  * precedent). AR2 entry-live, dead after. Bound 3806-381A.
  */
-extern void sub_06BC(void);
-extern void frag_37DF(void);
+extern void sub_06BC(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_37DF(void); /* joins 37d8_frag_37d8 interior @+0x7; see docs/evidence/extern-triage.md */
 
 void frag_3806(int *ar2_in)
 {

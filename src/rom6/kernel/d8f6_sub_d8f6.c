@@ -5,8 +5,8 @@
  *
  * Intent: Mode-switch call pair. Runs 0x684; saves ST1 (pshm); ST1 = 1856, BK = 0 (hardware mode state, BK comments the circular-buffer size select); cell 0x300A = 12424; AR2 = 12356 feeds 0xD2E2 with AR3 = 2504 in the calld delay slot (executes first); AR2 = 12355 gets A (sub_D2E2 result); ST1 restored (popm, hardware state); return.
  */
-extern void sub_0684(void);
-extern int sub_D2E2(void);
+extern void sub_0684(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern int sub_D2E2(void); /* joins d2e2_routine_d2e2; see docs/evidence/extern-triage.md */
 
 static int *G_AR2;
 static int *G_AR3;

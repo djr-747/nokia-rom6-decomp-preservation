@@ -1,7 +1,7 @@
 /* ROM6 0x3179 SUB_3179 -- 28w.
  * Verified encoding: src/rom6/kernel/3179_sub_3179.asm (recombine MATCH).
  * ORIGIN 0x3179
- * EXPECT: 7714 2512 12D2 1184 F330 FBFF FF44 F340 0400 8184 7714 2647 12D2 F1F8 818C F130 00FF 7684 00E0 7714 263E 10D2 8194 8084 F074 2E2F F073 2E64
+ * EXPECT: 7714 2512 12D2 1184 F330 FBFF FF44 F340 0400 8184 7714 2647 12D2 F1F8 818C F130 00FF 7684 00E0 7714 263E 10D2 8194 8084 F074 2E2F F073 2E64 69F8 2627 0100 FC00
  *
  * Intent: Masked store lane with tail chain. AR4 = 9490;
  * A = unsigned *AR2 (ldu, 3691 precedent) with AR2 += AR0
@@ -19,10 +19,10 @@
  * with AR4 post-incremented to 9791; cell AR4 = A-low;
  * runs 0x2E2F (extern) then tail-branches to frag_2E64
  * (extern). ARs/A/B dead into the tail (flagged). Bound
- * 3179-3194 (28w; the header's old 22w count is stale).
+ * 3179-3198 (32w; second-exit orm lane dead past unconditional b).
  */
-extern void sub_2E2F(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void sub_3179(int ar0_live, int *ar2_in)
 {
@@ -50,6 +50,7 @@ void sub_3179(int ar0_live, int *ar2_in)
     ar2 += ar0_live;                                 /* +0% (wrap flagged) */
     *ar4++ = (int)(b & 0xFFFF);                      /* stl b,*ar4+ */
     *ar4 = (int)(a & 0xFFFF);                        /* stl a,*ar4 */
-    sub_2E2F();                                      /* call 0x2e2f */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f */
     frag_2E64();                                      /* b 0x2e64 (tail) */
+    /* 3195 dead lane (unreachable past unconditional b; orm + ret not modeled, 5886 precedent) */
 }

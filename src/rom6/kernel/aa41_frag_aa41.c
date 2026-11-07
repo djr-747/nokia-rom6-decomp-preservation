@@ -11,9 +11,9 @@
  * runs dark SUB_D0BE, returns. Callee heads set DP/BK first (no
  * entry reads), so void externs are exact. Bound AA41-AA55.
  */
-extern void sub_0688(void);
-extern void sub_CFBD(void);
-extern void sub_D0BE(void);
+extern void sub_0688(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_CFBD(void); /* joins cfbd_routine_cfbd; see docs/evidence/extern-triage.md */
+extern void sub_D0BE(void); /* joins d0be_routine_d0be; see docs/evidence/extern-triage.md */
 
 void frag_AA41(void)
 {

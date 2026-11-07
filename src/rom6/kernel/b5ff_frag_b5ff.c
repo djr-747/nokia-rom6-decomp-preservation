@@ -5,7 +5,7 @@
  *
  * Intent: Cell preset plus helper call. Sets cell 0x4C5 = 3, calls 0x6B4, returns.
  */
-extern void sub_06B4(void);
+extern void sub_06B4(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void frag_B5FF(void)
 {

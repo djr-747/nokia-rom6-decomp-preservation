@@ -5,7 +5,7 @@
  *
  * Intent: Cell test plus call. Runs helper 0x65A; A = cell 0x262D, zero returns at once (rc aeq: A == 0 returns, cell NOT cleared); else B = 0, calls 0x4BA8 with (A = cell, B = 0), clears cell 0x262D, returns.
  */
-extern void helper_065A(void);
+extern void helper_065A(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void sub_4BA8(int a_live, int b_live);
 
 void routine_A5C6(void)

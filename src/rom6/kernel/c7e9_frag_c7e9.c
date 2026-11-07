@@ -10,8 +10,8 @@
  * A, AR5, AR6 entry-live; B internal.
  * Bound C7E9-C7F5 (exit F073@C7F4->283D + operand C7F5, byte-verified).
  */
-extern void frag_C7F8(void);
-extern void frag_283D(void);
+extern void frag_C7F8(void); /* joins c7f6_frag_c7f6 interior @+0x2; see docs/evidence/extern-triage.md */
+extern void frag_283D(void); /* joins 2800_stretch_2800 interior @+0x3D; see docs/evidence/extern-triage.md */
 
 void frag_C7E9(int a_live, int *par5, int *par6)
 {

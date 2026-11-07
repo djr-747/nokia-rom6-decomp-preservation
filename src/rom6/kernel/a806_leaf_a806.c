@@ -5,7 +5,7 @@
  *
  * Intent: Delta test plus bit move. Runs helper 0x660; A = cell 0x565 minus cell 0x915; nonzero skips ahead (rc aneq); when set, tests bit 12 of cell 0x2629 (bitf, TC = bit set); bit clear skips (rc ntc), else copies cell 0x22B to 0x38A (mvdk), returns.
  */
-extern void helper_0660(void);
+extern void helper_0660(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void leaf_A806(void)
 {

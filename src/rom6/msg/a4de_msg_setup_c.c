@@ -24,9 +24,9 @@
  * 11 callers (A27B A28F AFCA B057 B084 B0C9 B138 B161 B188 B2D2 B34B
  * per header). Bound A4DE-A514.
  */
-extern void helper_0658(void);
-extern void routine_463B(void);
-extern void sub_ABD2(void);
+extern void helper_0658(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void routine_463B(void); /* joins 463b_routine_463b; see docs/evidence/extern-triage.md */
+extern void sub_ABD2(void); /* joins abd2_routine_abd2; see docs/evidence/extern-triage.md */
 
 void msg_setup_C(void)
 {

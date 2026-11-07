@@ -5,7 +5,7 @@
  *
  * Intent: Neighbor-merge filter with delayed return. Runs 0x59E (dark, forward extern); AR2 = live-in + 7 (mar); 4 iterations (BRC = 3, rptb): B = *AR2-- << 16 OR *AR2++ (SXM-on-entry unknown, plain OR per 5e7d), B <<= 2 arithmetic, high word back to *AR2-- (STH per op_sth). Then B = *AR2 AND -512 (keeps all but low 9) <<= 2; A = *AR2 AND 511; retd delay slots always run (B |= A; store B-low); return. AR2 threaded from callers (83b4/83ce pass their live pointer). Bound 7FC6-7FDB.
  */
-extern void sub_059E(void);
+extern void sub_059E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_7FC6(int *par2)
 {

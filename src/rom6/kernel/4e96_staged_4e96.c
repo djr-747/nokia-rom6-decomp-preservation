@@ -14,10 +14,10 @@
  * caller param (walk base); AR0/AR2/AR4/ASM/AR1 set in-span; A/B dead
  * (never read); TC untouched. Bound 4E96-4EBB.
  */
-extern void sub_0670(void);
+extern void sub_0670(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void rptb_math_4EBC(int **ppar2, int **ppar3, int *par4,
                            int ar0_live, int asm_live);
-extern void frag_4F5F(void);
+extern void frag_4F5F(void); /* joins 4f5f_rolror_banz_4f5f; see docs/evidence/extern-triage.md */
 
 void staged_4E96(int *ar3_in)
 {

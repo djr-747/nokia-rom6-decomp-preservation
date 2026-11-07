@@ -10,7 +10,7 @@
  * callers (entry ambiguous -- calls land on the ret word 861E per prior
  * pool note; stub may be unreachable, flagged).
  */
-extern void sub_8627(void);
+extern void sub_8627(void); /* joins 8627_sub_8627; see docs/evidence/extern-triage.md */
 
 void stub_861F(void)
 {

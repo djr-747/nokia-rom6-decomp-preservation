@@ -20,7 +20,7 @@
  * (local walk; caller-register live-out flagged); AR4 set in-span;
  * A/B internal; TC untouched. Bound 4B06-4B2B.
  */
-extern void port_write_36(int v);
+extern void port_write_36(int v);                                     /* HW port 36 (per 3273/4b06 spans); no ROM definition */
 
 void frag_4B06(int *ar2_in, int *ar3_in)
 {

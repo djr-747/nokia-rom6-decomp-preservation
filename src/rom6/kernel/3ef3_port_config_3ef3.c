@@ -28,35 +28,35 @@
  * routine_3FFA: AH = 1, AL = 0). RET @3FC3. Ports direct-mapped
  * (extern ops per 2ACC). Bound 3EF3-3FC3.
  */
-extern void sub_0640(void);
-extern int sub_4007(int a_in, int b_in);
+extern void sub_0640(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern int sub_4007(int a_in, int b_in); /* joins 4007_port0_txn; see docs/evidence/extern-triage.md */
 extern void routine_3FFA(int a_live);
 extern void frag_3FC4(void);
-extern int port_read_2(void);
-extern int port_read_0(void);
-extern void port_write_2(int v);
-extern void port_write_14(int v);
+extern int port_read_2(void);                                         /* HW port 2 (FRAME sample combine per 27EB span); no ROM definition */
+extern int port_read_0(void);                                         /* HW port 0 (codec/RF control per 938c homology); no ROM definition */
+extern void port_write_2(int v);                                      /* HW port 2 (supervisor per 2875 precedent); no ROM definition */
+extern void port_write_14(int v);                                     /* HW port 14 (RF per 3EE1 span, 4999 preset); no ROM definition */
 extern void port_write_15(int v);
-extern void port_write_4(int v);
-extern void port_write_9(int v);
-extern void port_write_5(int v);
-extern void port_write_7(int v);
-extern void port_write_10(int v);
-extern void port_write_47(int v);
-extern void port_write_13(int v);
-extern void port_write_11(int v);
-extern void port_write_8(int v);
-extern void port_write_0(int v);
-extern void port_write_1(int v);
-extern void port_write_32(int v);
-extern void port_write_33(int v);
-extern void port_write_42(int v);
-extern void port_write_48(int v);
-extern void port_write_3(int v);
-extern void port_write_43(int v);
-extern void port_write_37(int v);
-extern void port_write_38(int v);
-extern void port_write_17(int v);
+extern void port_write_4(int v);                                      /* HW port 4 (RF per 3cd2 port4850 seq); no ROM definition */
+extern void port_write_9(int v);                                      /* HW port 9 (RF per 389c/3d79 spans); no ROM definition */
+extern void port_write_5(int v);                                      /* HW port 5 (RF sweep per 3EE1 span); no ROM definition */
+extern void port_write_7(int v);                                      /* HW port 7 (RF sweep per 3EE1 span); no ROM definition */
+extern void port_write_10(int v);                                     /* HW port 10 (RF per 3d79/3EE1 spans); no ROM definition */
+extern void port_write_47(int v);                                     /* HW port 47 (RF per 3EE1/4a19 spans); no ROM definition */
+extern void port_write_13(int v);                                     /* HW port 13 (RF per 3EE1/44af spans); no ROM definition */
+extern void port_write_11(int v);                                     /* HW port 11 (RF per 3e53 sweep + 3ef3 config spans); no ROM definition */
+extern void port_write_8(int v);                                      /* HW port 8 (RF per 389c/3EE1 spans); no ROM definition */
+extern void port_write_0(int v);                                      /* HW port 0 (codec/RF control per 938c homology); no ROM definition */
+extern void port_write_1(int v);                                      /* HW port 1 (RF/codec per 3EE1 sweep); no ROM definition */
+extern void port_write_32(int v);                                     /* HW port 32 (RF per 3ef3 span); no ROM definition */
+extern void port_write_33(int v);                                     /* HW port 33 (SAMPLE handshake per 22F3 span); no ROM definition */
+extern void port_write_42(int v);                                     /* HW port 42 (RF per 3EE1 span); no ROM definition */
+extern void port_write_48(int v);                                     /* HW port 48 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_3(int v);                                      /* HW port 3 (supervisor cell per 2088 span); no ROM definition */
+extern void port_write_43(int v);                                     /* HW port 43 (RF per 3e53 sweep); no ROM definition */
+extern void port_write_37(int v);                                     /* HW port 37 (RF per 3ef3 span); no ROM definition */
+extern void port_write_38(int v);                                     /* HW port 38 (RF per 3ef3 span); no ROM definition */
+extern void port_write_17(int v);                                     /* HW port 17 (RF per 3ef3 span); no ROM definition */
 
 void port_config_3EF3(void)
 {

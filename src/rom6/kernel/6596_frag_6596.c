@@ -5,8 +5,8 @@
  *
  * Intent: Range gate with three tails. B = A-live-in - 1, negative tail-enters FRAG_65AA (bc 0x65aa,blt: has .asm, no C yet, forward extern). B = A - 4, non-negative tail-enters FRAG_65AA too (bc bgeq). Bit 8 of cell 0x2627 clear jumps away to dark 0x65B1 (bc ntc, forward extern). Else tail-enters FRAG_65AA anyway (b). SUB dst = src minus operand per op_sub; B dead after (noted). Bound 6596-65A4.
  */
-extern void frag_65AA(void);
-extern void frag_65B1(void);
+extern void frag_65AA(void); /* joins 65aa_frag_65aa; see docs/evidence/extern-triage.md */
+extern void frag_65B1(void); /* joins 65aa_frag_65aa interior @+0x7; see docs/evidence/extern-triage.md */
 
 void frag_6596(int a_live)
 {

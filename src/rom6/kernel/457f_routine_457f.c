@@ -5,8 +5,8 @@
  *
  * Intent: Shifted test plus copy-call. Runs 0x594; B = cell 0x529 >> 8 (arithmetic, ld shift -8) masked to a byte; zero returns early (rc beq); else AR3 = 1319, AR4 = 12032, 3 words (rpt #2) AR3 to AR4 (mvdd *ar3+,*ar4+), call 0x4533, return.
  */
-extern void helper_0594(void);
-extern void sub_4533(void);
+extern void helper_0594(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_4533(void); /* joins 4533_frag_4533; see docs/evidence/extern-triage.md */
 
 static int *G_AR3;
 static int *G_AR4;

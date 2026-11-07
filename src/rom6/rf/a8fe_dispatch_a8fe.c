@@ -5,13 +5,13 @@
  *
  * Intent: Long call chain with early return. Runs 0x666; bit 6 of cell 0x51C set returns immediately (bc 0xa91b,tc: target is the lone ret FC00 at 0xA91B, cited, no .asm span so no C file). Else five calld calls with presets (0xBBEF with AR2 = 12694, 0x9FCF with AR6 = 10380, 0xA12B plain, 0x9F42 with BRC = 159, 0x6A2 with AR2 = 12694, 0xBADB with AR2 = 12694; each delay-slot preset executes first); return.
  */
-extern void sub_0666(void);
-extern void sub_BBEF(void);
-extern void sub_9FCF(void);
-extern void sub_A12B(void);
-extern void sub_9F42(void);
-extern void sub_06A2(void);
-extern void sub_BADB(void);
+extern void sub_0666(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_BBEF(void); /* joins bbef_correl_init_bbef; see docs/evidence/extern-triage.md */
+extern void sub_9FCF(void); /* joins 9fcf_sub_9fcf; see docs/evidence/extern-triage.md */
+extern void sub_A12B(void); /* joins a12b_message_setup_a12b; see docs/evidence/extern-triage.md */
+extern void sub_9F42(void); /* joins 9f42_audio_engine_9f42; see docs/evidence/extern-triage.md */
+extern void sub_06A2(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_BADB(void); /* joins badb_routine_badb; see docs/evidence/extern-triage.md */
 
 static int *G_AR2;
 static int *G_AR6;

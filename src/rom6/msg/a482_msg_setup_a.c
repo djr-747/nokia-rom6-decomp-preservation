@@ -5,10 +5,10 @@
  *
  * Intent: Tune-select setup with status return. Runs dark SUB_0656; A = cell 0x262C, zero returns 0 (rc aeq: A live-out 0). B = cell 0x2615; cell 0x250F != 34 selects the 3400 lane (bc ntc) else the 3650 lane (b); A = B - lane (SUB #lk SHFT-0 per ti-c54x op_sub_lk; 16-bit narrowing noted, alt precedent per 6871); A < 0 skips to the calld gate (bc alt). Else saves B-low (pshm bl), A = port 16 (AL alias) minus cell 0x265A, nonzero skips the setup stores (bc aneq to the SUB_3986 gate). Stores 3 to cell 0x543; cell 0x250F != 34 or cell 0x34BF != 0 skips the downgrade to 2 (bc ntc pair). Runs dark SUB_3986. Zeroes B then restores B-low (ld plus popm round-trip: high was zero from the cell load, net B preserved, noted). A = cell 0x262C, then delayed-call into SUB_AB82 (calld, void per A3E1 precedent: delay slots stm #10,ar2 and ld #1,a always run in ROM; AR2 preset dead in C, A = 1 doubles as the return value); returns 1. Bound A482-A4B9.
  */
-extern void sub_0656(void);
+extern void sub_0656(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int port_read_16(void);
 extern void sub_3986(void);
-extern void sub_AB82(void);
+extern void sub_AB82(void); /* joins ab82_shared_worker_596; see docs/evidence/extern-triage.md */
 
 int sub_A482(void)
 {

@@ -14,7 +14,7 @@
  * runs, then unlock and return. Delay slots of bcd/bd/calld run
  * before their branches (modeled as pre-branch state here).
  */
-extern void cond_init_3D3B(void);        /* cc 0x3d3b,ntc */
+extern void frag_3D3B(void);        /* cc 0x3d3b,ntc */
 extern void setup_3C00(void);           /* call/calld 0x3c00 */
 extern void port0_txn_4007(int b);      /* calld 0x4007, B=#4 */
 
@@ -22,7 +22,7 @@ void port_programmer_7AE5(int **pp1, int *ar3, int *ar4, int *ar5)
 {
     int a, b;
     if (*(volatile int *)0x10 != 0)       /* cmpm, cc ntc */
-        cond_init_3D3B();
+        frag_3D3B();
     a = *(volatile int *)0x578;          /* ld */
     *(volatile int *)0x579 = a;          /* stl */
     b = **pp1;                            /* ld *ar1,b */

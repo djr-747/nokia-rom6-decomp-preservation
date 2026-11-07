@@ -5,7 +5,7 @@
  *
  * Intent: Cell test plus shared tail. Runs 0x67C; A = cell 0x2EFD, zero returns at once (rc aeq: taken return per the op_rc leaf). Else TC = (cell 0x2510 == 192), clear jumps to the tail with B live (bc 0xa8cd,ntc). Else cell 0x2EF5 != 0 returns at once (rc ntc: taken return); else B = 0. Tail: call 0x4BA8 with (A = cell, B); clear cell 0x2EFD; return. CMPM is TC-only per ti-c54x op_cmpm.
  */
-extern void sub_067C(void);
+extern void sub_067C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void sub_4BA8(int a_live, int b_live);
 
 void wrap_A8BF(int b_live)

@@ -5,7 +5,7 @@
  *
  * Intent: Masked merge with live-A tail. A = *AR2-live-in OR 256; bit 8 of cell 0x2512 set tail-enters dark 0x5502 with A live (bc 0x5502,tc, forward extern with A arg per B-threading precedent). Else A &= -257 (clears bit 8), stored through live-in AR3; falls into the next convergence head. 11w per .asm header (no yaml bound entry; recombine MATCH).
  */
-extern void frag_5502(int a_live);
+extern void frag_5502(int a_live); /* joins 54f8_msg_producer_converge interior @+0xA; see docs/evidence/extern-triage.md */
 
 void frag_54F8(int *par2, int *par3)
 {

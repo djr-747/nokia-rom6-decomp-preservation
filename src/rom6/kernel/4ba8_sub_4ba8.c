@@ -26,15 +26,15 @@
  * = 12123 rides in) and tail-enters dark 0x4D9C (b, forward extern void).
  * A/B entry-live; AR cursors dead at the tail. Bound 4BA8-4BD6.
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void fill_2F5D_4BD7(long a_live_in, int *ar3_in, int ar7_in);
 extern void sub_9268(int *par3);
 extern void sub_4D9D(int brc_live, int asm_live);
 extern void sub_4F3A(void);
 extern void sub_4EE0(int brc_live_in);
-extern void sub_51D8(void);
-extern void routine_2C88(void);
-extern void frag_4D9C(void);
+extern void frag_51D8(void);
+extern void routine_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
+extern void frag_4D9C(void); /* joins 4cb4_frag_4cb4 interior @+0xE8; see docs/evidence/extern-triage.md */
 
 void sub_4BA8(int a_live, int b_live)
 {
@@ -70,7 +70,7 @@ void sub_4BA8(int a_live, int b_live)
     /* calld 0x4ee0 (delay BRC = 1 rides in) */
     sub_4EE0(1);
     /* call 0x51d8 */
-    sub_51D8();
+    frag_51D8();
     if (b != 0) {                                      /* bc 0x4d9c,bneq */
         frag_4D9C();                                   /* (dead in model) */
         return;

@@ -5,9 +5,9 @@
  *
  * Intent: Bit-test call chain. Runs 0x688; bit 9 of cell 0x263A set skips the load (rc tc); else A = cell 0xB67, nonzero skips the next test (rc aneq); bits 0-1 of cell 0x51C set skip 0xCF25 (rc tc); else call 0xCF25; always call 0xCF4B, return. BITF any-bit TC per ti-c54x op_bitf.
  */
-extern void sub_0688(void);
-extern void sub_CF25(void);
-extern void sub_CF4B(void);
+extern void sub_0688(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_CF25(void); /* joins cf25_routine_cf25; see docs/evidence/extern-triage.md */
+extern void sub_CF4B(void); /* joins cf4b_routine_cf4b; see docs/evidence/extern-triage.md */
 
 void frag_AA2F(void)
 {

@@ -12,7 +12,7 @@
  * 0x8894 (frag_8894: has .asm, no C yet; AR2 live-in unbound, flagged).
  * Bound 89B3-89C3.
  */
-extern void frag_8894(void);
+extern void frag_8894(void); /* joins 8894_frag_8894; see docs/evidence/extern-triage.md */
 
 void frag_89B3(void)
 {

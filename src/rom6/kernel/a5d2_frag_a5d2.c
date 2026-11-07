@@ -5,7 +5,7 @@
  *
  * Intent: Measure-delta flag. Runs helper 0x65A; when cell 0x262A reads 160 (cmpm sets TC on equal per ti-c54x op_cmpm; rc ntc skips only when unequal), A = cell 0x36D minus cell 0x250D; when negative (rc ageq skips when A >= 0) sets bit 3 of cell 0x2639, returns.
  */
-extern void helper_065A(void);
+extern void helper_065A(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void frag_A5D2(void)
 {

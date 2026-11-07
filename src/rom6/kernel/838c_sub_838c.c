@@ -5,8 +5,8 @@
  *
  * Intent: Triple-calld launcher A. AR6 = -20092 feeds 0x7F55 with T = -3 in the calld delay slot (executes first); AR6 = -20124 feeds 0x7F95 with T = -7; 0x7FC6 runs with AR2 = 10884 preset in its delay slot; sets bits 8-9 of cell 0x2A87 (orm #1536), returns.
  */
-extern void sub_7F55(void);
-extern void sub_7F95(void);
+extern void sub_7F55(void); /* joins 7f55_sub32_7f55; see docs/evidence/extern-triage.md */
+extern void sub_7F95(void); /* joins 7f95_sub32_7f95; see docs/evidence/extern-triage.md */
 extern void sub_7FC6(void);
 
 static int *G_AR6;

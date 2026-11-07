@@ -1,5 +1,6 @@
 ; ROM6 0x2FE8 SUB_2FD3B -- 58w, symbols.yaml program_word.
 ; Evidence: Bound 2FE8-3021 (58w); entry TRACE (same histogram: 2FE8 bc-taken lane x1, 2FF2 b-target x1, hot 2FFF-3001 lane x4); interior bc lanes; exits b F073@3020->2E64; tail 3022-3027 (inc
+; Wave-13: retd tail @3022-3027 annexed (gap orphan; ldm/stl/retd + 2 delays). 3028 span starts after delays (post-retd head, consistent).
 ; ORIGIN 0x2FE8
 	.sect ".text"
 	.mmregs
@@ -34,3 +35,7 @@ _start:
 	portw  *(0x8),56
 	call   0x2e2f
 	b      0x2e64
+	ldm    ar1,a
+	stl    a,*(0x2649)
+	retd
+	stl    a,*(0x2648)

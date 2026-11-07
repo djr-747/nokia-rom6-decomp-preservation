@@ -30,9 +30,9 @@
  * step on locals; AR1 passthrough; A/B locals; all dead
  * at return (flagged). Bound 45C2-45F9.
  */
-extern void sub_2E2F(void);
+extern void dispatcher_entry_2E2F(void);
 extern void wrapper_8529(int **pp1_in);
-extern void routine_2C88(void);
+extern void routine_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 
 void frag_45C2(int *ar2_in, int *ar1_in)
 {
@@ -57,7 +57,7 @@ void frag_45C2(int *ar2_in, int *ar1_in)
         ar2 += ar0;                                  /* +0% (wrap flagged) */
     }
     (void)ar0;
-    sub_2E2F();                                      /* call 0x2e2f */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f */
     wrapper_8529(&ar1);                              /* call 0x8529 */
     ar4 = (int *)12040;                              /* calld delay (runs first) */
     wrapper_8529(&ar1);                              /* calld 0x8529 */

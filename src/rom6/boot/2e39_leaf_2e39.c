@@ -5,10 +5,10 @@
  *
  * Intent: Flag-cell setup plus tail chain. Bit 5 of cell 0x549 clear jumps to the 2E4A fragment (bc 0x2e4a,ntc: 2E4A = bit-test plus tail to 2E52, forward extern, bytes cited); else saves AR2 (pshm, hardware state), AR3 = 1353 with bit 5 cleared, AR4 = 159, AR5 = 2 feed 0x2C88; restores AR2 (popm); bit 2 of cell 0x54D clear jumps to the 2E52 entry (bc 0x2e52,ntc, C: frag_2E52); else call 0x2E64; return.
  */
-extern void frag_2E4A(void);
-extern void sub_2C88(void);
+extern void frag_2E4A(void); /* joins 2e39_leaf_2e39 interior @+0x11; see docs/evidence/extern-triage.md */
+extern void sub_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 extern void frag_2E52(void);
-extern void sub_2E64(void);
+extern void sub_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 static int *G_AR3;
 static int *G_AR4;

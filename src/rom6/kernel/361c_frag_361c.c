@@ -5,7 +5,7 @@
  *
  * Intent: Flag test with match-loop tail. Bit 2 of cell 0x54D clear jumps away to FRAG_3623 (bc 0x3623,ntc: bit-reversed span, asm-only, extern only); else tail-enters DISPATCH_MATCH_LOOP (b 0x2e64, C: dispatch_match_loop). Bound 361C-3622.
  */
-extern void frag_3623(void);
+extern void frag_3623(void); /* joins 3623_frag_3623; see docs/evidence/extern-triage.md */
 extern void dispatch_match_loop(void);
 
 void frag_361C(void)

@@ -1,5 +1,6 @@
 ; ROM6 0x3199 WORKER_3199 -- 205w, symbols.yaml data_word.
 ; Evidence: Entry 61F8 051D (bitf *(0x51d)#256), post-ret (FC00@3198); bound 3199-3265 (205w, exit F073@3264->2E64); interior joins incl parent-verified F073 31E9->31EE, 3219->321E, 3235->325D
+; Wave-13: exit ret @3266 owned here (gap orphan annexed).
 ; ORIGIN 0x3199
 	.sect ".text"
 	.mmregs
@@ -109,3 +110,4 @@ _start:
 	bc     0x3266,ntc
 	call   0x2e2f
 	b      0x2e64
+	ret

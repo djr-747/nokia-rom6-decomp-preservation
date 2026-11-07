@@ -9,8 +9,8 @@
  * B = cell 0x2659, clear cell 0x12 except bit 10 (andm #1024),
  * call 0xAB82, return. Callers 7x F074; abuts MEASUREMENT_A3F0.
  */
-extern void helper_0656(void);
-extern void sub_AB82(void);
+extern void helper_0656(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_AB82(void); /* joins ab82_shared_worker_596; see docs/evidence/extern-triage.md */
 
 static int *G_AR2;
 

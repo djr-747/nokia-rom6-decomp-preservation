@@ -5,7 +5,7 @@
  *
  * Intent: Helper-call plus clear. B = AR3 (live-in), A = *AR4 (live-in), call 0x4007, clear AR6, return the helper result.
  */
-extern int sub_4007(int a_in, int b_in);
+extern int sub_4007(int a_in, int b_in); /* joins 4007_port0_txn; see docs/evidence/extern-triage.md */
 
 static int *G_AR6;
 

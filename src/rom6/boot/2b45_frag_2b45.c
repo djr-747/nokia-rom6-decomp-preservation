@@ -5,9 +5,9 @@
  *
  * Intent: Port 1 strobe plus flag. Runs 0x64E (dark, forward extern); stores 64 through live-in AR2 and out to port 1 (portw *ar2,1); 14 idle cycles (rpt #13 nop); sets bit 13 of cell 0x552 (orm #8192); tail-enters dark 0x283D (b, forward extern). Bound 2B45-2B52.
  */
-extern void sub_064E(void);
-extern void port_write_1(int v);
-extern void frag_283D(void);
+extern void sub_064E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void port_write_1(int v);                                      /* HW port 1 (RF/codec per 3EE1 sweep); no ROM definition */
+extern void frag_283D(void); /* joins 2800_stretch_2800 interior @+0x3D; see docs/evidence/extern-triage.md */
 
 void frag_2B45(int *par2)
 {

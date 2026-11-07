@@ -14,9 +14,9 @@
  * SUB_2C88 (calld, delay AR4 = 116); return. DP = 0 assumed for
  * the direct cells (flagged). Bound 4533-454E.
  */
-extern void sub_0594(void);
+extern void sub_0594(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void sub_454F(int a_in, int b_in, int ar6_in);
-extern void sub_2C88(void);
+extern void sub_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 
 void frag_4533(int ar5_live)
 {

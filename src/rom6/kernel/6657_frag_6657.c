@@ -5,7 +5,7 @@
  *
  * Intent: Conditional rebias with B floor. A = 204; runs 0x6976 (dark, calld, forward extern; delay stm #12249,ar2 dead, noted); A = B-live-in + 51 (add #51,b,a) - 204 (sub); two nops; A < 0 runs A += 204 then B = min(A,B) (xc 2,alt pair; MIN signed 40-bit per op_compare, A/B live-in). Falls through with A and B live-out (out-params; accumulators as long). Bound 6657-6665.
  */
-extern void sub_6976(void);
+extern void sub_6976(void); /* joins 6973_sub_6973 interior @+0x3; see docs/evidence/extern-triage.md */
 
 void frag_6657(int b_live, long *pa_out, long *pb_out)
 {

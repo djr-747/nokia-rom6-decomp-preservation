@@ -31,9 +31,9 @@
  * values to thread), so this full intent lives under
  * frag_3623_stage to avoid a signature collision.
  */
-extern void sub_2E2F(void);
-extern void frag_93CE(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void frag_93CE(void); /* joins 93ce_msg_classify_by_caller; see docs/evidence/extern-triage.md */
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void frag_3623_stage(int ar0_live, int *ar2_in, int ar5_live)
 {
@@ -62,7 +62,7 @@ void frag_3623_stage(int ar0_live, int *ar2_in, int ar5_live)
         *ar3++ = (int)(a & 0xFFFF);                  /* stl a,*ar3+ */
     }
     ar2 -= ar0_live;                                 /* mar *ar2-% */
-    sub_2E2F();                                      /* call 0x2e2f */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f */
     b = (long)ar4v;                                  /* ldm ar4,b */
     a = (long)(unsigned)ar5_live;                    /* ldm ar5,a (zero-ext) */
     ar2 = (int *)12032;                              /* calld delay (runs first) */

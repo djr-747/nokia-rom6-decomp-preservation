@@ -13,7 +13,7 @@
  * (rpt #2 + MVDD, 457f precedent); return. AR2 caller-live,
  * dead after. Bound 43D3-43E9.
  */
-extern void sub_2E2F(void);
+extern void dispatcher_entry_2E2F(void);
 extern void frag_4533(void);
 
 void frag_43D3(int *ar2_in, int ar0_live)
@@ -29,7 +29,7 @@ void frag_43D3(int *ar2_in, int ar0_live)
         ar2 += ar0_live;                             /* +0% (wrap flagged) */
         *ar4++ = (int)(a & 0xFFFF);                  /* stl a,*ar4+ */
     }
-    sub_2E2F();                                      /* call 0x2e2f (dark) */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f (dark) */
     a &= 255;                                        /* and #255,a */
     a -= 1;                                          /* sub #1,a */
     if (a == 0) {                                    /* bc 0x4533,aeq */

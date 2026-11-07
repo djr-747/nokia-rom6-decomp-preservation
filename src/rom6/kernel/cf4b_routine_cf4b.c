@@ -1,0 +1,10 @@
+/* ROM6 0xCF4B CF4B_ROUTINE_CF4B -- 99w (Pool).
+ * Verified encoding: src/rom6/kernel/cf4b_routine_cf4b.asm (recombine MATCH).
+ * ORIGIN 0xCF4B
+ * EXPECT: EA00 7719 0000 4A07 7707 0740 F074 0680 E803 61F8 0C4C 0004 F820 CF7B 7712 1100 EC03 7192 235C 771A 0008 7712 110A F272 CF68 7713 234A 4492 9081 4E93 4A07 F274 E5D1 11F8 0ED0 8A07 10F8 0C4C F030 FFF7 F2A3 EA14 F274 DA18 80F8 0C4C 105A EA00 76F8 0ECD 0ED6 F274 DD9B 80F8 0A5A E800 7711 0F10 7712 0C62 7713 0F92 7714 0F7E F274 E492 7715 1118 61F8 0A5A 0001 FA20 CFAE 7712 0F3C E801 E721 7712 0C6C 7713 0F9C 7714 0F88 F274 E492 7715 1118 7712 0C62 7713 0C6C EC09 7092 0F7E EC09 7093 0F88 8A07 FC00
+ *
+ * Intent: Pool -- C intent deferred per the asm span's own documented blocker:
+ * HYPOTHESIS ea00-family worker.
+ * (see src/rom6/kernel/cf4b_routine_cf4b.asm header for the full evidence record). No C entry is claimed;
+ * the span stays owned by its verified .asm encoding.
+ */

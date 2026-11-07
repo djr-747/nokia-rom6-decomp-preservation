@@ -6,7 +6,7 @@
  * Intent: Dispatcher plus flag-clear call. Runs the 0x2E2F dispatcher entry, clears bit 13 of cell 0x51F (andm -8193), passes B = 16 to 0xB4A8, returns.
  */
 extern void dispatcher_entry_2E2F(void);
-extern void sub_B4A8(int b);
+extern void sub_B4A8(int b); /* joins b4a8_routine_b4a8; see docs/evidence/extern-triage.md */
 
 void frag_45A9(void)
 {

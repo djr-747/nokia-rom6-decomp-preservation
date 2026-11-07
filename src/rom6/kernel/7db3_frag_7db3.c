@@ -8,7 +8,7 @@
  * entry is a forward extern carrying live B). Entered via B @7DAE from
  * SUB_7D74 (per .asm header). Bound 7DB3-7DB4, no own exit.
  */
-extern void frag_7DB5(long b_live);
+extern void frag_7DB5(long b_live); /* joins 7db5_frag_7db5; see docs/evidence/extern-triage.md */
 
 void frag_7DB3(void)
 {

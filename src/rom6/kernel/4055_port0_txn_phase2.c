@@ -7,7 +7,7 @@
  * Runs dark SUB_0652 (call, C: sub_0652 per 40A1). Falls into 0x4057
  * exterior. Bound 4055-4056.
  */
-extern void sub_0652(void);
+extern void sub_0652(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void port0_txn_phase2_4055(void)
 {

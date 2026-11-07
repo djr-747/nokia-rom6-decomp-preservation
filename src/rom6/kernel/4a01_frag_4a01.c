@@ -6,7 +6,7 @@
  * Intent: B-lane chain head. Cell 0x34BF == 1 or == 4 tail-enters FRAG_4A12 (bc tc pair, C: frag_4A12). Cell 0x366F == 15 tail-enters dark 0x4A1E (bc tc, forward extern). Else tail-enters FRAG_4A4B (b: has .asm, no C yet, forward extern). CMPM TC-on-equal per op_cmpm. Bound 4A01-4A11.
  */
 extern void frag_4A12(void);
-extern void frag_4A1E(void);
+extern void frag_4A1E(void); /* joins 4a19_frag_4a19 interior @+0x5; see docs/evidence/extern-triage.md */
 extern void frag_4A4B(void);
 
 void frag_4A01(void)

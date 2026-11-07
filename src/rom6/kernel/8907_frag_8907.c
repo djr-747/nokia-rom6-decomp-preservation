@@ -14,7 +14,7 @@
  * flagged). RPTBD block [RSA = PC + 4 = 0x8913, REA = 0x8915];
  * execution stays deferred, flagged. Bound 8907-891B.
  */
-extern void frag_8936(void);
+extern void frag_8936(void); /* joins 8936_frag_8936; see docs/evidence/extern-triage.md */
 
 void frag_8907(int *ar4)
 {

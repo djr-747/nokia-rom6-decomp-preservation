@@ -5,7 +5,7 @@
  *
  * Intent: Entry-call stub (the .asm captures only the head call; the span body from 0x3988 through RET at 0x399D per the header evidence has no .asm and stays dark). Head-calls dark SUB_062E. Defines SUB_3986 for the A482 caller.
  */
-extern void sub_062E(void);
+extern void sub_062E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_3986(void)
 {

@@ -31,7 +31,7 @@
  * read on every path; all dead at return (flagged).
  * Bound 425F-42B7.
  */
-extern void sub_0606(void);
+extern void sub_0606(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void arith_blk_425F(int *ar2_in, int ar7_live)
 {

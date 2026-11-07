@@ -12,10 +12,10 @@
  * (file-static globals, 82cb.c G_AR6 precedent, flagged). A/B untouched.
  * Exterior caller call @81CD (810A gap region, objdump-verified), flagged.
  */
-extern void sub_066E(void);
+extern void sub_066E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void sub_82CB(void);
-extern void sub_82D4(void);
-extern void sub_82FF(void);
+extern void sub_82D4(void); /* joins 82d4_head_82d4; see docs/evidence/extern-triage.md */
+extern void sub_82FF(void); /* joins 82fe_leaf43_82d4 interior @+0x1; see docs/evidence/extern-triage.md */
 
 static int *G_AR0;
 static int *G_AR2;

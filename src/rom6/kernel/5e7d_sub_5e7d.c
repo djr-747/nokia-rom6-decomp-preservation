@@ -5,11 +5,11 @@
  *
  * Intent: Masked merge plus ring stage. Runs 0x598 (dark, forward extern); cell 9767 bit 0 clear jumps away to dark 0x5EE1 (bc ntc). B = 0; cell 0x2627 bit 7 set jumps away to dark 0x5E96 (bc tc). A = cell 0x2634, negative jumps away to 0x5EE1 (bc alt: A < 0 per 6871 precedent); cell 0x2629 sign bit set jumps away too (bc tc). Else B = 256; clears bits 0 and 7 of cell 9767 (andm #-130) and bits 13-15 of 9768/9769 (andm #8191); clears cell 0x2614; B |= cell 9302 into cell 12042; moves cell 9303 to 12043 (mvdd, AR2 fixed); moves cells 0x2618/0x2615 to 12044/12045 (mvdk pair); cell 0x250F != 34 jumps away to FRAG_5EB3 (bc ntc: has .asm, no C yet, forward extern). Else cell 12045 += 3750 (addm), tail-enters dark 0x5EB5 (b, forward extern). AR2/AR3 fully preset in span, no params. Bound 5E7D-5EB2.
  */
-extern void sub_0598(void);
-extern void frag_5EE1(void);
-extern void frag_5E96(void);
-extern void frag_5EB3(void);
-extern void frag_5EB5(void);
+extern void sub_0598(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_5EE1(void); /* joins 5eb3_frag_5eb3 interior @+0x2E; see docs/evidence/extern-triage.md */
+extern void frag_5E96(void); /* joins 5e7d_sub_5e7d interior @+0x19; see docs/evidence/extern-triage.md */
+extern void frag_5EB3(void); /* joins 5eb3_frag_5eb3; see docs/evidence/extern-triage.md */
+extern void frag_5EB5(void); /* joins 5eb3_frag_5eb3 interior @+0x2; see docs/evidence/extern-triage.md */
 
 void sub_5E7D(void)
 {

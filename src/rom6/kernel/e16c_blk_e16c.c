@@ -1,0 +1,10 @@
+/* ROM6 0xE16C E16C_BLK_E16C -- 90w (Pool).
+ * Verified encoding: src/rom6/kernel/e16c_blk_e16c.asm (recombine MATCH).
+ * ORIGIN 0xE16C
+ * EXPECT: 7662 000F 7712 0CCA 7713 1100 ED1E 4492 EC26 C889 8683 6D8A F4BA ED00 E801 EC27 388A FA60 E186 7663 0000 7663 FFFC E801 EC27 388B F48E 7669 8000 8C64 F48F 0269 8265 4564 3F63 8364 F4BA E801 6D92 7713 10D2 EC27 B089 FA60 E1A3 7663 0000 6D8B 7712 1127 E801 7663 FFFE EC27 B045 F48E 8C66 F48F 0269 8267 4566 3F63 8366 F161 0004 E800 FC4B 6F67 0C4F 8267 4467 EC0E 1E65 8068 E802 0066 0864 F484 880E F100 0010 1468 890E FF4B 1468 F470 F120 1333 F487 FC00
+ *
+ * Intent: Pool -- C intent deferred per the asm span's own documented blocker:
+ * HYPOTHESIS.
+ * (see src/rom6/kernel/e16c_blk_e16c.asm header for the full evidence record). No C entry is claimed;
+ * the span stays owned by its verified .asm encoding.
+ */

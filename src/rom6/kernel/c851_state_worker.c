@@ -11,7 +11,7 @@
  * into 0xC85D (no C binding yet); fall-through, no return modeled.
  * Bound C851-C85C.
  */
-extern void sub_05EA(void);
+extern void sub_05EA(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void state_worker_C851(void)
 {

@@ -5,7 +5,7 @@
  *
  * Intent: Masked store plus join. Cell 0x54D = *AR2-live-in AND 255 (ld plus and); tail-enters 0x37DF (b, forward extern). Bound 3827-382D.
  */
-extern void frag_37DF(void);
+extern void frag_37DF(void); /* joins 37d8_frag_37d8 interior @+0x7; see docs/evidence/extern-triage.md */
 
 void frag_3827(int *par2)
 {

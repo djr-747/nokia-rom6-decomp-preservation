@@ -7,7 +7,7 @@
  */
 extern int prom_read_word(int prog_addr);      /* mvpd: program read */
 extern void frag_44A6(void);
-extern void sub_052A(void);
+extern void sub_052A(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void dispatch_target_C_4453(int *par3, int *par4)
 {

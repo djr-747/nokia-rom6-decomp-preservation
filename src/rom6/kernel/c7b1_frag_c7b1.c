@@ -24,15 +24,15 @@
  * A write). Bound C7B1-C7E8 (exit F073@C7E7->C878 + operand C7E8; abuts the
  * separate FRAG_C7E9 span at C7E9 with zero overlap).
  */
-extern void sub_05EC(void);
-extern void portw_alias08_port1(void);
-extern void portr_port53_cell08(void);
-extern void frag_C7F6(void);
+extern void sub_05EC(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void portw_alias08_port1(void); /* HW port alias, emulator-provided */
+extern void portr_port53_cell08(void); /* HW port alias, emulator-provided */
+extern void frag_C7F6(void); /* joins c7f6_frag_c7f6; see docs/evidence/extern-triage.md */
 extern void frag_C7E9(int a_live, int *par5, int *par6);
-extern void frag_C8F8(void);
-extern void frag_C8FE(void);
-extern void frag_C7F8(void);
-extern void frag_C878(void);
+extern void frag_C8F8(void); /* joins c85d_state_dispatch_worker interior @+0x9B; see docs/evidence/extern-triage.md */
+extern void frag_C8FE(void); /* joins c85d_state_dispatch_worker interior @+0xA1; see docs/evidence/extern-triage.md */
+extern void frag_C7F8(void); /* joins c7f6_frag_c7f6 interior @+0x2; see docs/evidence/extern-triage.md */
+extern void frag_C878(void); /* joins c85d_state_dispatch_worker interior @+0x1B; see docs/evidence/extern-triage.md */
 
 void frag_C7B1(int a_live)
 {

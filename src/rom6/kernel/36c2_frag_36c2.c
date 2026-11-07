@@ -14,10 +14,10 @@
  * AR2 caller-live, dead after (dark-call liveness flagged).
  * Bound 36C2-36E0.
  */
-extern void sub_2E2F(void);
-extern void sub_E79D(void);
+extern void dispatcher_entry_2E2F(void);
+extern void sub_E79D(void); /* joins e79d_ext_call_stub_c; see docs/evidence/extern-triage.md */
 extern void blk_E7EF(void);
-extern void frag_2E64(void);
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 extern void frag_36E1(void);
 
 void frag_36C2(int *ar2_in, int ar0_live)
@@ -47,7 +47,7 @@ void frag_36C2(int *ar2_in, int ar0_live)
     ar2 += ar0_live;
     *(volatile int *)0x2450 = *ar2;
     ar2 += ar0_live;
-    sub_2E2F();                                      /* call 0x2e2f (dark) */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f (dark) */
     sub_E79D();                                      /* call 0xe79d (dark) */
     blk_E7EF();                                      /* call 0xe7ef */
     frag_2E64();                                     /* b 0x2e64 (dark tail) */

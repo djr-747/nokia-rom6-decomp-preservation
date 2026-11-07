@@ -5,7 +5,7 @@
  *
  * Intent: Constant-block plus zero-fill. Runs 0x6C0; five constant stores (cells 0x57D = 10496, 0x57E/0x2A69 = 12854, 0x57C/0x861 = 0); AR1 = 12854; A = 0 with 160 stores (rpt #159) through AR1; return.
  */
-extern void sub_06C0(void);
+extern void sub_06C0(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void stub_9DDD(void)
 {

@@ -21,14 +21,14 @@
  * frag_802F(long b_live), same pattern as B61F). A/B internal; AR4 cursor
  * local. Bound 7FF4-802C (exit F073@802B->802F + operand 802C).
  */
-extern void sub_059E(void);
-extern void frag_805A(void);
-extern void frag_8009(void);
+extern void sub_059E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_805A(void); /* joins 802d_frag_802d interior @+0x2D; see docs/evidence/extern-triage.md */
+extern void frag_8009(void); /* joins 7ff4_sub_7ff4 interior @+0x15; see docs/evidence/extern-triage.md */
 extern void routine_4590(int b_in);
-extern void frag_8029(void);
-extern void frag_801F(void);
-extern void frag_802D(long b_live);
-extern void frag_802F(long b_live);
+extern void frag_8029(void); /* joins 7ff4_sub_7ff4 interior @+0x35; see docs/evidence/extern-triage.md */
+extern void frag_801F(void); /* joins 7ff4_sub_7ff4 interior @+0x2B; see docs/evidence/extern-triage.md */
+extern void frag_802D(long b_live); /* joins 802d_frag_802d; see docs/evidence/extern-triage.md */
+extern void frag_802F(long b_live); /* joins 802d_frag_802d interior @+0x2; see docs/evidence/extern-triage.md */
 
 void frag_7FF4(void)
 {

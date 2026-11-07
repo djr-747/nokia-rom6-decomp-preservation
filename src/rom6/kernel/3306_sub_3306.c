@@ -36,8 +36,8 @@
  * Bound 3306-333B.
  */
 extern void frag_333C(int ar0_live, int *ar2_in);
-extern void sub_2E2F(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void sub_3306(int ar0_live, int *ar2_in)
 {
@@ -83,6 +83,6 @@ void sub_3306(int ar0_live, int *ar2_in)
         if (!taken)
             break;
     }
-    sub_2E2F();                                      /* 335C epilogue join */
+    dispatcher_entry_2E2F();                                      /* 335C epilogue join */
     frag_2E64();                                      /* b 0x2e64 (tail) */
 }

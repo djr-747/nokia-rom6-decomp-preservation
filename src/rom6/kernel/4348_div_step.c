@@ -9,7 +9,7 @@
  * return-delayed with an AND #32767 spill in the delay slots that keeps
  * A nonnegative on exit.
  */
-extern void helper_0606(void);
+extern void helper_0606(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int subc_step(int a, int divisor);   /* one SUBCDop, exact carry
                                              * semantics in the .asm */
 

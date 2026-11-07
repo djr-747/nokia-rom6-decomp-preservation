@@ -5,8 +5,8 @@
  *
  * Intent: FRAG_B942 delayed-call tail (6w, ROM slice verified: no listing row). Delayed-call into unbound FIR_WORKER_B743 (calld, forward extern void; delay stm #12206,ar3 preset dead in C, noted); tail-enters dark 0xB8B0 (b, forward extern).
  */
-extern void sub_B743(void);
-extern void frag_B8B0(void);
+extern void sub_B743(void); /* joins b743_fir_worker_b743; see docs/evidence/extern-triage.md */
+extern void frag_B8B0(void); /* joins b809_leaf_b809 interior @+0xA7; see docs/evidence/extern-triage.md */
 
 void frag_B942(void)
 {

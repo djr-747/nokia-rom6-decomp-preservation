@@ -6,7 +6,7 @@
  * Intent: Decrement-or-join gate. B = cell 9337 unsigned (stm plus ldu, AR1 dead after); zero tail-enters 0x5301 (bc 0x5301,beq: has .asm, no C yet, forward extern). Else B - 1 stored back to cell 9337 (sub plus stl), tail-enters dark 0x56B9 (b, forward extern). 10w per .asm header (Bound 52F7-5300; recombine MATCH).
  */
 extern void frag_5301(void);
-extern void frag_56B9(void);
+extern void frag_56B9(void); /* joins 56b7_msg_producer_converge interior @+0x2; see docs/evidence/extern-triage.md */
 
 void frag_52F7(void)
 {

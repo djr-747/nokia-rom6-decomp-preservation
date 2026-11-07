@@ -6,7 +6,7 @@
  * Intent: Worker pair plus gated primitive. Runs 0xA2C3 then 0xA361; when the 0xA361 result is nonzero (rc aneq on live A, exact skip semantics in the .asm), runs the A2B9 primitive with AR5 preset -8820 (calld delay slot), return.
  */
 extern void msg_worker_A2C3(void);
-extern int sub_A361(void);
+extern int sub_A361(void); /* joins a361_stub_a361; see docs/evidence/extern-triage.md */
 extern void msg_primitive_A2B9(int ***ppp5);
 
 static int *G_AR5;

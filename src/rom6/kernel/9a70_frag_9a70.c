@@ -12,7 +12,7 @@
  * calls dark 0x710 before clobbering A, so 710 may consume the passed
  * A (flagged). Bound 9A70-9A81, falls into 0x9A82.
  */
-extern void frag_9A82(long a_live);
+extern void frag_9A82(long a_live); /* joins 9a82_frag_9a82; see docs/evidence/extern-triage.md */
 
 void frag_9A70(int *par3)
 {

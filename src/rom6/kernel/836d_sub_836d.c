@@ -16,9 +16,9 @@
  * 837C-838B lane words were owned by the deleted 836c draft (which also
  * duplicated 838C-839F/83A0-83A3). Bound 836D-838B, abuts 838C.
  */
-extern void sub_82D4(void);
-extern void sub_7F95(void);
-extern void sub_7FC0(void);
+extern void sub_82D4(void); /* joins 82d4_head_82d4; see docs/evidence/extern-triage.md */
+extern void sub_7F95(void); /* joins 7f95_sub32_7f95; see docs/evidence/extern-triage.md */
+extern void sub_7FC0(void); /* joins 7fb4_sub32_7f95 interior @+0xB; see docs/evidence/extern-triage.md */
 extern void sub_7FC6(void);
 
 void sub_836D(int *par7)

@@ -5,11 +5,11 @@
  *
  * Intent: Triple-flag chain with delayed away-branch. Runs 0x59C (dark, forward extern); cell 0x250F != 34 jumps away to dark 0x5002 (bc ntc). Bit 4 of cell 0x3ACA set runs FRAG_500B (bc tc: has .asm, no C yet, forward extern; tail position). Bit 0-1 of cell 0x51C set jumps away to dark 0x5052 (bc tc). Else A = cell 0x2F1F in the bd delay slot (always runs, dead after, noted); branch to dark 0x1000 (bd, forward extern). BITF any-bit TC per op_bitf. Bound 4FF6-500A.
  */
-extern void sub_059C(void);
-extern void frag_5002(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_5002(void); /* joins 4ff6_frag_4ff6 interior @+0xC; see docs/evidence/extern-triage.md */
 extern void frag_500B(void);
-extern void frag_5052(void);
-extern void frag_1000(void);
+extern void frag_5052(void); /* joins 500b_frag_500b interior @+0x47; see docs/evidence/extern-triage.md */
+extern void frag_1000(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void frag_4FF6(void)
 {

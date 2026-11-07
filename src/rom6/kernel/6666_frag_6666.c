@@ -5,9 +5,9 @@
  *
  * Intent: Threshold gate with save plus retest. A = B-live-in + 6 - *AR5-live-in; positive tail-enters 0x676A (bc 0x676a,agt: has .asm, no C yet, forward extern). Else stores B to *AR5, runs DARAM save/restore 0x697F (C: daram_save_restore), copies cell 0x53D to cell 9751, A -= 51, non-negative jumps away to dark 0x6672 (bc 0x6672,ageq, forward extern); else tail-enters 0x676A. AGT = A > 0 per 6871 precedent. Bound 6666-6678.
  */
-extern void frag_676A(void);
+extern void frag_676A(void); /* joins 676a_branch_tail_676a; see docs/evidence/extern-triage.md */
 extern void daram_save_restore(void);
-extern void frag_6672(void);
+extern void frag_6672(void); /* joins 6666_frag_6666 interior @+0xC; see docs/evidence/extern-triage.md */
 
 void frag_6666(int b_live, int *par5)
 {

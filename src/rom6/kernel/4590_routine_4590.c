@@ -5,8 +5,8 @@
  *
  * Intent: Shifted-store pair plus call. Runs helper 0x594; AR3 = 12517; stores 12800 with post-increment; B = B | (1 << 8), stored with post-decrement; AR5 = 4 feeds 0x2C88 with AR4 = 116 in the calld delay slot (executes first), returns.
  */
-extern void helper_0594(void);
-extern void sub_2C88(void);
+extern void helper_0594(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 
 static int *G_AR3;
 static int *G_AR5;

@@ -36,12 +36,12 @@
  * (bc ntc to RET); else *(0x34C4..0x34C7) = 0, return.
  * Ports 3/15/16 direct-mapped (extern ops per 2ACC). Bound A2C3-A360.
  */
-extern void helper_0654(void);
+extern void helper_0654(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int port13_stable_read(void);
 extern void sub_3986(void);
-extern void portseq_AC4C(void);
-extern int port_read_3(void);
-extern void port_write_3(int v);
+extern void portseq_AC4C(void); /* joins ac4c_portseq_ac4c; see docs/evidence/extern-triage.md */
+extern int port_read_3(void);                                         /* HW port 3 (supervisor cell per 2088 span); no ROM definition */
+extern void port_write_3(int v);                                      /* HW port 3 (supervisor cell per 2088 span); no ROM definition */
 extern int port_read_16(void);
 extern void port_write_15(int v);
 

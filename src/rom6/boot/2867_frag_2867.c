@@ -5,9 +5,9 @@
  *
  * Intent: Port 2 set-bit strobe. Sets bit 0 of cell 0x866; A = port 2 (portr 2,*(0x8): AL alias) OR 2, written back to the cell and out to port 2 (portw *(0x8),2); tail-enters dark 0x283D (b, forward extern). Bound 2867-2874.
  */
-extern int port_read_2(void);
-extern void port_write_2(int v);
-extern void frag_283D(void);
+extern int port_read_2(void);                                         /* HW port 2 (FRAME sample combine per 27EB span); no ROM definition */
+extern void port_write_2(int v);                                      /* HW port 2 (supervisor per 2875 precedent); no ROM definition */
+extern void frag_283D(void); /* joins 2800_stretch_2800 interior @+0x3D; see docs/evidence/extern-triage.md */
 
 void frag_2867(void)
 {

@@ -5,12 +5,12 @@
  *
  * Intent: Measurement setup pair (two entries, one file per 53EB convention). Entry 0 (0xA679): runs dark SUB_065C; A = cell 0x262E, zero returns (rc aeq). Else B = 1, calls SUB_4BA8 with (A = cell, B = 1); B = 0 stored low to cell 0x262E; delayed return with cell 0x2614 = B-low in the slot (retd: slot always runs per 4238, then return). Entry 1 (0xA687, symbols SUB_A687): runs dark SUB_065E; cell 0x2510 != 193 returns (rc ntc). AR2 = 0x51C; *AR2 bit 0-1 set returns (bitf plus rc tc). Runs unbound FANOUT_AB2C (call, has .asm with bcd inside, forward extern void). A = cell 0x51C AND 3072 minus 2048 (SUB #lk,src form), zero returns (rc aeq). Else cell 0x337C = 12854, A = 95 into dark SUB_BA56; cell 0x337D = 12854, cell 0x337B = cell 0x54A (mvdk, dmad is destination), A = 95 into dark SUB_B750; sets bit 15 of cell 0x2AFF (orm); returns. Bound A679-A6AD.
  */
-extern void sub_065C(void);
+extern void sub_065C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void sub_4BA8(int a_live, int b_live);
-extern void sub_065E(void);
-extern void fanout_AB2C(void);
-extern void sub_BA56(void);
-extern void sub_B750(void);
+extern void sub_065E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void fanout_AB2C(void); /* joins ab2c_fanout_ab2c; see docs/evidence/extern-triage.md */
+extern void sub_BA56(void); /* joins ba56_bkmax_ba56; see docs/evidence/extern-triage.md */
+extern void sub_B750(void); /* joins b743_fir_worker_b743 interior @+0xD; see docs/evidence/extern-triage.md */
 
 void sub_A679(void)
 {

@@ -1,0 +1,10 @@
+/* ROM6 0xD970 D970_SUB_D970 -- 87w (Pool).
+ * Verified encoding: src/rom6/kernel/d970_sub_d970.asm (recombine MATCH).
+ * ORIGIN 0xD970
+ * EXPECT: 4A07 7707 0740 EA16 7712 307E F071 0009 8092 F274 D8E3 7658 1000 7712 0C2A F020 019A EC04 8092 7713 0C2F E801 EC04 8093 825B 765C 1000 825D 805E 825F 8260 8261 8262 F120 F6B3 7712 0C18 EC03 8192 7712 0C1C 7692 002C 7692 0025 7692 0016 7682 000C 7712 EB9E 7711 0C20 7713 0C34 7714 0B30 7715 0B44 771A 0009 ED00 4592 F272 D9B7 7716 0B3A 8291 8393 8394 8396 CB8B 7665 0028 8266 7712 0C3E EC09 8292 F274 D9FC 7713 3219 6968 0001 8A07 FE00
+ *
+ * Intent: Pool -- C intent deferred per the asm span's own documented blocker:
+ * HYPOTHESIS.
+ * (see src/rom6/kernel/d970_sub_d970.asm header for the full evidence record). No C entry is claimed;
+ * the span stays owned by its verified .asm encoding.
+ */

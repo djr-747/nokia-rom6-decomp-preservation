@@ -6,7 +6,7 @@
  * Intent: Gated lane with shared tail. A2B9 primitive with AR5 preset -8751 (calld delay slot); cell 0x2510 != 192 jumps to the shared B012 tail (bc ntc); bits 12-13 of cell 0x51F set jumps there too (bc tc); bit 0-1 of cell 0x51C set jumps there too (bc tc); A = cell 0x2EFE, nonzero jumps there (bc aneq); else far call 0x18060. All taken paths land on the B012 bytes (calld 0xa2b9 with AR5 = -8746, return: byte-identical to the own tail, cited); fall-through runs it too. BITF any-bit TC per ti-c54x op_bitf; CMPM TC-on-equal per ti-c54x op_cmpm.
  */
 extern void msg_primitive_A2B9(int ***ppp5);
-extern void far_18060(void);
+extern void far_18060(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
 
 static int *G_AR5;
 

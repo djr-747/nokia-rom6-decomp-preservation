@@ -5,9 +5,9 @@
  *
  * Intent: Match-loop filter with early returns. Runs 0x5A0 (dark, forward extern); cell 0x54D bit 2 clear jumps away to 0x2E8F (bc ntc, C-bound frag_2E8F: hot entry, 275x trace). A = sub_942E() (dark callee, A live-out as int return); A == 0 returns (rc aeq). AR4 = B-live-in then AR4-- (stlm plus mar, AR4 modeled in-out); A = *AR2 unsigned (AR2 live-in); B = A >> 8 logical (sftl -8 per logical barrel semantics) XOR 5, zero tail-enters WORKER_2E84 (bc 0x2e84,beq: C-bound; head trace-cold). Recomputes B, XOR 0 is a no-op pad (assembles F350 0000, kept for honesty); B != 0 returns (rc bneq). Else A &= 255, stores to cell 0x54D, return. Bound 2E64-2E83.
  */
-extern void sub_05A0(void);
+extern void sub_05A0(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_2E8F(void);
-extern int sub_942E(void);
+extern int sub_942E(void); /* joins 942e_cobba_verify_loop; see docs/evidence/extern-triage.md */
 extern void worker_2E84(void);
 
 void dispatch_match_loop(int b_live, int *par2, int **ppar4)

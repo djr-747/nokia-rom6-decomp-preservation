@@ -5,7 +5,7 @@
  *
  * Intent: Table zero-fill. Runs 0x590; A = 0 into cells 0x551/0x550; 32 stores (rpt #31) of AL to 0x11BA (mvmd al); 16 stores (rpt #15) of AL to 0x11DA; return.
  */
-extern void sub_0590(void);
+extern void sub_0590(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void routine_8813(void)
 {

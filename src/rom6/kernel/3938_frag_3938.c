@@ -18,9 +18,9 @@
  * caller; entry value unused in-span) and returns. A, AR2 entry-live; AR3
  * the only register live-out. Bound 3938-397A (exit FC00@397A).
  */
-extern void sub_05A0(void);
-extern void portw_alias08_port49(void);
-extern void portw_alias09_port50(void);
+extern void sub_05A0(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void portw_alias08_port49(void); /* HW port alias, emulator-provided */
+extern void portw_alias09_port50(void); /* HW port alias, emulator-provided */
 
 void frag_3938(int a_live, int *par2, int *par3_out)
 {

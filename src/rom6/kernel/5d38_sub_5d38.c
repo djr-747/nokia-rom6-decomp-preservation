@@ -54,16 +54,16 @@
  * Bound 5D38-5DF3 (ret FC00@5DF3; next span at 5DF4 is the cc
  * target ROUTINE_5DF4). Entry call F074@5C93 (per header evidence).
  */
-extern void sub_0598(void);
-extern void routine_5DF4(void);
+extern void sub_0598(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void routine_5DF4(void); /* joins 5df4_routine_5df4; see docs/evidence/extern-triage.md */
 extern void sub_5E7D(void);
-extern void sub_69BE(void);
-extern void sub_69E4(void);
-extern void sub_5EF7(void);
-extern void sub_5F4B(void);
-extern void sub_05A4(void);
-extern void sub_6155(void);
-extern void sub_640F(void);
+extern void sub_69BE(void); /* joins 69be_sub_69be; see docs/evidence/extern-triage.md */
+extern void sub_69E4(void); /* joins 69e4_sub_69e4; see docs/evidence/extern-triage.md */
+extern void sub_5EF7(void); /* joins 5ef7_sub_5ef7; see docs/evidence/extern-triage.md */
+extern void sub_5F4B(void); /* joins 5f4b_sub_5f4b; see docs/evidence/extern-triage.md */
+extern void sub_05A4(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_6155(void); /* joins 6155_sub_6155; see docs/evidence/extern-triage.md */
+extern void sub_640F(void); /* joins 63da_cmpd_63da interior @+0x35; see docs/evidence/extern-triage.md */
 
 void sub_5D38(void)
 {

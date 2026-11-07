@@ -6,7 +6,7 @@
  * Intent: Clear gate. Bit 7 of *AR3-live-in set tail-enters FRAG_2A5F (bc 0x2a5f,ntc, C: frag_2A5F). Else clears *AR3, tail-enters dark 0x2993 (b, forward extern). Bound 2A57-2A5E.
  */
 extern void frag_2A5F(void);
-extern void frag_2993(void);
+extern void frag_2993(void); /* joins 2983_frag_2983 interior @+0x10; see docs/evidence/extern-triage.md */
 
 void frag_2A57(int *par3)
 {

@@ -5,8 +5,7 @@
  *
  * Intent: Store plus zerofill call. Stores A-live-in to cell 0x264E, runs ZEROFILL_RETD 0x77EE (has .asm, no C yet, forward extern); falls into the next convergence head on return. 4w per .asm header (no yaml bound entry; recombine MATCH).
  */
-extern void zerofill_retd(void);
-
+extern void zerofill_retd(void); /* 77ee_zerofill_retd; see docs/evidence/extern-triage.md */
 void frag_569E(int a_live)
 {
     *(volatile int *)0x264E = a_live;        /* stl a,*(0x264e) */

@@ -5,7 +5,7 @@
  *
  * Intent: Conditional zero-fill. Runs 0x6A4; bit 0 of cell 0x577 set fills (bitf any-bit TC per ti-c54x op_bitf; rc ntc skips the fill when clear): A = 0 with 160 stores (rptz a,#159) through live-in AR2, return.
  */
-extern void sub_06A4(void);
+extern void sub_06A4(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void leaf_AB78(int **ppar2)
 {

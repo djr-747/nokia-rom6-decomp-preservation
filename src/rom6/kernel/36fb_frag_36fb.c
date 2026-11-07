@@ -24,11 +24,11 @@
  * exit (flagged). Bound 36FB-372D. Branch-entered from
  * 36F3 (entry state externally driven, flagged).
  */
-extern void sub_05B2(void);
+extern void sub_05B2(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_372E(int ar0_live, int *ar2_in);
-extern void sub_2E2F(void);
-extern void routine_2C88(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void routine_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void frag_36FB(int ar0_live, int *ar2_in)
 {
@@ -64,7 +64,7 @@ void frag_36FB(int ar0_live, int *ar2_in)
         *(volatile int *)0x2D34 = *ar2;
         ar2 += ar0_live;                             /* +0% (wrap flagged) */
     }
-    sub_2E2F();                                      /* call 0x2e2f */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f */
     ar3 = (int *)10217;                              /* stm #10217,ar3 */
     /* stm #158,ar4; stm #2,ar5 (dead, noted) */
     *ar3 = 8;                                        /* st #8,*ar3 */

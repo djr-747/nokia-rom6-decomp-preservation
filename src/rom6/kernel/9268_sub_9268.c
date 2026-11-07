@@ -5,10 +5,10 @@
  *
  * Intent: Constant spread plus triple call. Runs 0x594 then 0x9217; A = 127 with 8 stores (rpt #7) of AL to fixed cell 0x3224 (mvmd al); BRC = 38 feeds 0x9042; AR7 = 12836; BRC = 3 feeds 0x9042 again; BRC = 38 feeds 0x9315; A <<= 9 (sftl, logical barrel shift); store A-low through live-in AR3; return.
  */
-extern void helper_0594(void);
-extern void sub_9217(void);
-extern void sub_9042(void);
-extern void sub_9315(void);
+extern void helper_0594(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_9217(void); /* joins 9217_late_leaf_9217; see docs/evidence/extern-triage.md */
+extern void sub_9042(void); /* joins 9042_kernel_9042; see docs/evidence/extern-triage.md */
+extern void sub_9315(void); /* joins 9315_span_tail_9315; see docs/evidence/extern-triage.md */
 
 void sub_9268(int *par3)
 {

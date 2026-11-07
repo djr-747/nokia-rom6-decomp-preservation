@@ -15,7 +15,7 @@
  */
 extern void sub_698B(int **pp1);
 extern void sub_69A9(int *ar1_live);
-extern void frag_62F2(void);
+extern void frag_62F2(void); /* joins 62f2_branch_tail_62f2; see docs/evidence/extern-triage.md */
 
 void loop_629F(int *par6)
 {

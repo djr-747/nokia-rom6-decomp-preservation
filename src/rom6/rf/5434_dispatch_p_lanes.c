@@ -20,7 +20,7 @@
 extern void sub_06E4(void);                          /* dark, no symbol */
 extern void routine_B4A8(void);                      /* pooled */
 extern void init_filter_C717(void);                  /* pooled */
-extern void msg_producer_converge_54BB(void);        /* mid-span entry */
+extern void frag_54BB(void);        /* mid-span entry */
 
 void frag_5434(void)
 {
@@ -31,7 +31,7 @@ void frag_5434(void)
     sub_06E4();                                      /* call 0x6e4 */
     if (*(volatile int *)0x573 == -23991) {          /* cmpm; bc 0x5446,tc */
         init_filter_C717();                          /* 5446: the c717 call */
-        msg_producer_converge_54BB();                /* b 0x54bb */
+        frag_54BB();                /* b 0x54bb */
         return;
     }
     ar1 = (int *)(long)11264;                        /* stm #11264,ar1 (delay, once) */
@@ -44,5 +44,5 @@ void frag_5434(void)
     (void)ar1;                                       /* AR1-out, caller-observable, not carried */
     routine_B4A8();                                  /* call 0xb4a8 */
     init_filter_C717();                              /* call 0xc717 */
-    msg_producer_converge_54BB();                    /* b 0x54bb */
+    frag_54BB();                    /* b 0x54bb */
 }

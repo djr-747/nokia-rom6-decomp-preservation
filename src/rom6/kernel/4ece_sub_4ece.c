@@ -5,7 +5,7 @@
  *
  * Intent: Conditional one-store with delayed return. B = cell 0x2F1D, nonzero jumps away to dark 0x4ED5 (bc bneq, forward extern). Else sets bit 9 of cell 0x264E; B = 0, or 1 when bit 4 of cell 0x2628 is set (bitf plus xc 1,tc pair, BITF any-bit TC per op_bitf; TC live in-span); stores B to cell 0x9C7; retd delay slot stores the same B to cell 0x9C6 (always runs); return. Bound 4ECE-4EDF.
  */
-extern void frag_4ED5(void);
+extern void frag_4ED5(void); /* joins 4ece_sub_4ece interior @+0x7; see docs/evidence/extern-triage.md */
 
 void sub_4ECE(void)
 {

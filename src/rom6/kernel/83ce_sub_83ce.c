@@ -5,9 +5,9 @@
  *
  * Intent: Preset call sandwich with in-span skip. Same shape as SUB_83B4 with AR6 presets -20125/-8966 and T preset 0; nonzero popped AL (saved AR7, modeled live-in) jumps forward into the span at the second calld (bc 0x83e0,aneq, in-span per bound 83CE-83E7); else the 0x7FC0 call first. Both paths: AR2 = 10884, call 0x7FC6 (live AR2 threaded), set bit 10 of cell 0x2A87, return.
  */
-extern void sub_7F75(void);
-extern void sub_7FC0(void);
-extern void sub_82FF(void);
+extern void sub_7F75(void); /* joins 7f75_sub_7f75; see docs/evidence/extern-triage.md */
+extern void sub_7FC0(void); /* joins 7fb4_sub32_7f95 interior @+0xB; see docs/evidence/extern-triage.md */
+extern void sub_82FF(void); /* joins 82fe_leaf43_82d4 interior @+0x1; see docs/evidence/extern-triage.md */
 extern void sub_7FC6(int *par2);
 
 static int *G_AR6;

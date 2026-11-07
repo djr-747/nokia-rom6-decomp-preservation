@@ -29,7 +29,7 @@ extern void sub_05BE(void);                          /* dark, no symbol */
 extern void sub_9459(void);                          /* asm-only, forward extern */
 extern void frag_9453(int a_live);                   /* linked C */
 extern int msg_verify_loop(void);                    /* asm-only, A-out dark */
-extern void sub_9A50(void);                          /* dark (9453 precedent) */
+extern void routine_9A50(void);                          /* dark (9453 precedent) */
 
 void frag_942E(void)
 {
@@ -70,7 +70,7 @@ l942e:
         return;
     goto l942e;                                      /* b 0x942e */
 l944b:
-    sub_9A50();                                      /* calld 0x9a50 */
+    routine_9A50();                                      /* calld 0x9a50 */
     ar4 = 155;                                       /* calld delay: stm (dead, noted) */
     (void)ar4;
     if (a9a50 > 0)                                   /* bc 0x942e,agt */

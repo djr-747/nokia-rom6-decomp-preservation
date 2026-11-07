@@ -5,7 +5,7 @@
  *
  * Intent: T-scaled accumulate with cell snapshot. T = cell 0x51F (mvdm); cell 0xE &= 15 (andm to MMR); B = T times 80 (MPY #lk,dst per 84CF precedent; 16-bit narrowing noted); A = A-live-in plus B (ADD src,dst). AR3 = A low (stlm); AR4 = 139; A = *AR3; cell 0x1234 = AR3 value, cell 0x1235 = A low (mvmd pair). A = cell 0x51F AND 15; B = cell 0x263B AND 240; A |= B; *AR3 = A low. Delayed-call into dark ROUTINE_2C88 (calld, void per 36B0; delay stm #162,ar5 preset dead in C, noted). AR3 = cell 0x1234; *AR3 = cell 0x1235 (mvdm/mvkd restore); returns. Bound 423B-425E.
  */
-extern void routine_2C88(void);
+extern void routine_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 
 void frag_423B(int a_live)
 {

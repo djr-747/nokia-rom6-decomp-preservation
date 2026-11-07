@@ -18,12 +18,12 @@
  * caller-live and any dark-callee BRC use is unbound
  * (flagged). Bound 92F4-9314.
  */
-extern void sub_0676(void);
+extern void sub_0676(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_9233(int *par3);
-extern void sub_90B9(void);
-extern void sub_90D6(void);
-extern void sub_90E7(void);
-extern void sub_9331(void);
+extern void sub_90B9(void); /* joins 90b9_wrap_90b9; see docs/evidence/extern-triage.md */
+extern void sub_90D6(void); /* joins 90d6_wrap_90d6; see docs/evidence/extern-triage.md */
+extern void sub_90E7(void); /* joins 90e7_wrap_90e7; see docs/evidence/extern-triage.md */
+extern void sub_9331(void); /* joins 9331_sub_9331; see docs/evidence/extern-triage.md */
 
 void sub_92F4(int *par3_in, long a_live)
 {

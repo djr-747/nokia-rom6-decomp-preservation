@@ -48,7 +48,7 @@
  * on locals; all dead at return (flagged). Bound
  * 3D3D-3D78.
  */
-extern void sub_05AA(void);
+extern void sub_05AA(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void routine_3D3D(int *ar2_in, int *ar4_in, int ar0_live, int *ar5_in, int *ar6_in, int *ar1_in, int ar7_live)
 {

@@ -5,11 +5,11 @@
  *
  * Intent: Far-call chain with shared tail. AR4 = 2504 feeds far call 0x1A8FD (fcalld, AR3 = 12074 preset in the delay slot, always executes), then far call 0x1A260, 0xA679, the 0xA5E1 measure setup (C: meas_setup_A_A5E1); cell 0x2510 != 192 jumps to the shared B0B8 tail (bc ntc: bytes call 0xa7b7, call 0xa7eb, ret). Else A = cell 0x2EFE, nonzero jumps there too (bc aneq); else far call 0x180A7 first. Fall-through runs the audio workers 0xA7B7 and 0xA7EB (C: audio_B_A7EB for the latter); return.
  */
-extern void far_1A8FD(void);
-extern void far_1A260(void);
+extern void far_1A8FD(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
+extern void far_1A260(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
 extern void sub_A679(void);
 extern void meas_setup_A_A5E1(void);
-extern void far_180A7(void);
+extern void far_180A7(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
 extern void audio_A_A7B7(void);
 extern void audio_B_A7EB(void);
 

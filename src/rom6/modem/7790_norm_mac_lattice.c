@@ -1,0 +1,10 @@
+/* ROM6 0x7790 7790_NORM_MAC_LATTICE -- 94w (Pool).
+ * Verified encoding: src/rom6/modem/7790_norm_mac_lattice.asm (recombine MATCH).
+ * ORIGIN 0x7790
+ * EXPECT: F074 059E E706 E731 E720 771A 0009 F272 77A4 7714 2F03 4482 3184 F485 F845 77A4 F074 4348 FD4B F484 8092 7717 0001 E702 7714 2F04 7715 2FA4 771A 0046 F072 77BA F071 0009 B098 3084 F48F F46E 8295 6DEB FFF8 6DEA FFF6 6C8F 77AC E717 60F8 2F02 0040 FC30 4A10 4A16 4A17 F074 91F3 8A17 8A16 8A10 6E86 77ED E702 E773 7715 2FA4 7717 0001 7716 001F 771A 0004 F272 77DE E800 E900 B018 BB90 B014 B398 6D92 F47F F77F 4E95 4F95 6DEB FFF8 6DEA FFF6 6C8E 77D4 6E8F 77D2 6DEB 009C FC00
+ *
+ * Intent: Pool -- C intent deferred per the asm span's own documented blocker:
+ * HYPOTHESIS.
+ * (see src/rom6/modem/7790_norm_mac_lattice.asm header for the full evidence record). No C entry is claimed;
+ * the span stays owned by its verified .asm encoding.
+ */

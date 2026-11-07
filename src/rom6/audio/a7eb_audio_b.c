@@ -5,9 +5,9 @@
  *
  * Intent: Audio worker B. Runs 0x660; bit 8 of cell 0x2628 set calls 0xABD2 (ccd tc, AR2 = 9742 then AR3 = 555 presets in/after the delay slot, always execute); bit 14 set skips ahead (rc tc); bit 0 of cell 0x58F set jumps to the A803 stub (bc 0xa803,tc: A803 = call 0x9E85 plus ret, inlined here with byte citation); bit 9 of cell 0x51D set skips the final call (rc tc); else call 0x9E85; return. BITF any-bit TC per ti-c54x op_bitf.
  */
-extern void sub_0660(void);
-extern void sub_ABD2(void);
-extern void sub_9E85(void);
+extern void sub_0660(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_ABD2(void); /* joins abd2_routine_abd2; see docs/evidence/extern-triage.md */
+extern void sub_9E85(void); /* joins 9e85_wrap_9e85; see docs/evidence/extern-triage.md */
 
 static int *G_AR2;
 static int *G_AR3;

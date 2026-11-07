@@ -5,8 +5,8 @@
  *
  * Intent: Triple-calld launcher D. Same shape as SUB_838C with AR6 presets -20076/-20108 and T presets -1/-13; 0x7FC6 with AR2 = 10884; clears cell 0x2630; sets bits 8-9 of cell 0x2A87; returns.
  */
-extern void sub_7F55(void);
-extern void sub_7F95(void);
+extern void sub_7F55(void); /* joins 7f55_sub32_7f55; see docs/evidence/extern-triage.md */
+extern void sub_7F95(void); /* joins 7f95_sub32_7f95; see docs/evidence/extern-triage.md */
 extern void sub_7FC6(void);
 
 static int *G_AR6;

@@ -5,9 +5,9 @@
  *
  * Intent: Preset call sandwich. AR5 = -19153, AR6 = -19135, A = -19137 feed 0xAEEC then 0xA4BA; AR3 = -19153, AR6 = -19135, A = -19137 feed 0xAF16, return.
  */
-extern void sub_AEEC(void);
-extern void sub_A4BA(void);
-extern void sub_AF16(void);
+extern void sub_AEEC(void); /* joins aeec_regfield_helper; see docs/evidence/extern-triage.md */
+extern void routine_A4BA(void);
+extern void sub_AF16(void); /* joins af16_routine_af16; see docs/evidence/extern-triage.md */
 
 static int *G_AR5;
 static int *G_AR6;
@@ -20,7 +20,7 @@ void routine_B39E(void)
     G_AR6 = (int *)-19135;                       /* stm #-19135,ar6 */
     (void)a;
     sub_AEEC();                                  /* call 0xaeec */
-    sub_A4BA();                                  /* call 0xa4ba */
+    routine_A4BA();                                  /* call 0xa4ba */
     a = -19137;                                  /* ld #-19137,a */
     G_AR3 = (int *)-19153;                       /* stm #-19153,ar3 */
     G_AR6 = (int *)-19135;                       /* stm #-19135,ar6 */

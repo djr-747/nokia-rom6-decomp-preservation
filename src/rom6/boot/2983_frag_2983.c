@@ -5,8 +5,8 @@
  *
  * Intent: Flag chain with arithmetic tails. Runs dark 0x5B8 (call, forward extern); bit 6 of *AR2-live-in (entry pointer param) clear jumps away to dark 0x2979 (bitf plus bc ntc, forward extern). Bit 1 of cell 0x3EC8 set runs FRAG_2ACC (bc tc, C: frag_2ACC with A); bit 5 clear tail-enters FRAG_2A73 (bc ntc, C: frag_2A73 this turn). AR2 = cell 0x265E, AR3 = cell 0x2660 (mvdm locals); cell 0x13D0 == 0 tail-enters FRAG_2A73 (bc tc, C: frag_2A73... correction same, forward note). AR3 = 5072; bit 0 of cell 5072 clear tail-enters FRAG_29B9 (bc ntc, C: frag_29B9 with AR2 plus AR3 = 5072). Runs PORT13_STABLE_READ 0x3EE1 (A-OUT proven by the 3EE3 loop shape -- the stable reading overwrites entry A; the old preserve-A reading was wrong, fixed this wave); B = *(AR2+1); A(reading) -= B, > 0 tail-enters FRAG_29B1 (bc agt, C: frag_29B1 with AR3 = 5072). B -= cell 0x126F, > 0 tail-enters FRAG_29B1 too (bc bgt). Else AR3 = cell 0x2660 (mvdm), tail-enters FRAG_2A73 (b, forward extern). SUB per op_sub. Bound 2983-29B0.
  */
-extern void sub_05B8(void);
-extern void frag_2979(void);
+extern void sub_05B8(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_2979(void); /* joins 296a_frag_296a interior @+0xF; see docs/evidence/extern-triage.md */
 extern void frag_2ACC(int a_live);
 extern void frag_2A73(void);
 extern void frag_29B9(int *par2, int *par3);

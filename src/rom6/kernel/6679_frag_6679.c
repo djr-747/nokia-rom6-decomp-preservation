@@ -6,10 +6,10 @@
  * Intent: Add-compare store with save tail. BL-alias cell != 2 runs C FRAG_6693 with entry AR5/AR6 (bc ntc, C-bound passthrough pair). Else AR1 = 0x53D, A = 51; delayed-call into dark SUB_6976 (calld, void; delay stm #12247,ar2 preset dead, AR2 unused after, noted). A = B-live-in plus 3 (ADD #lk,src,dst); A -= *AR5-entry (SUB Xmem,src, 16-bit narrowing noted), positive tail-enters dark 0x676A (bc agt, signed per 6871). Else *AR5 = B low; runs C DARAM_SAVE_RESTORE (call, C-bound); AR2 = 0x53D into DARAM_CELL_STORE (calld, C-bound with src param: the delay-slot stm IS the argument); tail-enters dark 0x676A (b). Bound 6679-6692.
  */
 extern void frag_6693(int *par5, int *par6);
-extern void sub_6976(void);
+extern void sub_6976(void); /* joins 6973_sub_6973 interior @+0x3; see docs/evidence/extern-triage.md */
 extern void daram_save_restore(void);
 extern void daram_cell_store(int *src);
-extern void frag_676A(void);
+extern void frag_676A(void); /* joins 676a_branch_tail_676a; see docs/evidence/extern-triage.md */
 
 void frag_6679(int b_live, int *par5, int *par6)
 {

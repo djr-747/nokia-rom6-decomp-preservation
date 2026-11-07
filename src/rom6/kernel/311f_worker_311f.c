@@ -30,9 +30,9 @@
  * (extern). ARs/A/B dead into the tail (flagged). Bound
  * 311F-315E.
  */
-extern void sub_2E2F(void);
-extern void sub_98AD(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void sub_98AD(void); /* joins 98ad_wrap_98ad; see docs/evidence/extern-triage.md */
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void worker_311F(int ar0_live, int *ar2_in)
 {
@@ -75,7 +75,7 @@ void worker_311F(int ar0_live, int *ar2_in)
     if (a != 0)                                      /* xc 2,beq */
         a = -1;                                      /* ld #-1,a */
     *(volatile int *)0x2203 = (int)(a & 0xFFFF);     /* stl a,*(0x2203) */
-    sub_2E2F();                                      /* call 0x2e2f */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f */
     /* pshm ar2 (hardware state, C local carries it) */
     sub_98AD();                                      /* call 0x98ad */
     /* popm ar2 (hardware state) */

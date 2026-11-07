@@ -5,7 +5,7 @@
  *
  * Intent: Countdown plus mid-span entry. B decrements (live-in); the cell 0x59 tick and cell 0x5A = 3 preset run in the bcd delay slots (always execute); then a nonzero result enters FRAG_DA21 mid-span at DA23 (skips its st #7,0x58 init), else delayed return. DA23 target has no C binding yet -- forward extern per convention.
  */
-extern void frag_DA21_at_DA23(void);
+extern void frag_DA21_at_DA23(void); /* joins da21_frag_da21 interior @+0x2; see docs/evidence/extern-triage.md */
 
 void sub_DA18(int b_in)
 {

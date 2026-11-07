@@ -12,7 +12,7 @@
  * MVMD-AL to a fixed cell: no AR, no stepping, same cell rewritten);
  * return. Bound A7A0-A7B6.
  */
-extern void sub_86FB(void);
+extern void sub_86FB(void); /* joins 86fb_shared_sub_86fb; see docs/evidence/extern-triage.md */
 
 void sub_A7A0(void)
 {

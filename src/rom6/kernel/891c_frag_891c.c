@@ -12,8 +12,8 @@
  * (.asm only, forward extern; AR liveness through the dark call
  * unbound, flagged). Bound 891C-8935.
  */
-extern void sub_86FB(void);
-extern void frag_88AD(void);
+extern void sub_86FB(void); /* joins 86fb_shared_sub_86fb; see docs/evidence/extern-triage.md */
+extern void frag_88AD(void); /* joins 8894_frag_8894 interior @+0x19; see docs/evidence/extern-triage.md */
 
 void frag_891C(void)
 {

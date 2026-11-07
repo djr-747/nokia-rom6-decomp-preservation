@@ -32,7 +32,7 @@
  * locals, written before read on every path; ARs dead
  * at return (flagged). Bound 4858-4882.
  */
-extern void sub_059E(void);
+extern void sub_059E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sum_rptb_4858(int ar5_live)
 {

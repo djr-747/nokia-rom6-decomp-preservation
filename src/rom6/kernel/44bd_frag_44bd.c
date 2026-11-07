@@ -5,11 +5,11 @@
  *
  * Intent: Overlay patch plus readback. Runs 0x594 then the 0x2E2F dispatcher entry; AR3 = 12032; A = (10 << 8) OR 9 stored with post-increment (12032 then AR3 = 12033); AR2 = 96; *AR2 = 256; program word 0xFF87 = 256 (mvdp data-to-program write, extern prom_write_word); AR4 = 116; *AR3-- = program word 0xFF87 (mvpd readback, extern prom_read_word; AR3 back to 12032); calls 0x2C88 with AR5 = 4 in the calld delay slot (executes first); return.
  */
-extern void helper_0594(void);
+extern void helper_0594(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void dispatcher_entry_2E2F(void);
 extern void prom_write_word(int prog_addr, int v); /* mvdp */
 extern int prom_read_word(int prog_addr);          /* mvpd */
-extern void sub_2C88(void);
+extern void sub_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 
 static int *G_AR3;
 static int *G_AR2;

@@ -19,7 +19,7 @@
 extern void fanout_855F(int *ar4_in, int *ar5_in, int *ar6_in);
 extern void or_combine_8577(int *p2, int *p3);
 extern void block_copy_85E4(int *src3, int *src4);
-extern void sub_85FD(void);
+extern void sub_85FD(void); /* joins 85fd_block_copy_85fd; see docs/evidence/extern-triage.md */
 
 void fanout26_853B(int **pp1, int *ar4, int *ar6)
 {

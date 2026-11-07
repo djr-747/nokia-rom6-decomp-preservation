@@ -1,0 +1,10 @@
+/* ROM6 0x3364 3364_WORKER_3364 -- 88w (Pool).
+ * Verified encoding: src/rom6/kernel/3364_worker_3364.asm (recombine MATCH).
+ * ORIGIN 0x3364
+ * EXPECT: 12D2 F130 00FF 7714 2615 6FF8 053C 0C98 E5CA 8194 71DA 053D 7714 050F 71DA 2618 7684 0000 10F8 053C F110 0002 F010 0003 F844 3387 6182 0200 7713 054F 6883 EFFF FF30 6983 1000 7713 051F 10D2 61F8 0008 0100 6883 FEFF FF30 6983 0100 F84C 339F F030 00FF F110 000A F495 F495 FD4E E800 8084 80F8 0510 F074 2E2F F074 05B6 61F8 058F 000F F820 33BA 10F8 053C F010 0004 F844 2E64 69F8 2453 0001 70F8 2451 2616 70F8 2452 2618 76F8 053C 0000 F073 2E64
+ *
+ * Intent: Pool -- C intent deferred per the asm span's own documented blocker:
+ * HYPOTHESIS.
+ * (see src/rom6/kernel/3364_worker_3364.asm header for the full evidence record). No C entry is claimed;
+ * the span stays owned by its verified .asm encoding.
+ */

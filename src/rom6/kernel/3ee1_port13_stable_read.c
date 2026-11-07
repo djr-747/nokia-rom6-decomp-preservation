@@ -13,7 +13,7 @@
  * PORT13_STABLE_READ for the 2983/A7B7/4474/A2C3 callers. Body modules:
  * 3ee3_stable_read_3ee3 (loop), 3ef3_port_config_3ef3 (config ladder).
  */
-extern void sub_063E(void);
+extern void sub_063E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int stable_read_3EE3(void);
 
 int port13_stable_read(void)

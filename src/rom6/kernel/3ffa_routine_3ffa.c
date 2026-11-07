@@ -5,9 +5,9 @@
  *
  * Intent: Port snapshot plus double store. Runs 0x64A (A live after, modeled as live-in); PORT[24] = A-high (portw *(0x9),24: DATA 0x9 aliases AH); 32-bit A to cells 0x1FE/0x1FF (dst a: LONG32 store per ti-c54x op_dst, guard bits dropped); PORT[25] = A-low (portw *(0x8),25: AL alias); return.
  */
-extern void sub_064A(void);
-extern void port_write_24(int v);
-extern void port_write_25(int v);
+extern void sub_064A(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void port_write_24(int v);                                     /* HW port 24 (per 3ffa span); no ROM definition */
+extern void port_write_25(int v);                                     /* HW port 25 (per 3ffa span); no ROM definition */
 
 void routine_3FFA(int a_live)
 {

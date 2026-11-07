@@ -5,7 +5,7 @@
  *
  * Intent: Worker plus triple fanout. Runs 0x67C; sets bit 8 of cell 0x51E; AR2 = 9593; 9 copies (rpt #8) of cell 0x9C8 through AR2 (mvdk); A = cell 0x51F AND 6144, zero tail-calls FRAG_A8B1 (bc 0xa8b1,aeq: has .asm, no C yet, forward extern per convention). Else AL == 2048 tail-calls FRAG_A89B (bc 0xa89b,ntc, C: frag_A89B); else A = cell 0x3082 OR cell 0x2EF7, nonzero tail-calls FRAG_A8B9 (bc 0xa8b9,aneq, C: frag_a8b9_zero); else return. BITF... (cmpm sets TC on equal per ti-c54x op_cmpm).
  */
-extern void sub_067C(void);
+extern void sub_067C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_A8B1(void);
 extern void frag_A89B(void);
 extern void frag_a8b9_zero(void);

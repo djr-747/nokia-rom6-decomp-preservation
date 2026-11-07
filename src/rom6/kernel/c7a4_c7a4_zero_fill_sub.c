@@ -5,7 +5,7 @@
  *
  * Intent: Zero-fill plus table copy. Runs 0x694; A = 0 with 24 stores (rptz a,#23) from AR2 = 10393; then 31 copies (rpt #30) of cell 0xB609 through AR2 = 10417 (mvkd), return.
  */
-extern void sub_0694(void);
+extern void sub_0694(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void c7a4_zero_fill_sub(void)
 {

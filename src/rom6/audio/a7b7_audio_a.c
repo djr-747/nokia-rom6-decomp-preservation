@@ -28,9 +28,9 @@
  * forward externs needed. SUB per op_sub. Bound per .asm header
  * 52w (recombine MATCH).
  */
-extern void sub_0660(void);
+extern void sub_0660(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int port13_stable_read(void);
-extern void cmd_dispatch_port15(void);
+extern void sub_3986(void);
 
 void audio_A_A7B7(int a_live)
 {
@@ -70,6 +70,6 @@ L_A7DD:
 L_A7E5:
     *(volatile int *)0x543 = 7;              /* st #7,*(0x543) */
 L_A7E8:
-    cmd_dispatch_port15();                       /* call 0x3986 */
+    sub_3986();                       /* call 0x3986 */
     /* ret */
 }

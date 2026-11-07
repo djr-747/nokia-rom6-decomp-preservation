@@ -22,8 +22,8 @@
  * entry-live (first pass *AR0 read); A/B internal. Bound 670D-6752 (exit
  * F073@6751->676A + operand 6752).
  */
-extern void frag_6717(void);
-extern void frag_676A(void);
+extern void frag_6717(void); /* joins 670d_frag_670d interior @+0xA; see docs/evidence/extern-triage.md */
+extern void frag_676A(void); /* joins 676a_branch_tail_676a; see docs/evidence/extern-triage.md */
 extern void frag_6753(int b_live);
 extern int sub_6961(int b_in, int *par0, int *par1, int *par2, int *b_out);
 extern void daram_save_restore(void);

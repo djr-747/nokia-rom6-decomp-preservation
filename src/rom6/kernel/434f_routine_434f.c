@@ -19,8 +19,8 @@
  * AR7 (popm; the stepped local dies) and returns. ARs
  * dead at return (flagged). Bound 434F-436B.
  */
-extern void sub_0608(void);
-extern void sub_436C(void);
+extern void sub_0608(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_436C(void); /* joins 436c_routine_436c; see docs/evidence/extern-triage.md */
 
 void routine_434F(int ar7_live)
 {

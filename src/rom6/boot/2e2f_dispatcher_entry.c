@@ -8,7 +8,7 @@
  * exact skip semantics in the .asm), copy cell 0x54C to *(0x853).
  * Return either way.
  */
-extern void helper_05A0(void);
+extern void helper_05A0(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void dispatcher_entry_2E2F(void)
 {

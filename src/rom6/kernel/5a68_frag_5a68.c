@@ -32,7 +32,7 @@
  * BK/AR0/AR4/AR2-window persist across passes (never re-armed inside);
  * AR3/AR1/T re-derived per pass. Bound 5A68-5AAB.
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void frag_5A68(int *par2, int t_live)
 {

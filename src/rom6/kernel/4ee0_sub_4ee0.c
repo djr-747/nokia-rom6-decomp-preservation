@@ -5,9 +5,9 @@
  *
  * Intent: Counter-gated delayed branch. Runs 0x59C (dark, forward extern); A = cell 0x2F1F << 8 (ld shifted form); AR3 = cell 0x2F1E; nonzero AR3 (post-decremented, BANZ per ti-c54x branch_sind: while (ar-- != 0)) tail-enters FRAG_4EF3 with A = cell << 8, AR2 = 12123 (the preset feeds the tail, not dead), and caller-live BRC threaded through as brc_live_in. Else dead AR3/AR4 presets (noted); B = cell 0x250E in the bd delay slot (always runs); branch to dark 0x4EF9 (bd, forward extern). Bound 4EE0-4EF2.
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_4EF3(long a_live_in, int *ar2_in, int brc_live_in);
-extern void frag_4EF9(void);
+extern void frag_4EF9(void); /* joins 4ef3_frag_4ef3 interior @+0x6; see docs/evidence/extern-triage.md */
 
 void sub_4EE0(int brc_live_in)
 {

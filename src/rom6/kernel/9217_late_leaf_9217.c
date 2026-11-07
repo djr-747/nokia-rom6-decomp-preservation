@@ -12,7 +12,7 @@
  * All stores exact (small constants; A-low of -512 = 0xFE00).
  * Bound 9217-9232.
  */
-extern void helper_0594(void);
+extern void helper_0594(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void late_leaf_9217(int ar3_live)
 {

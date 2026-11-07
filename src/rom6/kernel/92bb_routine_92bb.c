@@ -15,10 +15,10 @@
  * last wins); return. A assumed preserved through the dark
  * callees (flagged, 9268 convention). Bound 92BB-92D6.
  */
-extern void helper_0594(void);
+extern void helper_0594(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void late_leaf_9217(int ar3_live);
-extern void sub_9071(void);
-extern void sub_9315(void);
+extern void sub_9071(void); /* joins 9071_kernel_9071; see docs/evidence/extern-triage.md */
+extern void sub_9315(void); /* joins 9315_span_tail_9315; see docs/evidence/extern-triage.md */
 
 void routine_92BB(int *par3)
 {

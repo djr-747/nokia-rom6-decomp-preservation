@@ -8,7 +8,7 @@
  * words outside this span). Runs dark SUB_0652 (call, C: sub_0652 per
  * 40A1). Falls into 0x4009 exterior. Bound 4007-4008.
  */
-extern void sub_0652(void);
+extern void sub_0652(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void port0_txn_4007(void)
 {

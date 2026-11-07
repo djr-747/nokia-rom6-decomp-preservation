@@ -5,7 +5,7 @@
  *
  * Intent: MSG_FILL_8653 entry-call stub (2w). Head-calls dark SUB_0592. No in-tree callers yet.
  */
-extern void sub_0592(void);
+extern void sub_0592(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_8653(void)
 {

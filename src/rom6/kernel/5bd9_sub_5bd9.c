@@ -28,7 +28,7 @@
  * Callers: calld F274 @5B4D/56 (SEG_5B26 twin tail) + @5B6D/76
  * (FRAG_5B5C/68 twin, interior). Bound 5BD9-5BF0.
  */
-extern void sub_0674(void);
+extern void sub_0674(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_5BD9(long a_live, int *par4, int *par5, int ar0_live)
 {

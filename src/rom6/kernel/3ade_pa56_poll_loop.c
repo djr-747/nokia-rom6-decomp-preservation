@@ -5,8 +5,8 @@
  *
  * Intent: PA56 ready-poll plus mask. Runs 0x632; polls port 56 into AL (portr 56,*(0x8): DATA 0x8 aliases AL) until bit 7 clears (and #128,a; bc 0x3ade,aneq self-loop); then A = fresh port 56 masked to bits 5-6 (and #96,a), return it.
  */
-extern void sub_0632(void);
-extern int port_read_56(void);
+extern void sub_0632(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern int port_read_56(void);                                        /* HW port 56 (HPI/pa56 poll per 2baa span); no ROM definition */
 
 int pa56_poll_loop_3ADE(void)
 {

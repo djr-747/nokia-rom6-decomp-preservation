@@ -5,8 +5,8 @@
  *
  * Intent: Cell-equality pair with store tail. Cell 0x34BF == 0 or == 2 tail-enters FRAG_7A5B (bc tc pair: has .asm, no C yet, forward extern). Else stores cell 0x34CA through live-in AR4 (mvdk, AR4 fixed); AR3 = 13502 preset dead after (noted); tail-enters dark 0x7AB0 (b, forward extern). CMPM TC-on-equal per op_cmpm. Bound 7A4B-7A5A.
  */
-extern void frag_7A5B(void);
-extern void frag_7AB0(void);
+extern void frag_7A5B(void); /* joins 7a5b_frag_7a5b; see docs/evidence/extern-triage.md */
+extern void frag_7AB0(void); /* joins 7a5b_frag_7a5b interior @+0x55; see docs/evidence/extern-triage.md */
 
 void frag_7A4B(int *par4)
 {

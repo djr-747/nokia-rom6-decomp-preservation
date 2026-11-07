@@ -18,12 +18,12 @@
  * local (plain +1); ARs/A dead at return (flagged).
  * Bound 3AB6-3ADD (40w).
  */
-extern void sub_0632(void);
+extern void sub_0632(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int pa56_poll_loop_3ADE(void);
-extern void port_write_60(int v);
-extern int port_read_0(void);
-extern void port_write_0(int v);
-extern int port_read_57(void);
+extern void port_write_60(int v);                                     /* HW port 60 (codec stream select per 399e span); no ROM definition */
+extern int port_read_0(void);                                         /* HW port 0 (codec/RF control per 938c homology); no ROM definition */
+extern void port_write_0(int v);                                      /* HW port 0 (codec/RF control per 938c homology); no ROM definition */
+extern int port_read_57(void);                                        /* HW port 57 (codec stream per 399e span); no ROM definition */
 
 void frag_3AB6(int *ar2_in)
 {

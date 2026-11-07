@@ -5,7 +5,7 @@
  *
  * Intent: Flag pair with B handoff. Runs 0x62A (dark, forward extern); bit 1 of cell 0x3EC8 set jumps away to FRAG_3938 (bc tc: has .asm, no C yet, forward extern). Bit 7 of cell 0x51F set runs ROUTINE_3907 (bc tc: has .asm, no C yet, forward extern; tail position). Else B = cell 0x3E7F threaded into dark 0x38AA (b, forward extern with B arg). BITF any-bit TC per op_bitf. Bound 388C-389B.
  */
-extern void sub_062A(void);
+extern void sub_062A(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_3938(void);
 extern void routine_3907(void);
 extern void frag_38AA(int b_live);

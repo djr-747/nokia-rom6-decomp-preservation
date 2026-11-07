@@ -5,7 +5,7 @@
  *
  * Intent: Two-bit select with delayed away-branch. Bits 9-10 of *AR2-live-in clear jumps away to FRAG_95A2 (bc 0x95a2,ntc: has .asm, no C yet, forward extern). Else B = 2, or 4 when bit 10 set (bitf plus xc 1,tc pair), stored to cell 0x21FE; A = 0 is dead (noted); orm #128,*AR4-live-in is the bd delay slot (always runs); branch to FRAG_9667 (bd 0x9667: has .asm, no C yet, forward extern). Bound 9591-95A1.
  */
-extern void frag_95A2(void);
+extern void frag_95A2(void); /* joins 95a2_frag_95a2; see docs/evidence/extern-triage.md */
 extern void frag_9667(void);
 
 void frag_9591(int *par2, int *par4)

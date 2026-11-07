@@ -5,11 +5,11 @@
  *
  * Intent: Worker chain with dead gate. Runs 0x678, 0xA2C3, copies cell 0x22D to 0x265B, then 0xA3C5, 0xA3E1, 0xA4DE. The cc 0xa815,beq never fires: the A4DE tail (ld #1,b, verified bytes in a4de_msg_setup_c.asm) leaves B = 1, so the call is omitted with this citation. Then the A2B9 primitive with AR5 preset -8760 (calld delay slot), return.
  */
-extern void sub_0678(void);
+extern void sub_0678(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void msg_worker_A2C3(void);
 extern void routine_A3C5(void);
 extern void routine_A3E1(void);
-extern void msg_setup_C_A4DE(void);
+extern void msg_setup_C(void);
 extern void msg_primitive_A2B9(int ***ppp5);
 
 static int *G_AR5;
@@ -23,7 +23,7 @@ void head_AFBF(void)
         *(volatile int *)0x22D;                /* mvdk */
     routine_A3C5();                              /* call 0xa3c5 */
     routine_A3E1();                              /* call 0xa3e1 */
-    msg_setup_C_A4DE();                          /* call 0xa4de; B = 1 */
+    msg_setup_C();                          /* call 0xa4de; B = 1 */
     /* cc 0xa815,beq dead: B = 1 per A4DE tail */
     G_AR5 = (int *)-8760;                        /* calld delay slot */
     pp5 = &G_AR5;

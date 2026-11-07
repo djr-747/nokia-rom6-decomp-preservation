@@ -5,7 +5,7 @@
  *
  * Intent: Scaled round-trip with delayed exits. B = *AR1-live-in; bcd delay slots always run (A = *AR1++ times 2045 per MPY Smem,#lk, ti-c54x op_mpy_smem_lk; A += 2045 << 16 per ADD #lk,16, ti-c54x op_add_lk_16). B >= 0 tail-enters dark 0x89FB (bcd bgeq, forward extern). Else B = *AR1 times 2045 stored back; A += *AR1-- << 16 (SXM-on-entry unknown, sign-extend assumed per 71d8) plus 1, stored to *AR1++; A <<= 12 logical (sftl) <<= 8 (sfta) >>= 8 arithmetic; retd delay slots always run (B = A >> 12 arithmetic; high word to *AR1-- per ti-c54x op_sth); return. AR1 modeled in-out. Bound 89F4-8A07.
  */
-extern void frag_89FB(void);
+extern void frag_89FB(void); /* joins 89f4_routine_89f4 interior @+0x7; see docs/evidence/extern-triage.md */
 
 void routine_89F4(int **ppar1)
 {

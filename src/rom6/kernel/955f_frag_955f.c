@@ -14,7 +14,7 @@
  * frag_95A2/frag_9667 have .asm only (forward externs, 89b3 precedent).
  * Bound 955F-956D.
  */
-extern void frag_95A2(long a_live, int ar3_live);
+extern void frag_95A2(long a_live, int ar3_live); /* joins 95a2_frag_95a2; see docs/evidence/extern-triage.md */
 extern void frag_9667(long a_live, int *ar2_live, long b_live);
 
 void frag_955F(int tc_live, long a_live, int ar3_live, int *ar2)

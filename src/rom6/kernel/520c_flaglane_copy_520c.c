@@ -53,11 +53,10 @@
  * Bound 520C-5281 (ret FC00@5281; abuts DISPATCH_SLED_A at 5282).
  * Entry call F074@51D8 (post-RET abut caller).
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void routine_434F(int ar7_live);
 extern void leaf_6F79_fill(void);
-extern void dispatch_sled_A(void);
-
+extern void dispatch_sled_A(void); /* 5282_dispatch_sled_a; see docs/evidence/extern-triage.md */
 void flaglane_copy_520C(int ar7_in)
 {
     long a;

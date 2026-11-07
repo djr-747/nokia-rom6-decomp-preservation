@@ -48,24 +48,24 @@
  * AR5/AR6/ASM set in-span; TC recomputed per test.
  * Bound 4CB4-4D9B + shared ret 0x4D9C (abuts 4D9D).
  */
-extern void sub_0670(void);
+extern void sub_0670(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void hub_5BF1(void);
 extern void routine_5B18(int *par2, int *par3, int ar1_live);
 extern void routine_5AAC(int *par2);
-extern void frag_4DA7(void);
+extern void frag_4DA7(void); /* joins 4da7_dispatch_4da7; see docs/evidence/extern-triage.md */
 extern void sub_924C(int *par3);
 extern void sub_4D9D(int brc_live, int asm_live);
 extern void pa60_57_writer_b(long a_0632_out, int *ar2_in);
 extern int routine_3A81(int a_in);
-extern void frag_807F(void);
-extern void frag_7FDC(void);
-extern void frag_4F6E(void);
+extern void frag_807F(void); /* joins 807f_sub116_807f; see docs/evidence/extern-triage.md */
+extern void frag_7FDC(void); /* joins 7fdc_routine_7fdc; see docs/evidence/extern-triage.md */
+extern void frag_4F6E(void); /* joins 4f6e_sub_4f6e; see docs/evidence/extern-triage.md */
 extern void sub_4EE0(int brc_live_in);
-extern void frag_50B2(void);
-extern void frag_516A(void);
-extern void frag_2C88(void);
+extern void frag_50B2(void); /* joins 50b2_feeder_2f61_50b2; see docs/evidence/extern-triage.md */
+extern void frag_516A(void); /* joins 516a_routine_516a; see docs/evidence/extern-triage.md */
+extern void frag_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 extern void sub_4ECE(void);
-extern void frag_4D9C(void);
+extern void frag_4D9C(void); /* joins 4cb4_frag_4cb4 interior @+0xE8; see docs/evidence/extern-triage.md */
 
 void frag_4CB4(int *ar3_in)
 {

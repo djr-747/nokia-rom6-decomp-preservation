@@ -5,9 +5,9 @@
  *
  * Intent: Zero-block plus call pair. Runs 0x5B0 then the 0x9DDD stub (C: stub_9DDD); six zero stores (cells 0x347F/0x244C/0x3480/0x3B8C/0x3B88/0x3B89); calls 0x2262 with AR2 = 12 in the calld delay slot (executes first); runs 0x5B0 again; return.
  */
-extern void sub_05B0(void);
+extern void sub_05B0(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void stub_9DDD(void);
-extern void sub_2262(void);
+extern void sub_2262(void); /* unowned @0x2262; see docs/evidence/extern-triage.md */
 
 static int *G_AR2;
 

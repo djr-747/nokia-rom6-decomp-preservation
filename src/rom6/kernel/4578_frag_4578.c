@@ -5,7 +5,7 @@
  *
  * Intent: Helper-call plus store. B = AR3 (live-in), call 0x4055, store result through live-in AR4, clear AR6, return.
  */
-extern int sub_4055(int b_in);
+extern int sub_4055(int b_in); /* joins 4055_port0_txn_phase2; see docs/evidence/extern-triage.md */
 
 static int *G_AR6;
 

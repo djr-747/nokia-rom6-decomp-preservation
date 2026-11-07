@@ -20,11 +20,11 @@
  * Bound 372E-3752.
  */
 extern void frag_3753(void);
-extern void sub_2E2F(void);
-extern void sub_E79D(void);
-extern void sub_E80C(void);
-extern void routine_2C88(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void sub_E79D(void); /* joins e79d_ext_call_stub_c; see docs/evidence/extern-triage.md */
+extern void sub_E80C(void); /* joins e80c_blk_e80c; see docs/evidence/extern-triage.md */
+extern void routine_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void frag_372E(int ar0_live, int *ar2_in)
 {
@@ -48,7 +48,7 @@ void frag_372E(int ar0_live, int *ar2_in)
     ar2 += ar0_live;
     *(volatile int *)0x2450 = *ar2;
     ar2 += ar0_live;
-    sub_2E2F();                                      /* call 0x2e2f */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f */
     sub_E79D();                                      /* call 0xe79d */
     sub_E80C();                                      /* call 0xe80c */
     ar3 = (int *)10217;                              /* stm #10217,ar3 */

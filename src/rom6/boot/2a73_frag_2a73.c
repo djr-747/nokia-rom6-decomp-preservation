@@ -5,10 +5,10 @@
  *
  * Intent: Port 49/50/4 sequence with delayed branch. AR2 = cell 0x265E, AR3 = cell 0x2660 (mvdm pair, locals); AR2++; *AR3++ out to ports 49 then 50 (portw pair); cell 0x2660 = AR3 (post-double-step); *AR2++ out to port 4; 12 idle cycles (rpt #11 nop); branch to dark 0x2979 (bd, forward extern) with cell 0x265E = AR2 in the delay slot (always runs, final AR2). 23w per .asm header (recombine MATCH).
  */
-extern void port_write_49(int v);
-extern void port_write_50(int v);
-extern void port_write_4(int v);
-extern void frag_2979(void);
+extern void port_write_49(int v);                                     /* HW port 49 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_50(int v);                                     /* HW port 50 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_4(int v);                                      /* HW port 4 (RF per 3cd2 port4850 seq); no ROM definition */
+extern void frag_2979(void); /* joins 296a_frag_296a interior @+0xF; see docs/evidence/extern-triage.md */
 
 void frag_2A73(void)
 {

@@ -11,7 +11,7 @@
  * (MEAS_RSSI_POSTER) and return.
  */
 extern void msg_header_builder_99A4(void);
-extern void sub_9A11(void);
+extern void sub_9A11(void); /* joins 9a11_msg_payload_copy; see docs/evidence/extern-triage.md */
 extern void meas_rssi_poster_96BD(void);
 
 void meas_dispatch_9414(void)

@@ -5,10 +5,10 @@
  *
  * Intent: Dual-subtract select with delayed tail. Cell 0x250F != 34 runs dark 0x4A7B (bc ntc, forward extern); cell 0x34BF != 3 runs dark 0x4A6B (bc ntc). A = B-live-in minus *(0x366f) (SUB Xmem,src,dst form: dst = (src << 0) - Xmem; B threaded as int param, 40-bit narrowing noted per ALT precedent), zero runs unbound FRAG_4A63 (bc aeq, has .asm, forward extern void: its 0x4A63 entry path overwrites A then branches out before any B/AR use). A = B minus *(0x37B0), zero runs dark 0x4A67 (bc aeq). Else delayed-branch into C FRAG_4AE0 (bd, C-bound with AR5) with *AR5-entry = 3 in the delay slot (always runs, visible to the callee per 2A73). Bound 4A4B-4A62.
  */
-extern void frag_4A7B(void);
-extern void frag_4A6B(void);
-extern void frag_4A63(void);
-extern void frag_4A67(void);
+extern void frag_4A7B(void); /* joins 4a63_frag_4a63 interior @+0x18; see docs/evidence/extern-triage.md */
+extern void frag_4A6B(void); /* joins 4a63_frag_4a63 interior @+0x8; see docs/evidence/extern-triage.md */
+extern void frag_4A63(void); /* joins 4a63_frag_4a63; see docs/evidence/extern-triage.md */
+extern void frag_4A67(void); /* joins 4a63_frag_4a63 interior @+0x4; see docs/evidence/extern-triage.md */
 extern void frag_4AE0(int *par5);
 
 void frag_4A4B(int b_live, int *par5)

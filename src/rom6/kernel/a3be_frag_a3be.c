@@ -8,7 +8,7 @@
  * .asm), call 0x3E53. The two calld delay-slot ops always execute:
  * clear low bits of *AR2 (andm -3073), then B = 0. Return.
  */
-extern void sub_3E53(void);
+extern void sub_3E53(void); /* joins 3e53_port_seq_sweep; see docs/evidence/extern-triage.md */
 
 void frag_A3BE(int a_in, int *par2)
 {

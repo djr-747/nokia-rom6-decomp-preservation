@@ -5,10 +5,10 @@
  *
  * Intent: ISR-tail call wrapper. Abuts ISR_2D5E tail; passes B = 17 to 0x4590, returns.
  */
-extern void sub_4590(int b);
+extern void routine_4590(int b);
 
 void frag_2D8B(void)
 {
-    sub_4590(17);                            /* ld #17,b; call 0x4590 */
+    routine_4590(17);                            /* ld #17,b; call 0x4590 */
     /* ret */
 }

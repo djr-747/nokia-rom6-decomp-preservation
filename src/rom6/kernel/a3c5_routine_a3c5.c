@@ -6,7 +6,7 @@
  * Intent: OR-measure plus conditional call. Runs ROUTINE_A3D5; AR2 = 2324 preset, then calls 0x39A4 only when the measure is nonzero (ccd aneq, AR3 = 9492 preset in the delay slot, always executes), return.
  */
 extern int routine_A3D5(void);
-extern void sub_39A4(void);
+extern void sub_39A4(void); /* joins 39a4_routine_pa60_57; see docs/evidence/extern-triage.md */
 
 static int *G_AR2;
 static int *G_AR3;

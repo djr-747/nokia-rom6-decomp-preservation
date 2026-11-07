@@ -10,7 +10,7 @@
  * 0x238 to 0x23A); else retest 0x2AEB & 15 for the reverse copy.
  * dld/dst move 32-bit cells.
  */
-extern void helper_061C(void);
+extern void helper_061C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 static long dld(int addr) { return ((long)(*(volatile int *)addr) << 16); }
 static void dst(long v, int addr) { *(volatile int *)addr = (int)(v >> 16); }

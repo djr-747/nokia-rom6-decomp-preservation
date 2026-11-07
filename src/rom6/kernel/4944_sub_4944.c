@@ -22,8 +22,8 @@
  * A untouched; B/AR5 internal; AR2 entry passthrough. Bound 4944-4985
  * (exit F073@4984->4996 + operand 4985).
  */
-extern void sub_059E(void);
-extern void frag_4996(void);
+extern void sub_059E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_4996(void); /* joins 4986_frag_4986 interior @+0x10; see docs/evidence/extern-triage.md */
 extern void frag_4986(int *par2);
 
 void frag_4944(int *par2)

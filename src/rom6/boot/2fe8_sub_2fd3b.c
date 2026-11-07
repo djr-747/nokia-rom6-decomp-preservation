@@ -1,7 +1,7 @@
 /* ROM6 0x2FE8 SUB_2FD3B -- 58w (span 2FE8-3021, two entries).
  * Verified encoding: src/rom6/boot/2fe8_sub_2fd3b.asm (recombine MATCH).
  * ORIGIN 0x2FE8
- * EXPECT: 68F8 2549 FDFF F130 0001 F84C 2FF2 68F8 2512 FDFF 7714 254B E745 F130 0001 F84C 2FFB 7715 2514 771A 0003 F072 3001 11D2 8194 8195 7714 0000 61F8 0013 0001 F820 300B 7714 0001 7314 056D F030 0001 F844 301E 74F8 0008 0038 F040 0010 6C84 301A F030 FFEF F495 75F8 0008 0038 F074 2E2F F073 2E64
+ * EXPECT: 68F8 2549 FDFF F130 0001 F84C 2FF2 68F8 2512 FDFF 7714 254B E745 F130 0001 F84C 2FFB 7715 2514 771A 0003 F072 3001 11D2 8194 8195 7714 0000 61F8 0013 0001 F820 300B 7714 0001 7314 056D F030 0001 F844 301E 74F8 0008 0038 F040 0010 6C84 301A F030 FFEF F495 75F8 0008 0038 F074 2E2F F073 2E64 4811 80F8 2649 FE00 80F8 2648
  *
  * Intent: Boot copy-and-poll tail (called by SUB_2FD3A with A = the
  * ldu-loaded byte >>= 8 and AR2 = the advanced cursor; also a TRACE
@@ -35,8 +35,8 @@
  * *ppar4 in the callee, never read). A-out void (dies in the
  * calls); B/AR2/TC outs via the tail call.
  */
-extern int port_read_56(void);
-extern void port_write_56(int v);
+extern int port_read_56(void);                                        /* HW port 56 (HPI/pa56 poll per 2baa span); no ROM definition */
+extern void port_write_56(int v);                                     /* HW port 56 (HPI/pa56 per 2baa span); no ROM definition */
 extern void dispatcher_entry_2E2F(void);
 extern void dispatch_match_loop(int b_live, int *par2, int **ppar4);
 
@@ -72,6 +72,7 @@ static void tail_2FFB(long a, long b, int *ar2, int *ar4, int *ar5)
     ar4slot = (int *)(long)(ar4v & 0xFFFF);          /* AR4 post-decrement (wrap exact) */
     dispatch_match_loop((int)(b & 0xFFFF), ar2, &ar4slot);
     /* b 0x2e64 tail */
+    /* 3022 dead lane (unreachable past unconditional b; ldm/retd + delays not modeled, 5886 precedent) */
 }
 
 void frag_2FF2(long a_in, int *ar2_in)

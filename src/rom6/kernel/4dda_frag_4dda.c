@@ -10,7 +10,7 @@
  * carrying live AR3/BK/AR1). Post-baccd head, chain-link 1/5 (per
  * header). Bound 4DDA-4DE1.
  */
-extern void frag_4E00(int ar3_live, int bk_live, int ar1_live);
+extern void frag_4E00(int ar3_live, int bk_live, int ar1_live); /* joins 4dfa_frag_4dfa interior @+0x6; see docs/evidence/extern-triage.md */
 
 void frag_4DDA(int ar3_live)
 {

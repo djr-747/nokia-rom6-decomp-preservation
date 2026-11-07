@@ -39,9 +39,9 @@
 extern void sub_05A8(void);                              /* dark, no symbol */
 extern int routine_A3D5(void);                           /* C-bound, A-out as return */
 extern void routine_pa60_57(int *ar2_in, int *ar3_in);   /* C-bound */
-extern int port_read_2(void);
-extern void port_write_2(int v);
-extern void port_write_1(int v);
+extern int port_read_2(void);                                         /* HW port 2 (FRAME sample combine per 27EB span); no ROM definition */
+extern void port_write_2(int v);                                      /* HW port 2 (supervisor per 2875 precedent); no ROM definition */
+extern void port_write_1(int v);                                      /* HW port 1 (RF/codec per 3EE1 sweep); no ROM definition */
 
 void sub_B358(void)
 {

@@ -19,7 +19,7 @@
  * caller-live throughout; ARs dead at return (flagged).
  * Bound 99E6-99FE.
  */
-extern void sub_05CE(void);
+extern void sub_05CE(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_99FF(int ar1_live, int ar0_live);
 
 void routine_99E6(int *ar2_in, int ar0_live)

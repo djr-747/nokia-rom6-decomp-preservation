@@ -1,7 +1,7 @@
 /* ROM6 0x8611 COPY14_8611 -- 13w.
  * Verified encoding: src/rom6/kernel/8611_copy14_8611.asm (recombine MATCH).
  * ORIGIN 0x8611
- * EXPECT: 4A15 EC05 E58B 8A15 7712 04F5 4492 1A8A 4595 1B8D F1C0 8395 818D
+ * EXPECT: 4A15 EC05 E58B 8A15 7712 04F5 4492 1A8A 4595 1B8D F1C0 8395 818D FC00
  *
  * Intent: 32-bit XOR combine. Copy 6 cells AR2 to AR5 (AR5
  * save/restored), then form two 32-bit words (high cell shifted 16
@@ -23,4 +23,5 @@ void copy14_8611(int *p2, int *p5)
     b ^= a;                                       /* xor a,b */
     p5[0] = (unsigned short)(b >> 16);            /* sth b,*ar5+ */
     p5[1] = (unsigned short)b;                    /* stl b,*ar5- */
+    /* ret @861E (exit; gap orphan annexed wave-13) */
 }

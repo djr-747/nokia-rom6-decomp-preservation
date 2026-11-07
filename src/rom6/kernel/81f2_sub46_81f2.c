@@ -20,8 +20,8 @@
  * post-return consumer (callers @817F/819A/81A3/81B5 sit in the 810A gap
  * region, unanalyzed), flagged. A/B dead at return, flagged.
  */
-extern void sub_066E(void);
-extern void frag_8220(void);
+extern void sub_066E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_8220(void); /* joins 8220_caller_seq_8220; see docs/evidence/extern-triage.md */
 
 void sub_81F2(void)
 {

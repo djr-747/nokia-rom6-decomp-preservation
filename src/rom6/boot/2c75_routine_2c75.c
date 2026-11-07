@@ -5,8 +5,8 @@
  *
  * Intent: Port 2 handshake. Clears cells 0x866/0x54C; AL = port 2 (portr 2,*(0x8): AL alias); clears low 2 bits (and #-3,a, AL alias cell follows); PORT[2] = AL back; sets bits 2 and 9 of the IMR cell *(0x0) (orm #516), return.
  */
-extern int port_read_2(void);
-extern void port_write_2(int v);
+extern int port_read_2(void);                                         /* HW port 2 (FRAME sample combine per 27EB span); no ROM definition */
+extern void port_write_2(int v);                                      /* HW port 2 (supervisor per 2875 precedent); no ROM definition */
 
 void routine_2C75(void)
 {

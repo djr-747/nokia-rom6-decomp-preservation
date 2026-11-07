@@ -5,7 +5,7 @@
  *
  * Intent: FRAG_9BF5 step tail (3w). AR7-entry steps once (mar *ar7+, plain post-increment, linear); tail-enters dark 0x9C15 (b, forward extern; stepped AR7 live into it, noted).
  */
-extern void frag_9C15(void);
+extern void frag_9C15(void); /* joins 9c13_frag_9c13 interior @+0x2; see docs/evidence/extern-triage.md */
 
 void frag_9BF5(int *par7)
 {

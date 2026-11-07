@@ -1,7 +1,7 @@
-/* ROM6 0x82A5 BIT_EXTRACT_82A5 -- 16w.
+/* ROM6 0x82A5 BIT_EXTRACT_82A5 -- 18w (wave-13: retd delays annexed).
  * Verified encoding: src/rom6/kernel/82a5_bit_extract_82a5.asm (recombine MATCH).
  * ORIGIN 0x82A5
- * EXPECT: 4582 448A 1B92 F2C2 F2C3 F2C5 F2C6 8294 448A F2C1 F2C4 F2C6 FD30 8294 F2C2 FE00
+ * EXPECT: 4582 448A 1B92 F2C2 F2C3 F2C5 F2C6 8294 448A F2C1 F2C4 F2C6 FD30 8294 F2C2 FE00 F2C3 8294
  *
  * Intent: XOR bit-extract pair. B = (cellAR2 << 16); A =
  * (cellAR2 << 16), AR2--; B |= cellAR2, AR2++ (net AR2 unchanged
@@ -13,7 +13,7 @@
  * (xc 1,tc covers the single sth, per ti-c54x op_xc); A ^= B<<2;
  * retd with delays in the next span (always run there, flagged).
  * TC caller-live (no in-span writer). AR2/AR4 caller-live,
- * dead at return. Bound 82A5-82B4.
+ * dead at return. Bound 82A5-82B6.
  */
 void bit_extract_82A5(int *ar2_in, int *ar4_in, int tc_live)
 {
@@ -40,6 +40,8 @@ void bit_extract_82A5(int *ar2_in, int *ar4_in, int tc_live)
     if (tc)                                          /* xc 1,tc (taken runs sth) */
         *ar4++ = (int)((a >> 16) & 0xFFFF);          /* sth a,*ar4+ */
     a = (long)((unsigned long)a ^ ((unsigned long)b << 2));  /* xor b,2,a */
-    /* retd (delays in next span, always run there) */
+    /* retd @82B4; delays always run: */
+    a = (long)((unsigned long)a ^ ((unsigned long)b << 3));  /* xor b,3,a @82B5 */
+    *ar4++ = (int)((a >> 16) & 0xFFFF);              /* sth a,*ar4+ @82B6 */
     (void)a; (void)b;                                /* A/B dead at return (flagged) */
 }

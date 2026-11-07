@@ -17,8 +17,8 @@
  * doubles as step and 3640 out-param), dead after. Bound 35A0-35BA.
  */
 extern void frag_3640(int a_live, int *par3, int *par4, int *par0_out);
-extern void sub_2E2F(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void frag_35A0(int *ar2_in, int ar0_live, int *par0_out)
 {
@@ -45,6 +45,6 @@ void frag_35A0(int *ar2_in, int ar0_live, int *par0_out)
     /* call always runs: */
     frag_3640((int)a, ar3, ar4, par0_out);           /* call 0x3640 */
     /* 3640 never returns (flagged): below dead */
-    sub_2E2F();                                      /* call 0x2e2f (dark) */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f (dark) */
     frag_2E64();                                     /* b 0x2e64 (dark tail) */
 }

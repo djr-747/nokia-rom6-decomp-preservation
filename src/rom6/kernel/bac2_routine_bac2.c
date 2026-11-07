@@ -14,7 +14,7 @@
  * the retd delay stores AR3 to cell0x54A (always runs); return
  * (ARs dead, flagged). Bound BAC2-BADA.
  */
-extern void sub_06A6(void);
+extern void sub_06A6(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void routine_BAC2(int *ar2_in)
 {

@@ -22,11 +22,11 @@
  * out to the dark tail (liveness flagged). AR2/AR0 caller-live (value,
  * step). No ret: every path tails. Bound 3273-32B3 (abuts 3273b @32B4).
  */
-extern void sub_2E2F(void);
-extern void frag_2E64(void);
-extern int port_read_33(void);
-extern void port_write_33(int v);
-extern void port_write_36(int v);
+extern void dispatcher_entry_2E2F(void);
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
+extern int port_read_33(void);                                        /* HW port 33 (SAMPLE handshake per 22F3 span); no ROM definition */
+extern void port_write_33(int v);                                     /* HW port 33 (SAMPLE handshake per 22F3 span); no ROM definition */
+extern void port_write_36(int v);                                     /* HW port 36 (per 3273/4b06 spans); no ROM definition */
 
 void sub_3273A(int *ar2_in, int ar0_live, int b_live_in)
 {
@@ -55,7 +55,7 @@ void sub_3273A(int *ar2_in, int ar0_live, int b_live_in)
         *ar4++ = *ar2;                          /* mvdd *ar2+0%,*ar4+ */
         ar2 += ar0_live;                        /* +0% (wrap flagged) */
     }
-    sub_2E2F();                                 /* call 0x2e2f (dark, always runs) */
+    dispatcher_entry_2E2F();                                 /* call 0x2e2f (dark, always runs) */
     a = (long)(unsigned)ar5;                    /* ldm ar5,a (zero-extend) */
     a -= 96;                                    /* sub #96,a */
     if (a != 0) {                               /* bc 0x2e64,aneq */

@@ -1,5 +1,6 @@
 ; ROM6 0x3179 SUB_3179 -- 28w, symbols.yaml program_word.
 ; Evidence: Bound 3179-3194 (22w); entry TRACE (same histogram: 3179-3193 heads x2); exits b F073@3193->2E64; tail 3195-3198 (orm/ret) unexecuted, stays dark; HYPOTHESIS.
+; Wave-13: second-exit lane @3195-3198 annexed (gap orphan; orm + ret).
 ; ORIGIN 0x3179
 	.sect ".text"
 	.global _start
@@ -23,3 +24,5 @@ _start:
 	stl    a,*ar4
 	call   0x2e2f
 	b      0x2e64
+	orm    #256,*(0x2627)
+	ret

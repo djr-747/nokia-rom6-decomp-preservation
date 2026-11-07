@@ -5,7 +5,7 @@
  *
  * Intent: SPAN_HEAD_8675 constant store with delayed return (9w). Runs dark SUB_0592; cell 0x10FE = 23; A = 0; cell 0x10FF = A low in the retd delay slot (always runs); returns. A dies, void.
  */
-extern void sub_0592(void);
+extern void sub_0592(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void frag_8675(void)
 {

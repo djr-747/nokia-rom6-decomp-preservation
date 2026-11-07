@@ -5,7 +5,7 @@
  *
  * Intent: Dispatcher-entry wrapper. Runs helper 0x6F4, then the 0x2E2F dispatcher entry, returns.
  */
-extern void helper_06F4(void);
+extern void helper_06F4(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void dispatcher_entry_2E2F(void);
 
 void frag_45FA(void)

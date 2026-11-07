@@ -5,8 +5,8 @@
  *
  * Intent: Measure router. Runs 0x632 then 0x3ADE; A == 64 tail-enters FRAG_3A8E with B = 0 (bc 0x3a8e,beq, exact). Else B = A - 32; zero keeps A (rc beq skips the clear), nonzero clears A; returns A. Routine entry also reachable via calld F274@4D17.
  */
-extern void sub_0632(void);
-extern void sub_3ADE(void);
+extern void sub_0632(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_3ADE(void); /* joins 3ade_pa56_poll_loop; see docs/evidence/extern-triage.md */
 extern int frag_3A8E(int b_in);
 
 int routine_3A81(int a_in)

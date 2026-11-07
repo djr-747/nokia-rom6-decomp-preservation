@@ -16,8 +16,8 @@
  * caller-live (value), dead after (dark-call liveness flagged).
  * Bound 32EE-3305.
  */
-extern void sub_2E2F(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void worker_32EE(int *ar2_in, int ar0_live)
 {
@@ -44,6 +44,6 @@ void worker_32EE(int *ar2_in, int ar0_live)
     *ar3 &= -65;                                     /* andm #-65,*ar3 */
     if (tc)                                          /* xc 2,tc (covers orm only) */
         *ar3 |= 64;                                  /* orm #64,*ar3 */
-    sub_2E2F();                                      /* call 0x2e2f (dark, always runs) */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f (dark, always runs) */
     frag_2E64();                                     /* b 0x2e64 (dark tail) */
 }

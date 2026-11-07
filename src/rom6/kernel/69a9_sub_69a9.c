@@ -16,7 +16,7 @@
  * return. Callers land on 0x69A9 with AR1 live (and *ar1 read
  * first). Bound 69A9-69BD.
  */
-extern void sub_0598(void);
+extern void sub_0598(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_69A9(int *ar1)
 {

@@ -14,7 +14,7 @@
  * 32640 again; *1222 = A-low (stl); returns. A/B/AR2/AR3 all internal.
  * Bound B605-B61E (exit FC00@B61E).
  */
-extern void frag_B61F(long b_live);
+extern void frag_B61F(long b_live); /* joins b61f_frag_b61f; see docs/evidence/extern-triage.md */
 
 void frag_B605(void)
 {

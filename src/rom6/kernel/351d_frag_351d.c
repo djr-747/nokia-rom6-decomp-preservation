@@ -16,9 +16,9 @@
  * unbound, flagged); tail-branch dark 0x2E64. AR2/AR0 caller-live,
  * dead after (dark-call liveness flagged). Bound 351D-3537.
  */
-extern void sub_2E2F(void);
-extern void sub_93CE(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void sub_93CE(void); /* joins 93ce_msg_classify_by_caller; see docs/evidence/extern-triage.md */
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void frag_351D(int ar4_live, int *ar2_in, int ar0_live)
 {
@@ -40,7 +40,7 @@ void frag_351D(int ar4_live, int *ar2_in, int ar0_live)
             ar2 += ar0_live;                         /* +0% (wrap flagged) */
         }
     }
-    sub_2E2F();                                      /* call 0x2e2f (dark) */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f (dark) */
     tc = (*(volatile int *)0x20FF & 1536) != 0;      /* bitf *(0x20ff),#1536 */
     /* stm #248,ar0 (dead, noted) */
     a = 28;                                          /* ld #28,a (dead, flagged) */

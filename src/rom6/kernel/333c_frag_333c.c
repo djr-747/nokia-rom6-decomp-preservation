@@ -1,7 +1,7 @@
 /* ROM6 0x333C FRAG_333C -- 36w.
  * Verified encoding: src/rom6/kernel/333c_frag_333c.asm (recombine MATCH).
  * ORIGIN 0x333C
- * EXPECT: 6182 4000 68F8 263A E3FF F820 3346 69F8 263A 1800 6F82 0C58 F030 003F 11D2 F330 003F 7714 03B5 80F8 2655 8194 EC1E E5CA 61F8 3EC8 0040 F495 F495 FF30 EC03 E5CA F074 2E2F F073 2E64
+ * EXPECT: 6182 4000 68F8 263A E3FF F820 3346 69F8 263A 1800 6F82 0C58 F030 003F 11D2 F330 003F 7714 03B5 80F8 2655 8194 EC1E E5CA 61F8 3EC8 0040 F495 F495 FF30 EC03 E5CA F074 2E2F F073 2E64 69F8 054F 0002 FC00
  *
  * Intent: Bit-gated block copy with tail chain. TC = bit 14
  * of *AR2 (bitf single-bit mask, both TC senses coincide);
@@ -19,10 +19,10 @@
  * precedent: xc covers rpt + mvdd, skips it whole);
  * runs 0x2E2F (extern) then tail-branches to frag_2E64
  * (extern). ARs/A/B dead into the tail (flagged). Bound
- * 333C-335F.
+ * 333C-3363 (second-exit orm lane dead past unconditional b).
  */
-extern void sub_2E2F(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void frag_333C(int ar0_live, int *ar2_in)
 {
@@ -55,6 +55,7 @@ void frag_333C(int ar0_live, int *ar2_in)
             ar2 += ar0_live;                         /* +0% (wrap flagged) */
         }
     }
-    sub_2E2F();                                      /* call 0x2e2f */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f */
     frag_2E64();                                      /* b 0x2e64 (tail) */
+    /* 3360 dead lane (unreachable past unconditional b; orm + ret not modeled, 5886 precedent) */
 }

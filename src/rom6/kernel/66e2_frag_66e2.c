@@ -5,10 +5,10 @@
  *
  * Intent: Masked compare-and-rebias pair. B = cell 0x54F, A = B AND 256, zero runs dark 0x66F2 (bc aeq, forward extern). Else runs dark SUB_68A2; A = B minus *AR5-entry (SUB Xmem,SHFT,src,dst with SHFT 0, AR5 threaded as param, unstepped), non-negative runs 0x66F2 (bc ageq, signed per 6871). Else *AR5-entry = B low, cell 0x56C = 1. Second verse: B = cell 0x54F, A = B AND -32768, zero tail-enters dark 0x676A (bc aeq). Else runs dark SUB_688D; A = B minus *AR5, non-negative tail-enters 0x676A (bc ageq). Else A = *AR5, *AR5 = B low; B += 4, B -= A; nonzero clears cell 0x56C (bc beq skips the store when B == 0, same shape as 4474); sets bit 10 of cell 0x51E; tail-enters dark 0x676A (b). 16-bit narrowing noted throughout. Bound 66E2-670C.
  */
-extern void frag_66F2(void);
+extern void frag_66F2(void); /* joins 66e2_frag_66e2 interior @+0x10; see docs/evidence/extern-triage.md */
 extern void sub_68A2(void);
-extern void sub_688D(void);
-extern void frag_676A(void);
+extern void sub_688D(void); /* joins 688d_sub14_688d; see docs/evidence/extern-triage.md */
+extern void frag_676A(void); /* joins 676a_branch_tail_676a; see docs/evidence/extern-triage.md */
 
 void frag_66E2(int *par5)
 {

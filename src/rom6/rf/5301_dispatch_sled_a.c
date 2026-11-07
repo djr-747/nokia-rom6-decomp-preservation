@@ -5,7 +5,7 @@
  *
  * Intent: Table-copy sled with conditional extra block. AR2 = 0x2650, AR1 = 0x250F; *AR1 == 128 skips the mask lane (bc tc to the shared load at 0x5312). Else AR2 = 0x264F, A = 240 AND *AR1 (ld plus AND Smem,src); AL-alias cell != 32 rejoins at 0x5315 (cmpm ntc); shared load A = *AR2, nonzero runs dark 0x56B9 (bc aneq, forward extern). Cell 0x2476 != 5 runs unbound FRAG_5336 (bc ntc, has .asm, forward extern; AR1/AR2 live, intake unobservable). Else copies 13 words 0x2545 to 0x250E (rpt/mvdd) and 32 words 0x2552 to 0x251B (rpt/mvdd); TC = bit 6 of cell 0x3EC8 (bitf, settle nops) also copies 4 more words (xc 2,tc over rpt/mvdd, exact skip per 4EBC); clears bit 3 of cell 0x2627, sets bit 7 of 0x2512; tail-enters C MSG_PRODUCER_CONVERGE_56B7 (b, C-bound). Bound 5301-5335.
  */
-extern void frag_56B9(void);
+extern void frag_56B9(void); /* joins 56b7_msg_producer_converge interior @+0x2; see docs/evidence/extern-triage.md */
 extern void frag_5336(void);
 extern void msg_producer_converge_56B7(void);
 

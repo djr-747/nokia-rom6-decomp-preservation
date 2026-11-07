@@ -11,7 +11,7 @@
  * 3115-class miscount (both paths hit the store, exact). Bound
  * 7CA5-7CB5.
  */
-extern int sub_059E(void);
+extern int sub_059E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_7CA5(int *par4)
 {

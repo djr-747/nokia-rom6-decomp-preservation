@@ -28,8 +28,8 @@
  * local; xc 2,bgt over andm #-513). A = 0, returns. A/B internal;
  * AR0/AR1/AR5 cursor locals. Bound 5905-5992 (exit FC00@5992).
  */
-extern void sub_059C(void);
-extern void sub_58E0(int a_live);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_58E0(int a_live); /* joins 58e0_sub_58e0; see docs/evidence/extern-triage.md */
 
 void frag_5905(void)
 {

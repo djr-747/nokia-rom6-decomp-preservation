@@ -40,18 +40,18 @@
  * Live-ins are read after the dark 0x063C head (values post-call,
  * flagged); AR0/A restored at return, B/AR1 dead (flagged).
  */
-extern void sub_063C(void);
-extern void sub_3CD2(long a_live);
-extern void sub_25D9(void);
-extern int port_read_33(void);
-extern void port_write_33(int v);
-extern int port_read_43(void);
-extern void port_write_43(int v);
-extern int port_read_3(void);
-extern void port_write_3(int v);
-extern void port_write_10(int v);
-extern void port_write_11(int v);
-extern void port_write_9(int v);
+extern void sub_063C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_3CD2(long a_live); /* joins 3cd2_port4850_seq; see docs/evidence/extern-triage.md */
+extern void sub_25D9(void); /* unowned @0x25D9; see docs/evidence/extern-triage.md */
+extern int port_read_33(void);                                        /* HW port 33 (SAMPLE handshake per 22F3 span); no ROM definition */
+extern void port_write_33(int v);                                     /* HW port 33 (SAMPLE handshake per 22F3 span); no ROM definition */
+extern int port_read_43(void);                                        /* HW port 43 (RF per 3e53 sweep); no ROM definition */
+extern void port_write_43(int v);                                     /* HW port 43 (RF per 3e53 sweep); no ROM definition */
+extern int port_read_3(void);                                         /* HW port 3 (supervisor cell per 2088 span); no ROM definition */
+extern void port_write_3(int v);                                      /* HW port 3 (supervisor cell per 2088 span); no ROM definition */
+extern void port_write_10(int v);                                     /* HW port 10 (RF per 3d79/3EE1 spans); no ROM definition */
+extern void port_write_11(int v);                                     /* HW port 11 (RF per 3e53 sweep + 3ef3 config spans); no ROM definition */
+extern void port_write_9(int v);                                      /* HW port 9 (RF per 389c/3d79 spans); no ROM definition */
 
 void pshm_kernel_caller_3D79(long a_live_in, long b_live_in,
                              int ar1_in, int ar2_in, int ar3_in)

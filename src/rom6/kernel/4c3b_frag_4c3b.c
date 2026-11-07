@@ -6,7 +6,7 @@
  * Intent: Compare rung 219. A-live-in - 219 nonzero to FRAG_4C41 (bc bneq: has .asm, no C yet, forward extern), equal to dark 0x706 (b, forward extern). Bound 4C3B-4C40.
  */
 extern void frag_4C41(void);
-extern void frag_0706(void);
+extern void frag_0706(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void frag_4C3B(int a_live)
 {

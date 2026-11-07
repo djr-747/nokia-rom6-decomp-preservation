@@ -13,8 +13,8 @@
  * (void per the 381b/3850 precedent; B clobber risk flagged).
  * AR2/AR5 caller-live (values), dead after. Bound 3862-3878.
  */
-extern void sub_2C88(void);
-extern void frag_37DF(void);
+extern void sub_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
+extern void frag_37DF(void); /* joins 37d8_frag_37d8 interior @+0x7; see docs/evidence/extern-triage.md */
 
 void frag_3862(int *ar2_in, int ar5_live, int ar0_live)
 {

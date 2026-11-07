@@ -5,9 +5,9 @@
  *
  * Intent: Port 4 strobe plus stage. Bit 9 of *AR3-live-in set jumps away to dark 0x2AC0 (bc ntc, forward extern). Else clears cell 0x13D0; cell 96 = 15000 out to port 4 (portw *ar2,4); 21 idle cycles (rpt #20 nop); moves cell 96 to cell 0x58E (mvdk, AR2 steps to 97, dead after); tail-enters dark 0x2979 (b, forward extern). Bound 2A5F-2A72.
  */
-extern void frag_2AC0(void);
-extern void port_write_4(int v);
-extern void frag_2979(void);
+extern void frag_2AC0(void); /* joins 2a8a_frag_2a73 interior @+0x36; see docs/evidence/extern-triage.md */
+extern void port_write_4(int v);                                      /* HW port 4 (RF per 3cd2 port4850 seq); no ROM definition */
+extern void frag_2979(void); /* joins 296a_frag_296a interior @+0xF; see docs/evidence/extern-triage.md */
 
 void frag_2A5F(int *par3)
 {

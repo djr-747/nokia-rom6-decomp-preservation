@@ -8,7 +8,7 @@
  * AR4, then run the 0x853B fanout driver and return.
  */
 extern void block_copy_8588(int *src);
-extern void sub_85FD(void);
+extern void sub_85FD(void); /* joins 85fd_block_copy_85fd; see docs/evidence/extern-triage.md */
 extern void fanout26_853B(int **pp1, int *ar4, int *ar6);
 
 void fanout_8555(int **pp5, int **pp1, int *ar6)

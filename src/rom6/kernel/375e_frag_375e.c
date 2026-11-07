@@ -7,7 +7,7 @@
  */
 extern void frag_3775(void);
 extern void dispatcher_entry_2E2F(void);
-extern void routine_2C88(void);
+extern void routine_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 extern void dispatch_match_loop(void);
 
 void frag_375E(void)

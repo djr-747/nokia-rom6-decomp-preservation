@@ -52,8 +52,8 @@
  * AR1/AR3/AR5 untouched; A/B rewritten after the dark head call).
  * Bound 5886-58DF (ret FC00@58DF; abuts pooled SUB_58E0 at 58E0).
  */
-extern void sub_059C(void);
-extern void sub_58E0(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_58E0(void); /* joins 58e0_sub_58e0; see docs/evidence/extern-triage.md */
 
 void frag_5886(void)
 {

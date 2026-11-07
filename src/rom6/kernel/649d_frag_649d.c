@@ -5,7 +5,7 @@
  *
  * Intent: B store plus join. Stores B-live-in through live-in AR5; tail-enters 0x676A (b: BRANCH_TAIL_676A head, has .asm, no C yet, forward extern). EXPECT includes the shared branch-operand word at 0x649F (shared with the next head per 8AA5 precedent; single-word boundary overlap allowed). Bound 649D-649E per yaml (operand shared).
  */
-extern void frag_676A(void);
+extern void frag_676A(void); /* joins 676a_branch_tail_676a; see docs/evidence/extern-triage.md */
 
 void frag_649D(int b_live, int *par5)
 {

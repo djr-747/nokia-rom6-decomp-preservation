@@ -6,7 +6,7 @@
  * Intent: Gated lane with shared tail. Same shape as LANE_AFF9 with AR5 presets -8716/-8711 and the shared B07B tail (bytes F274 A2B9 7715 DDF9 FC00, byte-identical to the own tail, cited); all four gates jump there; else far call 0x18060 first.
  */
 extern void msg_primitive_A2B9(int ***ppp5);
-extern void far_18060(void);
+extern void far_18060(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
 
 static int *G_AR5;
 

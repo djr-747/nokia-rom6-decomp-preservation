@@ -10,7 +10,7 @@
  * if that sum is >= 0 use it, else add cell 0x250C as well. Store
  * the result to 0x563 and return delayed.
  */
-extern void helper_0598(void);
+extern void helper_0598(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void stage_69A6(void);           /* chained continuation */
 extern int div_core_4384(int a16);      /* fixed cells: divisor @9484
                                          * (AR4), aux @12049 (AR2, set in

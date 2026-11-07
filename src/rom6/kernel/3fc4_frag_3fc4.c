@@ -15,14 +15,14 @@
  * op); tail-enters 0x3FBA (b). AR2 the only entry-live register.
  * Bound 3FC4-3FF9 (exit F073@3FF8->3FBA + operand 3FF9).
  */
-extern int sub_4007(int a_in, int b_in);
-extern void portw_par2_port43(int *par2);
-extern void portw_cell16014_port37(void);
-extern void portw_cell16015_port38(void);
-extern void portw_par2_port17(int *par2);
-extern void portr_port12_cell0B(void);
-extern void portw_cell0B_port12(void);
-extern void frag_3FBA(void);
+extern int sub_4007(int a_in, int b_in); /* joins 4007_port0_txn; see docs/evidence/extern-triage.md */
+extern void portw_par2_port43(int *par2); /* HW port alias, emulator-provided */
+extern void portw_cell16014_port37(void); /* HW port alias, emulator-provided */
+extern void portw_cell16015_port38(void); /* HW port alias, emulator-provided */
+extern void portw_par2_port17(int *par2); /* HW port alias, emulator-provided */
+extern void portr_port12_cell0B(void); /* HW port alias, emulator-provided */
+extern void portw_cell0B_port12(void); /* HW port alias, emulator-provided */
+extern void frag_3FBA(void); /* joins 3ef3_port_config_3ef3 interior @+0xC7; see docs/evidence/extern-triage.md */
 
 void frag_3FC4(int *par2)
 {

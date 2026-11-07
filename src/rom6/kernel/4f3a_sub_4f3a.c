@@ -20,7 +20,7 @@
  * A/B/C/AR1/BRC all set in-span; AR2/AR3 untouched; T unused;
  * TC recomputed. Bound 4F3A-4F5E (abuts 4F5F).
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_4F3A(void)
 {

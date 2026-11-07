@@ -21,13 +21,13 @@
  * A/B entry-live (B 40-bit long); AR2 entry cursor, re-pointed locally.
  * Bound 978F-97DC (ret FC00@97DC).
  */
-extern void routine_9682(void);
-extern void portr_port0_par2(int *par2);
-extern void portw_par2_port0(int *par2);
-extern void portr_port54_par2(int *par2);
-extern void portw_par2_port54(int *par2);
-extern void portr_port54_cell0B(void);
-extern void portw_cell0B_port54(void);
+extern void routine_9682(void); /* joins 9682_routine_9682; see docs/evidence/extern-triage.md */
+extern void portr_port0_par2(int *par2); /* HW port alias, emulator-provided */
+extern void portw_par2_port0(int *par2); /* HW port alias, emulator-provided */
+extern void portr_port54_par2(int *par2); /* HW port alias, emulator-provided */
+extern void portw_par2_port54(int *par2); /* HW port alias, emulator-provided */
+extern void portr_port54_cell0B(void); /* HW port alias, emulator-provided */
+extern void portw_cell0B_port54(void); /* HW port alias, emulator-provided */
 
 void frag_978F(int a_live, long b_live, int *par2)
 {

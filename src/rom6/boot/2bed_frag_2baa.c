@@ -5,11 +5,11 @@
  *
  * Intent: Port 56/2 relay segment. A = port 56 (portr, AL alias) AND -9, out to port 56; A = port 2 OR 2048, out to port 2; tail-enters dark 0x283D (b, forward extern). Second segment of FRAG_2BAA (bounds 2BAA-2BEC + 2BED-2C02 per .asm header; entered via interior join, exit to 283D; recombine MATCH).
  */
-extern int port_read_56(void);
-extern void port_write_56(int v);
-extern int port_read_2(void);
-extern void port_write_2(int v);
-extern void frag_283D(void);
+extern int port_read_56(void);                                        /* HW port 56 (HPI/pa56 poll per 2baa span); no ROM definition */
+extern void port_write_56(int v);                                     /* HW port 56 (HPI/pa56 per 2baa span); no ROM definition */
+extern int port_read_2(void);                                         /* HW port 2 (FRAME sample combine per 27EB span); no ROM definition */
+extern void port_write_2(int v);                                      /* HW port 2 (supervisor per 2875 precedent); no ROM definition */
+extern void frag_283D(void); /* joins 2800_stretch_2800 interior @+0x3D; see docs/evidence/extern-triage.md */
 
 void frag_2BAA_seg2(void)
 {

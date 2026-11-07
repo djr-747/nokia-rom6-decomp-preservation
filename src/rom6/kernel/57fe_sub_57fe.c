@@ -5,8 +5,8 @@
  *
  * Intent: Block copy plus call. Runs 0x59C; copies 9 words (rpt #8) from AR2 = 2322 to AR3 = 2332 (mvdd *ar2+,*ar3+); calls 0x425F with AR2 = 2332 in the calld delay slot (executes first), return.
  */
-extern void sub_059C(void);
-extern void sub_425F(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_425F(void); /* joins 425f_arith_blk_425f; see docs/evidence/extern-triage.md */
 
 static int *G_AR2;
 static int *G_AR3;

@@ -23,7 +23,7 @@
  * hub callers; B/T dead at RET @5C4E. AR5/AR0/AR1/A caller-live;
  * ASM untouched. Bound 5C34-5C4E.
  */
-extern void sub_0674(void);
+extern void sub_0674(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_5C34(long a_live, int ar1_live, int *par5, int ar0_live)
 {

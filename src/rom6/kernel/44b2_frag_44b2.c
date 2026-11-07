@@ -5,7 +5,7 @@
  *
  * Intent: Dispatcher plus byte extract. Runs helpers 0x594 and the 0x2E2F dispatcher entry, takes the low byte of cell 0x2F00 into cell 0x54D, returns it.
  */
-extern void helper_0594(void);
+extern void helper_0594(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void dispatcher_entry_2E2F(void);
 
 int frag_44B2(void)

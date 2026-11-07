@@ -5,9 +5,9 @@
  *
  * Intent: Dual-port relay with unlock. B-live-in |= 0x8000 (or #-32768,b); clears bit 5 of cell 0x549 (andm #-33); BL out to port 2 (portw *(0xb),2: DATA 0xB aliases BL); BL = port 55 (portr 55,*(0xb)) AND -17 (clears bit 4) out to port 55; clears INTM (rsbx st1,intm, hardware state per 399e); calls dispatcher_entry_2E2F; tail-enters DISPATCH_MATCH_LOOP (b 0x2e64, forward extern). Only BL observed downstream, int model exact. Bound 37C0-37D7.
  */
-extern int port_read_55(void);
-extern void port_write_55(int v);
-extern void port_write_2(int v);
+extern int port_read_55(void);                                        /* HW port 55 (codec ctrl per 938c/37c0 spans); no ROM definition */
+extern void port_write_55(int v);                                     /* HW port 55 (codec ctrl per 938c/37c0 spans); no ROM definition */
+extern void port_write_2(int v);                                      /* HW port 2 (supervisor per 2875 precedent); no ROM definition */
 extern void dispatcher_entry_2E2F(void);
 extern void dispatch_match_loop(void);
 

@@ -5,7 +5,7 @@
  *
  * Intent: Scaled product plus post. Runs 0x598; when bit 4 of cell 0x3EB5 is set (bitf any-bit TC per ti-c54x op_bitf; rc ntc skips only when clear), A = cell 0x578 << 16, else A is live-in; always A -= cell 0x585 << 16. B = cell 0x3EB8 times A-high (MPYA Smem overwrites B per ti-c54x op_mpya_smem, T untouched); B >>= 8 (sfta, 40-bit); B += *AR3 (live-in); store low word back, return it.
  */
-extern void sub_0598(void);
+extern void sub_0598(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 int scale_3EB8_leaf_71D8(int a_live, int *par3)
 {

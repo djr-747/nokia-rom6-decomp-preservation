@@ -1,6 +1,8 @@
 ; ROM6 0x90F8 POSTSCALE_90F8 -- 32w, symbols.yaml data_word.
 ; Evidence: Entry 4A17 7717 3120; BOUND CORRECTED entry-linear: straight-line to first exit retd @0x9115, bound 90F8-9117 (incl delay); was 9145 (overclaim; tail 9118-9145 belongs to BUTTERFLY
 ; Wave-12: 90f7-twin head-dup (90F8-9107) removed with that file; 90e7 now ends at ret @90F7 abutting here.
+; Wave-13: caller call 0x90f8 @90E7 (90e7_wrap, byte-verified) replaces the stale "zero callers" note; outer BANZ re-arms
+; (AR2/BRC reloaded at 90FD) so the in-span return path is OPEN -- see the .c file for the termination analysis.
 ; ORIGIN 0x90F8
 	.sect ".text"
 	.mmregs

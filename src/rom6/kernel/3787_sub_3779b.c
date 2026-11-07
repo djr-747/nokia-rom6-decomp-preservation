@@ -14,8 +14,8 @@
  * 0x2E64 (AR liveness through the dark call flagged). Cells absolute
  * per the da40 precedent (DP = 0 assumed, flagged). Bound 3787-379E.
  */
-extern void sub_2E2F(void);
-extern void frag_2E64(void);
+extern void dispatcher_entry_2E2F(void);
+extern void frag_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void sub_3787(int *ar2, int ar0_live)
 {
@@ -34,6 +34,6 @@ void sub_3787(int *ar2, int ar0_live)
     a &= 31;                                         /* and #31,a */
     *(volatile int *)0x58B = (int)(a & 0xFFFF);      /* stl a,*(0x58b) */
     *(volatile int *)0x589 |= 1;                     /* orm #1,*(0x589) */
-    sub_2E2F();                                      /* call 0x2e2f (dark) */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f (dark) */
     frag_2E64();                                     /* b 0x2e64 (dark tail) */
 }

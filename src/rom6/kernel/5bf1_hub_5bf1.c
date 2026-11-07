@@ -23,7 +23,7 @@
  * CPL = 1 restores at the end (hardware); RET @5C33.
  * Bound 5BF1-5C33.
  */
-extern void sub_0674(void);
+extern void sub_0674(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void sub_5C34(long a_live, int ar1_live, int *par5, int ar0_live);
 
 void hub_5BF1(void)

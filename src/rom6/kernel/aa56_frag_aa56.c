@@ -5,10 +5,10 @@
  *
  * Intent: Bit-test chain plus far store. Same chain as FRAG_AA2F through the 0xCF25 skip; then A = 1 stored to cell 0xECC in the calld delay slot (executes before sub_D0BE takes effect), call 0xD0BE, return.
  */
-extern void sub_0688(void);
-extern void sub_CF25(void);
-extern void sub_CF4B(void);
-extern void sub_D0BE(void);
+extern void sub_0688(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_CF25(void); /* joins cf25_routine_cf25; see docs/evidence/extern-triage.md */
+extern void sub_CF4B(void); /* joins cf4b_routine_cf4b; see docs/evidence/extern-triage.md */
+extern void sub_D0BE(void); /* joins d0be_routine_d0be; see docs/evidence/extern-triage.md */
 
 void frag_AA56(void)
 {

@@ -5,10 +5,10 @@
  *
  * Intent: Dispatcher-guarded call fanout (three entries, one file per 53EB convention). Entry 0 (0x44FD): runs dark SUB_0594; A = cell 0x2F00 AND 255, saved across the dispatcher call (pshm triple); runs C DISPATCHER_ENTRY_2E2F; A = cell 0x871, B = A - 0 (SUB #lk SHFT-0 per op_sub_lk), zero joins the shared epilogue (bc beq); else AR2 = A (stlm, local, live into dark SUB_226C per precedent) and runs SUB_226C. Epilogue 0x4511 (shared join): restores A (popm triple; the aneq below tests the restored masked value, not call junk); nonzero runs entry 2 (bc aneq). Else delayed-call into SUB_2262 (calld, void per 84CF; delay stm #13,ar2 preset dead in C, noted) then SUB_226C, tail-enters C FRAG_452C (b, C-bound). Entry 2 (0x451E): delayed-call 2262 (delay stm #14, dead), SUB_226C, falls into the 4524 tail: delayed-call 2262 (delay stm #4, dead), SUB_226C, tail-enters C FRAG_3028 (b, C-bound). Bound 44FD-452B.
  */
-extern void sub_0594(void);
+extern void sub_0594(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void dispatcher_entry_2E2F(void);
-extern void sub_226C(void);
-extern void sub_2262(void);
+extern void sub_226C(void); /* unowned @0x226C; see docs/evidence/extern-triage.md */
+extern void sub_2262(void); /* unowned @0x2262; see docs/evidence/extern-triage.md */
 extern void frag_452C(void);
 extern void frag_3028(void);
 extern void frag_451E(void);

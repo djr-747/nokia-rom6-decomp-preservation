@@ -9,7 +9,7 @@
  * the retd delay slot, so it applies on both paths), then return.
  * Callers F074 @A3C5/@A3CE/@B35A.
  */
-extern void helper_0654(void);
+extern void helper_0654(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 int routine_A3D5(void)
 {

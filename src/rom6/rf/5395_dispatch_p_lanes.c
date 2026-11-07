@@ -5,7 +5,7 @@
  *
  * Intent: P-lane zero-fill plus select head. Runs dark SUB_0672 (call, per 53D9). AND-masks cells 0x537/0x51D/0x263A. A = 572; 30 copies (rpt #29) of A low into 0x2ED4 up (stl loop); high word of A (zero) into cell 0x2EFD (sth to absolute: (A >> 16) & 0xFFFF per 3A8E). AR2 = 0x51C, cell &= -129; cell 0x2EFE = 1; cell 0x57B = cell 0x3F13 (mvdk, dmad is destination). Cell 0x573 != -20565 runs unbound FRAG_53BA (bc ntc, has .asm, forward extern); else tail-enters dark 0x54BB (b, forward extern per 53D9). Bound 5395-53B9.
  */
-extern void sub_0672(void);
+extern void sub_0672(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_53BA(void);
 extern void frag_54BB(void);
 

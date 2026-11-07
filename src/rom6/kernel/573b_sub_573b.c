@@ -5,7 +5,7 @@
  *
  * Intent: Delayed-branch cell test. Runs 0x59C; AR2 = 2328; A = 240 AND cell 0x250F; TC = (AL == 32) (cmpm on the AL-alias cell 0x8, TC-on-equal per ti-c54x op_cmpm). The bcd delay slots always execute (B = cell 0x2651, AR2 = 2327); TC set enters at the sub (bcd 0x574f,tc, in-span). Else cell 0x2510 == 128 gates the same sub (rc ntc); then B != 0 skips the flag set (rc bneq); else sets bit 5 of cell 0x2628; return.
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_573B(void)
 {

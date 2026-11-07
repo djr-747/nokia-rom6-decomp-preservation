@@ -50,9 +50,9 @@ extern void sub_43BA(void);                              /* dark, no symbol */
 extern void frag_2ECD(long a);                           /* C-bound */
 extern void frag_2EC6(void);                             /* C-bound */
 extern void dispatch_match_loop(int b_live, int *par2, int **ppar4);
-extern int port_read_2(void);
-extern void port_write_1(int v);
-extern void port_write_2(int v);
+extern int port_read_2(void);                                         /* HW port 2 (FRAME sample combine per 27EB span); no ROM definition */
+extern void port_write_1(int v);                                      /* HW port 1 (RF/codec per 3EE1 sweep); no ROM definition */
+extern void port_write_2(int v);                                      /* HW port 2 (supervisor per 2875 precedent); no ROM definition */
 
 static void tail_2EB7(int *ar2)
 {

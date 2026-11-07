@@ -5,7 +5,7 @@
  *
  * Intent: Sign-bit OR plus call. B = -32768 | cell 0x914, stored to cell 0x29C8; A = 40, B = 2, AR0 = 243; calls 0x93CE with AR2 = 10696 in the calld delay slot (executes first), returns.
  */
-extern void sub_93CE(void);
+extern void sub_93CE(void); /* joins 93ce_msg_classify_by_caller; see docs/evidence/extern-triage.md */
 
 static int *G_AR0;
 static int *G_AR2;

@@ -5,8 +5,8 @@
  *
  * Intent: Measure setup A. Runs helper 0x65A; when bit 9 of cell 0x2628 is set (bitf any-bit TC per ti-c54x op_bitf; rc ntc skips the loads when the bit is clear): A = 12, B = cell 0x2613; calls 0x3D79 with AR1 = 1843 in the calld delay slot (executes first); sets cell 0x22A = 1, returns.
  */
-extern void helper_065A(void);
-extern void sub_3D79(void);
+extern void helper_065A(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_3D79(void); /* joins 3d79_pshm_kernel_caller; see docs/evidence/extern-triage.md */
 
 static int *G_AR1;
 

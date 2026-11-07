@@ -9,7 +9,7 @@
  * store to 0x68) run either way. Zero falls to delayed return with
  * a zero spill that clears the next cell.
  */
-extern void helper_06DE(void);
+extern void helper_06DE(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void stage_BFB7(void);   /* chained continuation, extern to link */
 
 void norm_gate_BFAA(int **pp)

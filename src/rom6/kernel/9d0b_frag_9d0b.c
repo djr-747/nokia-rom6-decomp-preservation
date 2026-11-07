@@ -5,7 +5,7 @@
  *
  * Intent: Scaled-index call. B = (B + 2) << 1 (sftl 40-bit shift, live-in B); A = 40; AR0 = 243; calls 0x93CE with AR2 = 10696 in the calld delay slot (executes first), returns.
  */
-extern void sub_93CE(void);
+extern void sub_93CE(void); /* joins 93ce_msg_classify_by_caller; see docs/evidence/extern-triage.md */
 
 static int *G_AR0;
 static int *G_AR2;

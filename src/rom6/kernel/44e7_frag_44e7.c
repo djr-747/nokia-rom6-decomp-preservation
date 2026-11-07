@@ -6,7 +6,7 @@
  * Intent: Dispatcher plus shifted-OR store. Runs the 0x2E2F dispatcher entry; AR2 = 12032, AR3 = AR2 (mvmm); stores 4096 with post-increment; cell 0x54E through AR2++; A = (cell 0x22D << 8) OR cell 0x2623 stored through AR2; AR4 = 116 feeds 0x2C88 with AR5 = 6 in the calld delay slot (executes first); return.
  */
 extern void dispatcher_entry_2E2F(void);
-extern void sub_2C88(void);
+extern void sub_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 
 static int *G_AR2;
 static int *G_AR3;

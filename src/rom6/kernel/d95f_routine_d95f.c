@@ -25,7 +25,7 @@ void routine_D95F(int *ar2, int brc_live)
     b = 0;                                           /* ld #0,b */
     ar3 = (int *)0xFC58;                             /* rptbd delay: stm #-936,ar3 */
     for (i = 0; i < brc_live + 1; i++) {              /* rptbd 0xd965 */
-        a = ((long)*ar3++ - (long)*ar2++) << 16;     /* sub *ar2+,*ar3+,a */
+        a = ((long)*ar2++ - (long)*ar3++) << 16;     /* sub *ar2+,*ar3+,a (dual X-Y order per header rule; wave-13: was Y-X, corrected) */
         b |= a;                                      /* or a,b */
     }
     a = (long)*(volatile int *)0xB68;                /* ld *(0xb68),a */

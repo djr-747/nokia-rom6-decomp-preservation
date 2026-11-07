@@ -5,8 +5,8 @@
  *
  * Intent: FRAG_89EB register-gated delayed branch (9w). B = AR3-entry value (ldm, threaded as param); nonzero runs dark 0x89CE (bc bneq, forward extern). Else AR3 = 1 (local; entry value consumed by the test); delayed-branch to dark 0x89D2 inside ROUTINE_89C4 (bd, forward extern) with T = 120 in the slot (always runs, dead, noted). Bound 89EB-89F3.
  */
-extern void frag_89CE(void);
-extern void frag_89D2(void);
+extern void frag_89CE(void); /* joins 89c4_routine_89c4 interior @+0xA; see docs/evidence/extern-triage.md */
+extern void frag_89D2(void); /* joins 89c4_routine_89c4 interior @+0xE; see docs/evidence/extern-triage.md */
 
 void frag_89EB(int *par3)
 {

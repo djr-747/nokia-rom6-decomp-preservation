@@ -11,7 +11,7 @@
  * restore CLKMD to 20974, spin until bit 0 clears (84C4 loop),
  * clear bit 2 of 0x29, short nop delay, return.
  */
-extern void helper_05A0(void);
+extern void helper_05A0(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void cpu_idle_3(void);   /* idle 3: sleep until interrupt */
 
 void sub_84AF_clock_gate(void)

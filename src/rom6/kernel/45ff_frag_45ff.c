@@ -31,10 +31,10 @@
  * read-only; A/B locals; all dead at return (flagged).
  * Bound 45FF-463A.
  */
-extern void sub_06F6(void);
-extern void sub_2E2F(void);
+extern void sub_06F6(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void dispatcher_entry_2E2F(void);
 extern void sub_8534(void);
-extern void routine_2C88(void);
+extern void routine_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 
 void frag_45FF(int ar0_live, int *ar2_in)
 {
@@ -51,7 +51,7 @@ void frag_45FF(int ar0_live, int *ar2_in)
         *ar3++ = *ar2;                               /* mvdd *ar2+0%,*ar3+ */
         ar2 += ar0_live;                             /* +0% (wrap flagged) */
     }
-    sub_2E2F();                                      /* call 0x2e2f */
+    dispatcher_entry_2E2F();                                      /* call 0x2e2f */
     ar2 = (int *)1263;                               /* stm #1263,ar2 */
     ar3 = (int *)12052;                              /* stm #12052,ar3 */
     /* stm #5,brc */

@@ -15,10 +15,10 @@
  * A assumed preserved through the dark callees (flagged,
  * 9268 convention). Bound 924C-9267.
  */
-extern void helper_0594(void);
+extern void helper_0594(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void late_leaf_9217(int ar3_live);
-extern void sub_9042(void);
-extern void sub_9315(void);
+extern void sub_9042(void); /* joins 9042_kernel_9042; see docs/evidence/extern-triage.md */
+extern void sub_9315(void); /* joins 9315_span_tail_9315; see docs/evidence/extern-triage.md */
 
 void sub_924C(int *par3)
 {

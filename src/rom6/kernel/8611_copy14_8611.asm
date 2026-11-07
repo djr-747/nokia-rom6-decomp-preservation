@@ -1,6 +1,7 @@
 ; ROM6 0x8611 COPY14_8611 -- 13w, symbols.yaml data_word.
 ; Evidence: Entry 4A15 EC05 E58B 8A15 7712 04F5 4492 1A8A 4595 1B8D F1C0 8395 818D FC00; RET @861E len 14; 4 callers F074 @850C/8517/8522/852D; no inner calls; block-copy+accumulate; HYPOTHESI
 ; Wave-12: exit ret @861E owned here; pool bundle 861e_copy14_8611.asm split (ret belonged here; dld/call/dst stub 861F-8626 now 861f_stub_861f; rptb head 8627-862C owned by 8627).
+; Wave-13: exit ret @861E owned here (gap orphan annexed after 861e bundle split).
 ; ORIGIN 0x8611
 	.sect ".text"
 	.mmregs
@@ -18,3 +19,4 @@ _start:
 	xor    a,b
 	sth    b,*ar5+
 	stl    b,*ar5-
+	ret

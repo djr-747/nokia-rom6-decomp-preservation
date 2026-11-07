@@ -5,8 +5,8 @@
  *
  * Intent: Register zigzag with classify call. A = AR4-live-in AND 255; B = AR3-live-in << 8 logical OR A (sftl plus or); AR0 = B (stlm, dead preset, noted). A = AR3 AND -256 (clears low byte); B = AR4 >> 8 logical OR into A; B = 2 threaded into 0x93CE (call, has .asm, no C yet, forward extern with B arg: lane id per caller-classify role, noted); tail-enters 0x37DF (b: claimed FRAG_37D8 interior, no span, forward extern). ldm reads registers as values (no AR movement, int params). sftl shifts logical per barrel semantics. Bound 3850-3861.
  */
-extern void frag_93CE(int b_live);
-extern void frag_37DF(void);
+extern void frag_93CE(int b_live); /* joins 93ce_msg_classify_by_caller; see docs/evidence/extern-triage.md */
+extern void frag_37DF(void); /* joins 37d8_frag_37d8 interior @+0x7; see docs/evidence/extern-triage.md */
 
 void frag_3850(int ar3_live, int ar4_live)
 {

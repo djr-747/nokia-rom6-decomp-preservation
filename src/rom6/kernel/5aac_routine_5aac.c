@@ -18,7 +18,7 @@
  * tail-enters FRAG_5ACA (b 0x5aca = SEG_5AC8+2). Entry via calld F274@4CE4
  * (objdump-verified). Bound 5AAC-5AC7; no RET in span, exits forward.
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_5AC8(long a_live, int *par2);
 extern void frag_5ACA(long a_live, int *par2);
 

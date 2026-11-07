@@ -40,7 +40,7 @@
  * locals; ARs/A/B dead at return (flagged). Bound
  * 4315-4347.
  */
-extern void sub_0606(void);
+extern void sub_0606(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void gain_map_4315(long a_live, int *ar2_in, int **ppar2)
 {

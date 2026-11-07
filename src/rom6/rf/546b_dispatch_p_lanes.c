@@ -5,13 +5,13 @@
  *
  * Intent: P-lane store chain with compare tail. Runs dark SUB_06E4 (call). Cell 0x573 != -23991 runs unbound FRAG_5489 with entry AR2 (bc ntc, has .asm, forward extern with AR2 param per its own header). Else clears bit 7 of *AR2-entry (andm, AR2 threaded as param, unstepped); cell 0xB68 = 0; runs dark SUB_D970; B = 1 stored low to cell 0xC4C; cell 0xA5A = 3; runs PARAM_BUILDER_B6E6, INIT_FILTER_C717, SUB_9FA8 (forward externs); A = cell 0x3FC9 tail-enters dark 0x53CD (b, forward extern with A arg). Bound 546B-5488.
  */
-extern void sub_06E4(void);
+extern void sub_06E4(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_5489(int *par2);
 extern void sub_D970(void);
-extern void param_builder_b6e6(void);
-extern void init_filter_c717(void);
-extern void sub_9FA8(void);
-extern void frag_53CD(int a_live);
+extern void param_builder_b6e6(void); /* joins b6e6_param_builder_b6e6; see docs/evidence/extern-triage.md */
+extern void init_filter_c717(void); /* joins c717_init_filter_c717; see docs/evidence/extern-triage.md */
+extern void sub_9FA8(void); /* joins 9fa8_sub_9fa8; see docs/evidence/extern-triage.md */
+extern void frag_53CD(int a_live); /* joins 53ba_dispatch_p_lanes interior @+0x13; see docs/evidence/extern-triage.md */
 
 void frag_546B(int *par2)
 {

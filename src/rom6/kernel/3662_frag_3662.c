@@ -5,8 +5,7 @@
  *
  * Intent: Flag-cell copy with in-span gate. B = live-in OR 256, stored through live-in AR4; A = AR5 (as value), stored through live-in AR0++; bit 0 of live-in *AR3 tested (bitf, TC on any-bit); clear skips the next test (rc ntc keeps that TC); bit 8 clear jumps to 3671 in-span (bc 0x3671,ntc, forward extern, no C binding yet); else sets bit 9 of cell 0x54F, A = AR6 stored through AR0, return.
  */
-extern void frag_3671_entry(void);
-
+extern void frag_3671_entry(void); /* 3662_frag_3662 interior @+15; see docs/evidence/extern-triage.md */
 void frag_3662(int b_live, int *par4, int *par5, int **ppar0, int *par3, int *par6)
 {
     int a;

@@ -32,13 +32,13 @@
  * +1, no AR0); ARs/A dead at return (flagged). Bound
  * 39A4-39EF.
  */
-extern void sub_0630(void);
-extern void port_write_60(int v);
-extern void port_write_57(int v);
-extern int port_read_0(void);
-extern void port_write_0(int v);
-extern int port_read_56(void);
-extern void port_write_56(int v);
+extern void sub_0630(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void port_write_60(int v);                                     /* HW port 60 (codec stream select per 399e span); no ROM definition */
+extern void port_write_57(int v);                                     /* HW port 57 (codec stream per 399e span); no ROM definition */
+extern int port_read_0(void);                                         /* HW port 0 (codec/RF control per 938c homology); no ROM definition */
+extern void port_write_0(int v);                                      /* HW port 0 (codec/RF control per 938c homology); no ROM definition */
+extern int port_read_56(void);                                        /* HW port 56 (HPI/pa56 poll per 2baa span); no ROM definition */
+extern void port_write_56(int v);                                     /* HW port 56 (HPI/pa56 per 2baa span); no ROM definition */
 
 void routine_pa60_57(int *ar2_in, int *ar3_in)
 {

@@ -5,16 +5,16 @@
  *
  * Intent: P-lane far-call chain with measure tail. Runs dark SUB_0672 (call, per 53D9). Cell 0x573 != -23991 runs C FRAG_53D9 (bc ntc, C-bound). Else far calls 0x1A7F8/0x1A7F1 (modeled extern per 53D9), PARAM_BUILDER_B6E6, INIT_FILTER_C717, SUB_9FA8 (all have .asm, no C yet, forward externs). A = cell 0x3FC8 threaded through dark SUB_06E2 into FRAG_54A4 (call, A arg per 53D9 B-threading precedent; 6E2 clobbers unobservable). Clears bit 8 of cell 0x263A; B = 4; runs unbound FRAG_B461 (call, has .asm, forward extern); tail-enters dark 0x54BB (b, per 53D9). Bound 53BA-53D8.
  */
-extern void sub_0672(void);
+extern void sub_0672(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_53D9(void);
-extern void far_1A7F8(void);
-extern void far_1A7F1(void);
-extern void param_builder_b6e6(void);
-extern void init_filter_c717(void);
-extern void sub_9FA8(void);
-extern void sub_06E2(void);
-extern void frag_54A4(int a_live);
-extern void frag_B461(void);
+extern void far_1A7F8(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
+extern void far_1A7F1(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
+extern void param_builder_b6e6(void); /* joins b6e6_param_builder_b6e6; see docs/evidence/extern-triage.md */
+extern void init_filter_c717(void); /* joins c717_init_filter_c717; see docs/evidence/extern-triage.md */
+extern void sub_9FA8(void); /* joins 9fa8_sub_9fa8; see docs/evidence/extern-triage.md */
+extern void sub_06E2(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void msg_fetch_routine_54A4(int a_live);
+extern void sub_B461(void);
 extern void frag_54BB(void);
 
 void frag_53BA(void)
@@ -32,9 +32,9 @@ void frag_53BA(void)
     sub_9FA8();                                    /* call 0x9fa8 */
     a = *(volatile int *)0x3FC8;               /* ld */
     sub_06E2();                                    /* call 0x6e2 (A threads) */
-    frag_54A4(a);                                  /* call 0x54a4 */
+    msg_fetch_routine_54A4(a);                                  /* call 0x54a4 */
     *(volatile int *)0x263A &= -257;           /* andm */
     /* ld #4,b (B = 4, dead: B461 intake unknown, noted) */
-    frag_B461();                                   /* call 0xb461 */
+    sub_B461();                                   /* call 0xb461 */
     frag_54BB();                                   /* b 0x54bb tail */
 }

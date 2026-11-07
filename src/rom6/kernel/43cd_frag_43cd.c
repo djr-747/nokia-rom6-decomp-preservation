@@ -6,11 +6,11 @@
  * Intent: Dispatcher plus call wrapper. Runs the 0x2E2F dispatcher entry, passes B = 8 to 0x4590, returns.
  */
 extern void dispatcher_entry_2E2F(void);
-extern void sub_4590(int b);
+extern void routine_4590(int b);
 
 void frag_43CD(void)
 {
     dispatcher_entry_2E2F();                    /* call 0x2e2f */
-    sub_4590(8);                                 /* ld #8,b; call 0x4590 */
+    routine_4590(8);                                 /* ld #8,b; call 0x4590 */
     /* ret */
 }

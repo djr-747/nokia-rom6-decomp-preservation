@@ -15,7 +15,7 @@
  * (*AR3++ per pass), entry AR2 = nibble sink. A-live-out (word >> 16,
  * small) unused by the span; B/T dead at RET @5B25. Bound 5B18-5B25.
  */
-extern void sub_05FC(void);
+extern void sub_05FC(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void routine_5B18(int *par2, int *par3, int ar1_live)
 {

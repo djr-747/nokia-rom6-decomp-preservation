@@ -5,10 +5,10 @@
  *
  * Intent: Masked compare with out-of-span gates. Runs 0x59C; B = cell 0x250F AND 240 (live-in B dead); A = B - 48 (sub, dst = src minus operand per ti-c54x op_sub); zero skips the A = B - 16 recompute (rc aeq); nonzero remainder jumps away (bc 0x576e,aneq: target bytes 11F8 250F F210 0051 F845, forward extern, no C binding yet, per convention). Else A = cell 0x2642 minus cell 0x915; AR1 = 2326 always (calld delay slot); nonzero skips the 0x6993 call (rc aneq, exact), zero runs it then jumps away (bc 0x5785,aeq: target bytes 11F8 250F F330 00F0 7711, forward extern); nonzero-after-calld falls to RET.
  */
-extern void sub_059C(void);
-extern void sub_6993(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_6993(void); /* joins 698b_sub interior @+0x8; see docs/evidence/extern-triage.md */
 extern void frag_576E(void);
-extern void frag_5785(void);
+extern void frag_5785(void); /* joins 576e_frag_576e interior @+0x17; see docs/evidence/extern-triage.md */
 
 static int *G_AR1;
 

@@ -7,7 +7,7 @@
  * at 985, 32 cells of 0 at 9364, 64 more cells of 0 continuing past.
  * Shape is memset-like; the counts (rpt #31 / #63) are exact.
  */
-extern void helper_05B4(void);
+extern void helper_05B4(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void leaf_6F79_fill(void)
 {

@@ -16,7 +16,7 @@
  * nonzero tail-enters the head loop, else returns. AR2/AR5/AR0
  * caller-live, dead after. Bound 3500-351C.
  */
-extern void cpu_idle(int mode);
+extern void cpu_idle(int mode);                                       /* IDLE sleep (84af precedent: sleep until interrupt); no ROM definition */
 
 void routine_3500(void)
 {

@@ -8,7 +8,7 @@
 extern void msg_worker_A2C3(void);
 extern void routine_A3C5(void);
 extern void routine_A3E1(void);
-extern void msg_setup_C_A4DE(void);
+extern void msg_setup_C(void);
 extern void msg_primitive_A2B9(int ***ppp5);
 
 static int *G_AR5;
@@ -21,7 +21,7 @@ void frag_B12F(void)
         *(volatile int *)0x22D;                /* mvdk */
     routine_A3C5();                              /* call 0xa3c5 */
     routine_A3E1();                              /* call 0xa3e1 */
-    msg_setup_C_A4DE();                          /* call 0xa4de; B = 1 */
+    msg_setup_C();                          /* call 0xa4de; B = 1 */
     /* cc 0xa91c,beq dead: B = 1 per A4DE tail */
     G_AR5 = (int *)-8685;                        /* calld delay slot */
     pp5 = &G_AR5;

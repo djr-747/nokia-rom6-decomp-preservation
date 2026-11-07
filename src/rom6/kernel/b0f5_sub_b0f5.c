@@ -20,7 +20,7 @@
  * then returns with AR2 live-out through the out-pointer.
  * Bound B0F5-B10F.
  */
-extern void sub_0678(void);
+extern void sub_0678(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int frag_B110(int a_in, int b_in, int *par4, int **ppar2);
 
 void sub_B0F5(int **ppar2)

@@ -13,8 +13,8 @@
  * then dark SUB_2C88; tail-branch 0x37DF (B clobber risk via the dark
  * call, flagged). Bound 3879-388B.
  */
-extern void sub_2C88(void);
-extern void frag_37DF(void);
+extern void sub_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
+extern void frag_37DF(void); /* joins 37d8_frag_37d8 interior @+0x7; see docs/evidence/extern-triage.md */
 
 void frag_3879(int ar5_live, int *ar2_in)
 {

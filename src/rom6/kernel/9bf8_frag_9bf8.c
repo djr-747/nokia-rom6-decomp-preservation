@@ -22,8 +22,8 @@
  * noted) and tail-branch to frag_9C15. The span never falls
  * through to a return. Bound 9BF8-9C12.
  */
-extern void frag_9C15(void);
-extern void frag_9C13(void);
+extern void frag_9C15(void); /* joins 9c13_frag_9c13 interior @+0x2; see docs/evidence/extern-triage.md */
+extern void frag_9C13(void); /* joins 9c13_frag_9c13; see docs/evidence/extern-triage.md */
 
 void frag_9BF8(int ar6_live, int ar0_live, int *ar2_in, int ar4_live)
 {

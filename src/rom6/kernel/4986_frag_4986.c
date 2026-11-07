@@ -16,10 +16,10 @@
  * calad, opaque forward extern void frag_4AD8). B/AR2 entry-live; A
  * untouched. Bound 4986-49B1 (exit F073@49B0->4AD8 + operand 49B1).
  */
-extern void frag_4996(void);
+extern void frag_4996(void); /* joins 4986_frag_4986 interior @+0x10; see docs/evidence/extern-triage.md */
 extern void frag_49B6(void);
-extern void frag_4ABE(void);
-extern void frag_4AD8(void);
+extern void frag_4ABE(void); /* joins 4a63_frag_4a63 interior @+0x5B; see docs/evidence/extern-triage.md */
+extern void frag_4AD8(void); /* joins 4ad8_frag_4ad8; see docs/evidence/extern-triage.md */
 
 void frag_4986(int *par2)
 {

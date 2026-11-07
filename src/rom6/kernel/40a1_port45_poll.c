@@ -5,9 +5,9 @@
  *
  * Intent: Port 45 ready-poll plus port 44 strobe. Runs 0x652; re-reads port 45 into AH (portr 45,*(0x9): DATA 0x9 aliases AH) until high bit 12 clears (and #4096,16,a places the constant at A-high; bc 0x40a3,aneq self-loop). Then B-live-in OR 16 out to port 44 (portw *(0xb),44: DATA 0xB aliases BL), 15 idle cycles (rpt #14 nop), and re-reads port 45 into AL (portr 45,*(0x8): DATA 0x8 aliases AL) until low bit 12 clears (and #4096,a,b; bc 0x40b4,bneq self-loop); return. Bound 40A1-40BB.
  */
-extern void sub_0652(void);
-extern int port_read_45(void);
-extern void port_write_44(int v);
+extern void sub_0652(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern int port_read_45(void);                                        /* HW port 45 (port-45 poll per 40A1 span); no ROM definition */
+extern void port_write_44(int v);                                     /* HW port 44 (port-45 poll family per 40A1 span); no ROM definition */
 
 void port45_poll_40A1(int b_live)
 {

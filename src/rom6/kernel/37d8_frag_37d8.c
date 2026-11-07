@@ -26,9 +26,9 @@
  * in-span step); ARs/A/B dead at exit (flagged). Bound
  * 37D8-3801.
  */
-extern void sub_05A0(void);
-extern void sub_9E85(void);
-extern int sub_942E(void);
+extern void sub_05A0(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_9E85(void); /* joins 9e85_wrap_9e85; see docs/evidence/extern-triage.md */
+extern int sub_942E(void); /* joins 942e_cobba_verify_loop; see docs/evidence/extern-triage.md */
 extern void frag_3862(int *ar2_in, int ar5_live, int ar0_live);
 extern void frag_3802(void);
 extern void frag_3806(int *ar2_in);

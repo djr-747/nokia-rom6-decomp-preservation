@@ -16,8 +16,8 @@
  * dark 0x9CE7 (B handoff value unbound -- the bc path carries
  * entry B, flagged). ARs dead at tail (flagged). Bound 9CCF-9CE6.
  */
-extern void sub_06B8(void);
-extern void frag_9CE7(void);
+extern void sub_06B8(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_9CE7(void); /* joins 9ce7_frag_9ce7; see docs/evidence/extern-triage.md */
 
 void frag_9CCF(int *ar2_in)
 {

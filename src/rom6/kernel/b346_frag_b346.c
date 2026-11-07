@@ -6,9 +6,9 @@
  * Intent: Straight worker chain. Runs 0xA2C3 then 0xA361; nonzero A361 result runs 0xA4DE (rc aneq skips only that call); then 0xA482, the 0xA5E1 measure setup, 0xA679, and audio workers 0xA7B7/0xA7EB, return.
  */
 extern void msg_worker_A2C3(void);
-extern int sub_A361(void);
-extern void msg_setup_C_A4DE(void);
-extern void msg_setup_A_A482(void);
+extern int sub_A361(void); /* joins a361_stub_a361; see docs/evidence/extern-triage.md */
+extern void msg_setup_C(void);
+extern void msg_setup_A_A482(void); /* joins a482_msg_setup_a; see docs/evidence/extern-triage.md */
 extern void meas_setup_A_A5E1(void);
 extern void sub_A679(void);
 extern void audio_A_A7B7(void);
@@ -18,7 +18,7 @@ void frag_B346(void)
 {
     msg_worker_A2C3();                           /* call 0xa2c3 */
     if (sub_A361() != 0)                         /* call 0xa361; rc aneq */
-        msg_setup_C_A4DE();                      /* call 0xa4de */
+        msg_setup_C();                      /* call 0xa4de */
     msg_setup_A_A482();                          /* call 0xa482 */
     meas_setup_A_A5E1();                         /* call 0xa5e1 */
     sub_A679();                                  /* call 0xa679 */

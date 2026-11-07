@@ -5,13 +5,13 @@
  *
  * Intent: Strobe-then-clock gate. Runs dark SUB_05F6 (call, forward extern); *AR2-entry = 28, strobed to port 1 (15 settle cycles); B = A-live-in & 16 (AND preserves A, Z from B), zero detours to the in-span check at 0x2890 (bc beq, rejoins). Else sets bit 6 of cell 0x552; A = port 2 (portr 2,*(0x8): AL alias) OR 16, alias-updated, out to port 2, then jumps to the in-span clock at 0x2899 (b, rejoins). At 0x2890: B = A & 8, zero tail-enters dark 0x283D (bc beq; B == 0, A = entry live-in along this path). Bit 9 (512) of cell 0x2639 set runs FRAG_28A5 (bc tc: has .asm, no C yet, forward extern; AR2 cursor live but unused inside). Else *AR2-entry = 15000 clocked to port 15 (15 settle cycles), bit 1 of cell 0x263A raised, tail-enters dark 0x283D (b). Ports 1/2/15 direct-mapped (extern ops). Bound 2875-28A4.
  */
-extern void sub_05F6(void);
-extern int port_read_2(void);
-extern void port_write_1(int v);
-extern void port_write_2(int v);
+extern void sub_05F6(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern int port_read_2(void);                                         /* HW port 2 (FRAME sample combine per 27EB span); no ROM definition */
+extern void port_write_1(int v);                                      /* HW port 1 (RF/codec per 3EE1 sweep); no ROM definition */
+extern void port_write_2(int v);                                      /* HW port 2 (supervisor per 2875 precedent); no ROM definition */
 extern void port_write_15(int v);
 extern void frag_28A5(void);
-extern void frag_283D(void);
+extern void frag_283D(void); /* joins 2800_stretch_2800 interior @+0x3D; see docs/evidence/extern-triage.md */
 
 void frag_2875(int a_live, int *par2)
 {

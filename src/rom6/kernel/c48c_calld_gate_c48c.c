@@ -1,0 +1,10 @@
+/* ROM6 0xC48C C48C_CALLD_GATE_C48C -- 92w (Pool).
+ * Verified encoding: src/rom6/kernel/c48c_calld_gate_c48c.asm (recombine MATCH).
+ * ORIGIN 0xC48C
+ * EXPECT: F074 06DC F0C0 804D 7712 28A9 7715 28A8 A203 FA42 C4A8 7647 7FFF 1085 F274 BF8C 7711 3152 F7B8 3091 E911 0181 32F8 000B 2082 F582 F583 8347 F062 08C2 4047 FA43 C4B9 F062 0600 6247 EFF5 0242 F483 F063 FFFF F060 0719 F063 FFFF 7713 311A 770E 0AA9 F171 000B 2993 0342 F583 8352 4052 11F8 28A5 F761 FD43 1B41 81F8 28A5 30F8 28AA 1582 30F8 000B 2352 F361 005F 56F8 3100 FF4E 764D 0001 F162 007A F340 1200 F620 11F8 28A5 F330 0003 FE43 7645 0000 FF4C 7645 0001 FC00
+ *
+ * Intent: Pool -- C intent deferred per the asm span's own documented blocker:
+ * HYPOTHESIS.
+ * (see src/rom6/kernel/c48c_calld_gate_c48c.asm header for the full evidence record). No C entry is claimed;
+ * the span stays owned by its verified .asm encoding.
+ */

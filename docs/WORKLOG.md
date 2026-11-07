@@ -2,6 +2,65 @@
 
 This log is a running record. Entries run newest first. Dates are UTC.
 
+## 2026-11-07 — F2 supervisor loop + low-band ISR triple closed (1446w new)
+
+- F2 `2088` supervisor loop (474w): full C body (port strobes,
+  cmpm/cc lanes, bcd tails, calld-2D5E / calld-2C88 / 9E85 / E64C joins).
+  Corrected portr model: PORTR is memory-only (A untouched); fixed two
+  A-clobber stretches in the F2 C (no downstream effect, A reloaded).
+- Low band `0x0000` + `0x22DA-0x27FF`: 8 nonzero clusters (1440w) owned
+  as 8 spans (1446w with STM operands) + full C, entry-evidenced via
+  vectors (FFC0->22DA SAMPLE, FFD2->25DF STATE, FFC4/C8/E0->27CD FRAME)
+  and abuts (27FF->2800_stretch per its header). Contents: 0000 fill
+  table (128w, uniform 0x7C2A); 22DA SAMPLE prologue (23w); 22F1/25F0/27E9
+  STM-REA slots (2w each); 22F3 SAMPLE body (765w: pa33 handshake, kind
+  dispatch, dual-MAC FIR BRC=7, SQDST metrics, epilogue FRETE, dead lane
+  25D9-25DE, sub-entry 25DF); 25F2 STATE body (503w: mailbox copy, bound
+  C851, DRR0/DXR0 echo per emu MMR 0x20/0x21 mapping, pa54 poll, coeff
+  MAC chain, DXR0 write, FRETE 27CC, bc-296A exit, sub-entry 27CD);
+  27EB FRAME head (21w: sample combine, bc-296A, abuts 2800).
+- Correction: STM #lk,MMR is a 2-word instruction (oracle catalog row
+  0x7700/0xFF00, 2 words; gas confirms `stm #5,rea` -> 771C 0005). The six
+  `stm #0,rsa/rea` sites take operand 0x0000 as the immediate,
+  not a dumped zero: spans extended (22da 22->23, singles 1->2, 22f3
+  764->765, 25f2 502->503), headers/comments/symbols fixed. Nonzero words
+  below 0x2800: 2158/2158 owned (2176 span words incl. 18 zero immediates);
+  every nonzero word < 0x2800 is now owned.
+- Gates: check_c 618 OK / 0 FAIL; recombine 1011/1011 MATCH (57,472w);
+  link_audit 1011 spans, 0 overlaps, gap_runs 0 (outside=17, all pre-existing
+  low-region + new low spans: informational, no region covers <0x2800);
+  make test green (exit 0). symbols.yaml: +7 (LOW_FILL_0000 data_word;
+  SAMPLE/STATE/FRAME slots+bodies program_word).
+
+## 2026-11-07 — dark-gap Tier-3: gap_runs 0, gap_words 0 (was 15/1124)
+
+- 15 remaining PROMLOW/PROMHIGH gap runs owned as spans (asm +
+  C intent or pool/dead note, entry-evidenced via xrefs).
+  Gates: check_c 604 OK / 0 FAIL; recombine 997/997 MATCH
+  (55,296w); link_audit 997 spans, 0 overlaps, 0 gap runs;
+  make test green (exit 0).
+- C intents (13): 28D6 cmpm fork (frag_291C/291E forward joins);
+  2B54 ISR context-save (isr_2B54; pshm balanced, frete comment);
+  2C8A ring arith (dual sub/add per 2D8F/71A3); 2ED6 sample copy
+  (frag_2F41 second entry, uploaded 9F5D/9F7E callers); 33E8 bit
+  ladder (TC held to bc; mvmm/mar dance; routine_434F dark);
+  3475 dispatch fan (entries 3475/3480/3491/3497 + frag_34B4
+  subroutine; 3500 idle/checksum hangs; callee AR steps applied);
+  355C store lanes; 4009/4057 port0 phases (port45_poll_40A1
+  C-bound; TC/B dark-unbound flagged); 54BD msg stage (calld 2262
+  delay-first; C-bound 54F8/5503 joins); 7EC6 delay-abut (first 4w
+  run as 7EBE bd delays per D581, tail-joins 7F95); 8956 max-fold
+  (RPTBD RSA=PC+4 flagged; max b per 66C5/68A2; bare-word mvdk
+  per 64A0); 9613 counter lane (xorm per 4CB4; mvmd delay abut).
+- Pool/dead notes (2): E855 frame-divide (frame/fbacc, no C form);
+  7F1C 57w all-dead (post-bd, no entries); dead tails noted in
+  7EC6 (7ECA+), 8956 (8990+), 9613 (9629+), all xref NONE.
+- Fixes: 8643 trimmed to 11w call lane (prior +7w overlapped owned
+  864E/8653); 294D/35BB duplicates removed (boot/35bb owners kept);
+  3538 aligned to verified 351D (+0% AR0 param, bitf #512); pa44-45
+  as numeric ports (40A1 precedent); DP-relative as bare direct
+  (8F1C precedent); 4057 join label to l4095 (and, not end).
+
 ## 2026-11-05 — second half wave-3: 76.5% bounded (was 72.4%)
 
 - 4 teams + critic + parent adjudication; 40 new symbols (652 total),
@@ -1394,3 +1453,144 @@ ROM4 row.
   symbols.yaml: stale SUB85_644B entry rewritten
   (split reality); added 64A0/8508/8513/851E/861F
   entries; refreshed A679/E42D/FF40/853B/90xx.
+
+## Wave-13: oracle-grounded C corrections + live-C continuation
+- Oracle leaves consulted directly: op_sub_src_asm
+  (dst = dst - src<<SHIFT), op_sub_smem_shift (dst = src -
+  Smem<<SHIFT), op_add_smem (dst = src + Smem<<16),
+  op_dual_arithmetic (dual X/Y SXM-widened <<16, X-first),
+  op_poly_smem (A = rnd(T*AH + B_old), B = Smem<<16),
+  MIN_ACC (A = min(A,B)), DADD/DSADT semantics.
+- Fixed across live C: SUB/ADD Smem <<16 scale (e583,
+  b61f, 87d3, ac07, e50b, e59d, bfb7, e837, 8f7a);
+  accumulator-first shift forms as dst_old +/- src<<SHFT
+  (e0a2, e8c7 x5, 8f7a x3, 7f75); dual mem-mem results <<16
+  with X-first order (e0a2 x2, e8c7 x7, e50b, e837);
+  MPYA/MAC/MACSU/MAS T-vs-dual forms (b61f, bfb7, 772f);
+  4-operand SUB/ADD/MAS = (Xmem<<SHFT or X*Y) -/+ src
+  (e583, e50b, 8f7a x2, 772f, c556); POLY dual-channel
+  (bfb7); ADDS same Smem<<16 addend + saturate (bfb7);
+  ASM threaded as dark shifter (e8c7); DLD lane order +
+  DST two-store (ac07); MVPD template via prom_read_word
+  with ROM-ramp Pmad proof (d9e1); subc_step32 (e59d);
+  bit_merge_7EA7/late_leaf_9217 call arg forms.
+- XC direction corrected tree-wide: XC executes when its
+  condition holds (e0a2 x2, b61f, 9d16 x3, e583).
+- Delay-slot rule settled from the silicon pattern:
+  BD/BCD/BANZD/CALLD/RETD take 2 delay WORDS; BANZ/BCC/B
+  are immediate (no slots). CALLD order fixed: delays,
+  call, return-address load (ac07, 7e88). RPTBD blocks end
+  at REA with delays outside: re-mapped 7f95 (block =
+  7 words, or/stl are BANZD delays), 7e88 (block =
+  4 words; banz-taken preempted by delay-slot ret --
+  7E92 target dead, flagged), 7f75 (same shape),
+  c556/90f8 single-representative passes.
+- d95f dual-SUB order corrected (was Y-X, now X-Y per its
+  own header rule). 2d8f already correct (wave-12).
+- Provisional extern convention for asm-owned in-image
+  spans and mid-span joins (frag_88AD, frag_B0A1_tail,
+  sub_86FB/89C4/7067/9042/9071/9315/C53D, helper_0594,
+  sub_059E/067A/0696/06DA); far_1A839/1A425 (XPC pages).
+- 90F8 outer-BANZ re-arm documented OPEN (caller-evidenced
+  return vs no in-span exit path; asm header updated).
+- New rule: EXPECT always embedded from program.be16,
+  never hand-composed (90f8/c556/88b9 caught by check_c).
+- Gates: check_c 852 OK / 0 FAIL, recombine 1011/1011
+  MATCH, make test exit 0.
+
+## Wave-13 continued: live-C ascending (859 OK)
+- c556 (MAC lattice), 88b9 (init/block-copy, tail to 8854
+  zone), b080 (port gate chain with far_1A839/1A425 XPC
+  calls + B0A9/B09D/B0A1/A87F legs), ff40 (LMS lane;
+  LMS grounded via op_lms_dual -- dc18 note stale),
+  9ad2 (INTM mailbox lane), ab56 (predicate; XC BOV
+  qualifier oracle-unbound, flagged), ba08 (threshold;
+  BA07 = predecessor RETD with shared-word delays),
+  ceb4 (masked merge; AND/OR Smem zero-extend), dd77
+  (abs-accum; SRCCD/SACCD are conditional STORES per
+  oracle -- store-BRC / store-shifted-acc -- with
+  delayed-commit order modeled), 953c (port sweep).
+- Smem-logical zero-extension applied tree-wide (AND/OR/
+  XOR Smem clear upper; acc-acc and imm forms unaffected).
+- Provisional join-extern convention extended
+  (frag_88AD, frag_B0A1_tail, frag_95A2/956E, sub_2C88).
+- EXPECT-from-image rule held (c556/88b9/ff40 hand drafts
+  caught by check_c before commit).
+
+## Wave-14: live-C ascending 31-40w (check_c 875 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+Hand-wrote C intent for 9ce7 (XC-2-over-orm resync + DP:2 ADD), ba32 (dual RPTBD shuffle, MIN oracle), cf01 (CALLD pre-call delays), 82d9 (ROR/ROL/SFTA/SFTL oracle, RPTB in BANZD), 8894 (BK=0 frozen splat per oracle indirect_circular), 7937 (RPTBD quad-call), afd3/b0c2 (guard lanes), 7c2f (DADD + flagged 1-word DST/DLD), 89c4 (AND-immediate = A&(lk<<SHFT) per oracle, MPYA = T x A-high), 9fa8 (absolute DST/DLD oracle rows), e9a1 (BANZ shoot-first do-while). a687 dropped as dup (owned by a679_meas_setup_b Entry 1; direction *(0x337B) = *(0x54A) confirmed same). 2c8a `sftl b,-1` <<1 modeling contradicts oracle (SFTL -1 = logical right); flagged for a later correction pass, not silently fixed mid-wave.
+
+## Wave-14b: live-C 40-42w (check_c 882 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+87eb (FRCT=1 MAC/min/max lane), af16 (MVDK-to-AR scatter, RPTZ N+1 confirmed), e442 (quad MAC lane; caught + fixed zeroed-mpya bug, T threaded via maca read-phase load), 8ddb (MACR/MACAR exact rounding from oracle op_multiply; exact BRC+1 incl. wrap retrofitted to 7937/af16), ab2c (BCD-delay + all-paths-bitf retrace), ac22 (AR-select branches), e000 (dual-MAC FIR). New oracle-grounded rules: MVKD dmad = source; MVDK dmad = dest; MPYA-Smem = Smem x A-high into B (T untouched); MACA/MACAR loads T from Smem; MACR rounding = (sum+0x8000)&~0xFFFF; AND-imm = A&(lk<<SHFT); 1-word DST/DLD = MSW@AR LSW@(AR+1) step 2 (flagged gap, structural corroboration); BK=0 freezes % sources (oracle indirect_circular); `st||ld` parallel reads pre-store.
+
+## Wave-14c: correction debt logged (do not silently fix mid-wave)
+- 2c8a `sftl b,-1` modeled <<1 contradicts oracle (SFTL negative = logical right). Flagged for a dedicated correction pass with its siblings.
+- 2d8f/4b81 ADDS modeled as sign-extended plain add; oracle op_adds_smem says zero-extended + OVM-gated saturation. New files use oracle form; old files queued for the same correction pass.
+
+## Wave-14d: live-C 43-45w (check_c 887 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+ced6 (EXP/NORM/SUBC/SQUR/SQUARA all oracle-grounded; exact rounding + TS conventions), dad2 (bcd-lane joins, retd-delay repeat-abandoned), 72e3 (bubble compare-swap, nested BANZD/RPTB count caveat flagged), bf21 (ADDS zero-extend per oracle; butterfly), 7ab1 (guard cascade, no-op self-join branch noted).
+
+## Wave-14e: live-C 45-46w (check_c 890 OK / 0 FAIL, recombine 1011 MATCH)
+88da (dual-copy lanes), 8b03 (single-word RPTBD block -- dual runs once after; mutually-exclusive xc proof), 9c61 (xor-fold; call-redefined A/B convention). BCD delay = 2 WORDS re-verified (orm only); every-path-runs-bitf retrace pattern (ac22) -- stale-TC modeling corrected before commit.
+
+## Wave-14f: live-C 45-46w (check_c 891 OK / 0 FAIL, recombine 1011 MATCH)
+88da (BK=0 frozen sources), 8b03 (single-word RPTBD block; mutually-exclusive xc proof), 9c61 (xor-fold; call-redefined A/B), 7ab1 (guard cascade, no-op self-join), a815 (fcalld pre-call delays, bit-merge tail). New rule: `st||ld` parallel reads pre-store memory (8ddb C891); RPT N+1 incl. RPT-Smem (af16).
+
+## Wave-14g: live-C 46w e4dd (check_c 892 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+e4dd (PSHM_POPM_GATE): lattice post-filter gate, RPTBD x4 + once-tail. Oracle-settled rules: 1-word DLD/DADD/DRSUB indirect *ARx+/- steps AR by 2 (oracle indirect_single LONG32 MOD1/2; DADD/DRSUB Lmem legs route LONG32_SINGLE kind-21); `sub a,1,b` = B -= A<<1 (oracle SUB_ACC_SHIFT, bit9 = src, bit8 = dst, shift[4:0]); `ld #-13,asm` single-word ED13 (ASM = -13); `stl b,asm,*ar` = low16(B>>13). Tail-overlap (drsub pair = next dld pair) modeled faithfully, noted.
+
+## Wave-14g (cont): live-C 47w 7d31 (check_c 893 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+7d31 (SUB_7D31): mode-gated zero-init lane; cmpm TC = (Smem == lk) per oracle op_cmpm_smem_lk; B = *AR2 & 240 flag-dead; skip/tail joins via goto/early-return.
+
+## Wave-14g (cont): 3623 kept stage-owned, brev primitive derived (check_c 893 OK / 0 FAIL)
+3623 (FRAG_3623): a new frag_3623.c was written then REMOVED -- wave-12 3623_frag_3623_stage.c already owns the span (overlap guard tripped, correctly). Stage keeps the 351d linear convention (ar2 += ar0_live, wrap flagged) and local frag_93CE/frag_2E64 extern names. New ground for a future tree-wide `%` pass, derived from oracle foundation/reverse_carry.h + indirect_reverse_carry.c: reverse-carry carry/borrow propagates bit 15 -> bit 0, old AR addresses, post-access update; `+%` = add (MOD7), `-%` = subtract (MOD4) by TI suffix-sign convention (MOD-number assignment flagged oracle-unbound); oracle reverse-carry is WORD16-only, matching that no `%` appears on long-word forms. Exact C helpers drafted (rcarry_add/rcarry_sub) but NOT committed, pending a consistent `%`-span convention decision with 351d.
+
+## Wave-14h: live-C 47w ae71 + 9760 (check_c 895 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+ae71 (SUB_AE71): six entry lanes (71/75/79 stubs, 7B bitf-pair, 87, 8E) per 389c per-lane pattern; TRACE heads + unconditional-b shadowing cited. xc 2,alt execute-when-true; sub_0596 low-zone binding (72e3 precedent).
+9760 (SUB_9760): port-strobe gate. New grounded rules: PORTR numeric-port form carries a port-address extension word (0036 = port 54; 978f EXPECT corroborates 7482 0036); AND_IMMEDIATE_SHIFT decode (F130: src A dst B shift 0, B = A & 4096; oracle layout bits 9/8/[3:0]); COND_BEQ = B zero (oracle branch cond); frag_978F (A-low,B,AR2) + sub_2D5E(AR2,AR3) passthroughs; port extern-op decls (portr_port54_cell08, portw_par2_port1, portr_port2_par2, portw_par2_port2); sub_05C2 mini-kernel extern (pchist-evidenced).
+
+## Wave-14i: live-C 48w b431 + 7eec + 86fb (check_c 898 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+b431 (ROUTINE_B431): mode-cell switch; sub_05A8 dark (b358 binding), routine_B39E passthrough, rpt/mvdd x8, set-bit lane join.
+7eec (SUB_7EEC): four-phase stm/calld/bd lanes; family bindings sub_7F55 + frag_7F95 (7ebe/7ec6), delay-first ordering, TRACE-range lane entries flagged; no overlap with 7EC6 (starts exactly at 7EEC).
+86fb (SHARED_SUB_86FB): keyed-mix loop. New grounded rules: ADD Smem,SHIFT SXM = 0 gives logical right shift (oracle op_add_smem_shift: signed -16..15, SXM-ruled right); LD with SXM = 0 zero-extends; T-shift count = T & 0x3F (oracle ld leaves); ROL carry thread (82d9); BANZ test-then-decrement while-idiom; LD-TS plain `<< t` (82d9); `bc nc` repeat-abandon to the mar end word (dad2 precedent).
+
+## Wave-14j: live-C 49w b3b1 + d3be (check_c 900 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+b3b1 (ROUTINE_B431): helper-call fork; MVKD/MVDK both copy first->second (2000/2088/22f3 precedents); LD_LK shift-0 (oracle layout); BNEQ/BEQ (oracle cond); AF40 AR1-dark intake; A654 pooled comment-only; pshm/popm comments.
+d3be (CLAMP_STORE_SUB head): min/max clamp-store lane. New grounded rules: MIN_ACC dst = bit 8 (F587 dst B, F487 dst A; ba32 convention oracle-confirmed); MPYA_SMEM (0x3100 row + extension) does T <- Smem then B = Smem x A-high REPLACE (oracle leaf; 87eb/e442 form; 71a3 `+=` and 89c4 `T untouched` readings now correction-debt, logged not fixed); AND-Smem zero-ext (2acc); MVDM cell->AR idiom; retd delays owned by D3EF span (no overlap; function renamed clamp_store_sub_D3BE to avoid the delay-pair file's name).
+
+## Wave-14k: live-C 50w 9bc3 + 51w d499 (check_c 902 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+9bc3 (FRAG_9BC3): banz sieve; wrap_9C4D(AR2,AR4,AR6) + frag_9BF5/frag_9BF8 passthroughs; 9BBE epilogue inlined (verified 9B72 tail words); frag_9C15 shared-join void+dark (361c precedent); banz test-then-dec gotos; 351d linear `%` steps; ld-shift SXM? (4b9a); ldm (long)ar.
+d499 (D499_SHARED_TAIL): min/max filter pump. New grounded rules: DELAY Smem does *(Smem+1) = *(Smem) write-back + AR step (oracle op_delay_smem; 25f2 no-C-form note now correction-debt); MAX_ACC dst = bit 8 (F586 dst B: B = max); MPYA long-offset = MPYA_SMEM (0x3100 row + ext); MVDM cell->AR; DP = 0 assumed (da40); DP switches as hardware comments; routine_DB81(A) under DP = 20; delay-pump AR threading gives exact tap shifts.
+
+## Wave-14l: live-C 52w 9682 + a6ae (check_c 904 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+9682 (ROUTINE_9682): table-fill with port-bit exits; sub_05C4 mini-kernel extern (pchist-evidenced); B entry-dark read by and #128,b (decoded src/dst B via oracle layout bits -- same-word check applied tree-wide); portr_port54_cell0B extern (existing name); frag_96B6 tails; xc beq/tc lanes; retd delays in next span.
+a6ae (SUB_A6AE): measurement-gate fanout; sub_065E RAM-resident (a679), sub_BA56/sub_B750 A-live dark takes (a679), sub_9FCF asm-only (a8d4), C5F9/BCFC pooled comment-only; ccd always-delay shape (a7eb: delay duplicated both arms); SUB_LK shift-0; bitf -32768 = bit 15.
+
+## Wave-14m: live-C 53w abd2 (check_c 905 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+abd2 (ROUTINE_ABD2): select-and-scan loop; frag_71A3/scale_3EB8_leaf_71D8/frag_AC22/frag_AC07 passthroughs with entry AR2/AR3 params and dark-A intake; pshm/popm comments; SUB 2-op dst -= src vs 4-op dst = Smem<<SHIFT - src (dd77); AC00 decoded as sub *ar2+,0,a,b (4-op shift 0: probe proved 6F92 0D20, killing a phantom -32 shift -- binutils range-errors out-of-range shifts); banz test-then-dec loop; plain ADD Smem (long)+SXM flag.
+
+## Wave-14n: live-C 54w 82fe + 8b9d + 9c99 (check_c 908 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+82fe (LEAF43_82D4): abuts 82d9 (post-RET head not modeled, DP = 0 in-span grounds absolute cells); full 82d9-dance mirror incl ror/rol/sfta + or/stl + banzd-do/while.
+8b9d (ROUTINE_8B9D): rounded-MAC viper with per-lane entries (389c pattern, dark BRC/AR4/A/AR0 params); MPYR rounded (22f3), MACAR oracle pair (8ddb), parallel st||ld pre-store tmp (8ddb), +0% linear + AR0 (351d); sth tail; retd delays in-span.
+9c99 (CHAIN_HEAD_9C99): gain-apply + dispatch; sub_06D4/06BE mini-kernel externs (06BE pchist-evidenced); 9F35/8BDE/86E3 pooled; superblock_8C0A asm-only extern; frag_9CCF/frag_9CE7 tails; RPTBD delay-once + 160x; andm TC-neutral (required for xc-after-cmpm); xc+3-word-orm overlap: taken runs orm, skip executes 0x4000 as unidentified 1-worder (byte-probe verified, flagged).
+
+## Wave-14o: live-C 56w 8334 + a91c + e0b5 (check_c 911 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+8334 (SUB_8335): ret@8334 LEAF54 abut (not modeled); call 0686 dark; A from RAM cells; and #-1 = &0xFFFF; reada = program[A]->cell (oracle op_reada.h direction); bacc b dark exit via dark_8335_target (28a5 precedent); tail 8346-836B unreachable-in-model (whole-image xref scan: zero external targets in-range), documented not executed.
+a91c (ROUTINE_A91C): rc tc / rc aneq (RC cond8 catalog row 694, carry 0-modeled, unread in-span); bitf TC=(Smem&lk)!=0; orm TC-neutral (catalog neutral rows); xc-andm lane; rpt-mvkd x57 broadcast fill; d29e pooled; D0BE/872B asm-only externs; 0686 dark extern.
+e0b5 (ROUTINE_E0B5): neg/xc-alt MAC filter lane; A/AR2/AR0 dark params; stm#-9 AR0 rides all % steps (351d convention); rptbd 40x mpy+18mac+macr (795d plain + 8b9d round shape, FRCT flagged); first draft wrote 19 alternating macs, check_c word-compare caught E0E8 mismatch -- fixed to image 17+1 (EXPECT embedded-from-image rule vindicated again).
+Correction debt: 454F reada direction (454f_sub_454f.c models A = prom[cellB]; oracle op_reada.h says cellB = prom[A]; 8335 follows the oracle; 8335's compute-then-mask-to-16-bit A supports address-use). 454F left untouched (green); revisit with a reada probe.
+
+## Wave-14p: live-C 58w b3e2 + 9c13 (check_c 913 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+b3e2 (ROUTINE_B3E2): 3-phase straight-line setup; 05A8 dark extern (no symbol); frag_B41C extern; mvdk direction flip phase1 vs 2/3; cmpm+rc ntc / rc aeq; carry 0-modeled unread.
+9c13 (FRAG_9C13): dual entry (9C13 xor + 9C15 4x joins) via frag+lane pair (8b9d pattern); cc passes AR5/AR3/A/AR1 per 9B5C contract; bc-9bdc = interior join frag_9BDC into 9bc3 @+0x19 (28d6 precedent); banz AR-test-dec (4ee0); or a,-16 = OR_ACC_SHIFT dst=A logical (op_logical ground); 9C61 redefines A dark (2e84 clobber convention); ccd delay-always (a7eb/351d); mvmm address-as-value cast.
+
+## Wave-14q: live-C 59w 7e4d + badb (check_c 915 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+7e4d (SUB90_7E4D): 059E dark extern; rptb offset-load lane + rptbd delay-once + retd exit; OR_ACC_SHIFT S=bit9/D=bit8 layout ground (operand_layout_sets.c) fixes or b,8,a as A |= B<<8 and vindicates 9c13 or a,-16 as A |= A>>16.
+badb (ROUTINE_BADB): 06AA dark extern; AR2 dark param; ST1 save/restore with ssbx OVM/FRCT -- FRCT=1 KNOWN in-span so all mpy/mpya double (<<1 modeled, first known-FRct span; OVM small-values per 3d3d); bcd delay-always diamond; max signed idiom (22f3); ADD_SMEM_SH16 as A += (22f3); MPYA replace+load-T (wave-14/e442); sub a,-3,b arithmetic (SXM flagged); st||mpy parallel pre-write store.
+
+## Wave-14r: live-C 60w a843 (check_c 916 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+a843 (FRAG_A843): post-A815 head; cmpm+3x bitf/rc status web; cc-ntc fanout; rpt-mvkd broadcast; ccd-anex into AB7E = ab78 rptz lane interior (new INTERIOR triage section; frag_AB7E forward extern); cc-aeq pooled 9E2F; A8FE dispatch; BKMAX asm-only; BAC2(AR2) via calld delay.
+
+## Wave-14s: live-C 61w 6ae9 + 9a82 (check_c 918 OK / 0 FAIL, recombine 1011 MATCH, test exit 0)
+6ae9 (FRAG_6AE9): no own exit (falls into SPANHEAD_6B26); NORM = shift-by-signed6(T) per op_norm_acc (no T write; OVM/SXM flagged); MIN dst-bit rule (bit8: 0=A like 22f3 max, 1=B); full 32-bit DLD/DST pair (22f3 single-word dld noted partial, not followed); bc-6B26 + bc-6B3F(interior @+0x19, new INTERIOR triage line) tails; B-sign xc fill lanes; TC1 (bitf) survives mvdk/call to final bc.
+9a82 (FRAG_9A82): single head entry (6x pre-span bc verified in listing; interior joins all in-span); 3-word stack-carry to 9AD2 (push ar2/al/al vs its pops al/bl/ar2 per its C; pooled-9ABF exit leaves them, flagged); sfta shift-out carry (59dc) clobbers sub borrow (not modeled, noted); OR-Smem zero-extends (2289) vs AND-Smem sign-extends (59dc) kept per-op; +% linear (25f2); bc-ntc to pooled 9ABF (return, no extern).

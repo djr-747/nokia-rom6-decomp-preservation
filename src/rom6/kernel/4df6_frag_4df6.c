@@ -5,7 +5,7 @@
  *
  * Intent: Delayed-branch BK preset. Branches to dark 0x4E00 (bd, forward extern) with BK = 8 set in the delay slot (always runs; circular size, hardware state). Bound 4DF6-4DF9.
  */
-extern void frag_4E00(void);
+extern void frag_4E00(void); /* joins 4dfa_frag_4dfa interior @+0x6; see docs/evidence/extern-triage.md */
 
 void frag_4DF6(void)
 {

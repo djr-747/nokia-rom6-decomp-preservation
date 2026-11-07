@@ -12,7 +12,7 @@
  * execution stays deferred in the core, flagged). Return; AR2
  * live-out dropped (flagged). Bound 8A45-8A53.
  */
-extern void sub_0590(void);
+extern void sub_0590(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void routine_8A45(void)
 {

@@ -5,13 +5,13 @@
  *
  * Intent: Masked RF-port program. AR2/AR3 cursor pair from cells 0x265E/0x2660 (mvdm, locals); bit 2 (4) of *AR2 set skips the whole sample block to the in-span nop at 0x2AE6 (bc tc, rejoins). Else B = *(0x3E81) - *AR3 (ld/sub: SUB Smem,src per op_sub, B full rate); A = port 12 (portr 12,*(0x8): AL alias) OR *(0x3ECD), A live-in accumulates, Z from A; A == 0 skips only the complement mask via the in-span nop at 0x2AE2 (bc beq, rejoins at the port-12 write of the un-ORed alias value). Mask: B = *(0x3ECD), B = ~B (cmpl: full-40-bit NOT per ti-c54x op_cmpl.c:44-45, C/TC preserved; low16 exact, A high/guard kept by the AND), A &= B. Port 12 = A via alias; *AR2++ to ports 48 then 4; 23 idle cycles (rpt #22 nop); *AR3++ block to ports 49 then 50; cursors saved back to cells; tail-enters dark 0x283D (b, forward extern). Ports 4/12/48/49/50 direct-mapped (extern ops). Bound 2ACC-2AFB.
  */
-extern int port_read_12(void);
-extern void port_write_12(int v);
-extern void port_write_48(int v);
-extern void port_write_4(int v);
-extern void port_write_49(int v);
-extern void port_write_50(int v);
-extern void frag_283D(void);
+extern int port_read_12(void);                                        /* HW port 12 (supervisor RMW per 2088 span); no ROM definition */
+extern void port_write_12(int v);                                     /* HW port 12 (supervisor RMW per 2088 span); no ROM definition */
+extern void port_write_48(int v);                                     /* HW port 48 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_4(int v);                                      /* HW port 4 (RF per 3cd2 port4850 seq); no ROM definition */
+extern void port_write_49(int v);                                     /* HW port 49 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_50(int v);                                     /* HW port 50 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void frag_283D(void); /* joins 2800_stretch_2800 interior @+0x3D; see docs/evidence/extern-triage.md */
 
 void frag_2ACC(int a_live)
 {

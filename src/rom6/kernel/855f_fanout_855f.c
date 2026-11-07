@@ -6,7 +6,7 @@
  * Intent: XOR-fold fanout. AR2 = AR4, AR3 = AR5 (mvmm, live-ins); interleaved 0x8572 folds (C: xor_fold) on *AR6 (live-in) with 0x8573 calls, ending in the 0x8588 block copy (C: block_copy_8588); return.
  */
 extern int xor_fold(int *acc, int *src);
-extern void sub_8573(void);
+extern void sub_8573(void); /* joins 8572_xor_fold interior @+0x1; see docs/evidence/extern-triage.md */
 extern void block_copy_8588(int *src);
 
 static int *G_AR2;

@@ -20,7 +20,7 @@
  * Bound 516A-518F (retd + and delay, abuts LANE_36F at 5190).
  * Entry call F074@4D70 (far forward call from 4D-worker zone).
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int lane_36F(int *par4);
 extern int hit_51CC(int *par4);
 extern int miss_sink_51D4(int *par4);

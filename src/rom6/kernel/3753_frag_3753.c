@@ -6,7 +6,7 @@
  * Intent: Dispatcher-clause arm 3. AL (cell 0x8 alias) != 10 tail-enters FRAG_375E (bc 0x375e,ntc, C: frag_375E). Else far call 0x1AA2C (extended address, modeled extern per b036), call dispatcher_entry_2E2F, tail-enter DISPATCH_MATCH_LOOP (b 0x2e64, forward extern). Same shape as FRAG_36F0 with #10. Bound 3753-375D.
  */
 extern void frag_375E(void);
-extern void far_1AA2C(void);
+extern void far_1AA2C(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
 extern void dispatcher_entry_2E2F(void);
 extern void dispatch_match_loop(void);
 

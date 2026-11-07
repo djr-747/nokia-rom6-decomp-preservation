@@ -26,7 +26,7 @@
  * @0x9413, exterior 0x9414 = next routine head per listing).
  * BITF any-bit TC per op_bitf; CMPM TC-only per op_cmpm_smem_lk.
  */
-extern void sub_05BC(void);
+extern void sub_05BC(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 int msg_classify_by_caller(int *par2, int *sp_live, long a_live)
 {

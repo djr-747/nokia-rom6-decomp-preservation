@@ -10,7 +10,7 @@
  * a forward extern carrying live AR3/BK/AR1). Chain-link 3/5 (per
  * header); AR1 rides entry-live. Bound 4DEA-4DEF.
  */
-extern void frag_4E00(int ar3_live, int bk_live, int ar1_live);
+extern void frag_4E00(int ar3_live, int bk_live, int ar1_live); /* joins 4dfa_frag_4dfa interior @+0x6; see docs/evidence/extern-triage.md */
 
 void frag_4DEA(int ar3_live, int ar1_live)
 {

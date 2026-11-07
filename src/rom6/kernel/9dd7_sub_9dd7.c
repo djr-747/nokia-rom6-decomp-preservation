@@ -5,8 +5,8 @@
  *
  * Intent: Flag-gated double call. B is live-in; when zero (rc beq conditional prefix, exact skip semantics in the .asm) run helpers 0x6C8 then 0x9ED0, return.
  */
-extern void helper_06C8(void);
-extern void sub_9ED0(void);
+extern void helper_06C8(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_9ED0(void); /* joins 9ed0_wrap_9ed0; see docs/evidence/extern-triage.md */
 
 void sub_9DD7(int b_in)
 {

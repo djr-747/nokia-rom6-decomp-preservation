@@ -1,12 +1,12 @@
-/* ROM6 0x4557 FRAG_4557 -- 16w.
+/* ROM6 0x4557 FRAG_4557 -- 19w (wave-13: dead portr lane annexed).
  * Verified encoding: src/rom6/kernel/4557_frag_4557.asm (recombine MATCH).
  * ORIGIN 0x4557
- * EXPECT: 456A 456A 455C 455C 4578 4913 7717 052A EC02 7C97 4567 81F8 052B F074 052A FC00
+ * EXPECT: 456A 456A 455C 455C 4578 4913 7717 052A EC02 7C97 4567 81F8 052B F074 052A FC00 7494 000D FC00
  *
  * Intent: Dead-load program broadcast. Five single-word shifted loads (cells 0x6A/0x5C/0x78 << 16 into B) all overwritten by B = AR3 (ldm, live-in as value; the loads have no side effects, kept in bytes, noted dead); AR7 = 1322; 3 copies (rpt #2) of program word 0x4567 (mvpd absolute: fixed word broadcast, no auto-increment evidenced, flagged like FRAG_4444); cell 0x52B = B; call 0x52A; return.
  */
 extern int prom_read_word(int prog_addr);
-extern void sub_052A(void);
+extern void sub_052A(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void frag_4557(int *par3)
 {
@@ -18,4 +18,5 @@ void frag_4557(int *par3)
     *(volatile int *)0x52B = b;              /* stl b */
     sub_052A();                                  /* call 0x52a */
     /* ret */
+    /* 4567 dead lane (unreachable past ret; portr pa13 + ret not modeled, 5886 precedent) */
 }

@@ -34,7 +34,7 @@ extern void sub_06B2(void);                              /* dark, no symbol */
 extern void port0_txn_phase2_4055(void);                 /* C-bound, B residue */
 extern void port0_txn_4007(void);                        /* C-bound, A-out unbound */
 extern int port_read_0(void);                            /* port 0 (2-precedent family) */
-extern void port_write_0(int v);
+extern void port_write_0(int v);                                      /* HW port 0 (codec/RF control per 938c homology); no ROM definition */
 extern void spc0_write(int v);                           /* SPC0 addr ungrounded, flagged */
 
 void sub_B461(void)

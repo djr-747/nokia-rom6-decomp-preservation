@@ -8,11 +8,11 @@
 extern void frag_4A4B(int b_live, int *par5);
 extern void frag_4A46(int *par2);
 extern void frag_4ADF(void);
-extern void port_write_5(int v);
-extern void port_write_6(int v);
-extern void port_write_7(int v);
-extern void port_write_8(int v);
-extern void port_write_47(int v);
+extern void port_write_5(int v);                                      /* HW port 5 (RF sweep per 3EE1 span); no ROM definition */
+extern void port_write_6(int v);                                      /* HW port 6 (per 4a19 span); no ROM definition */
+extern void port_write_7(int v);                                      /* HW port 7 (RF sweep per 3EE1 span); no ROM definition */
+extern void port_write_8(int v);                                      /* HW port 8 (RF per 389c/3EE1 spans); no ROM definition */
+extern void port_write_47(int v);                                     /* HW port 47 (RF per 3EE1/4a19 spans); no ROM definition */
 
 void frag_4A19(int b_live, int *par4, int *par5, int *par2)
 {

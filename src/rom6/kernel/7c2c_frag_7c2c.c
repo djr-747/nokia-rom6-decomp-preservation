@@ -5,7 +5,7 @@
  *
  * Intent: Constant-A tail. A = 1 threaded into dark 0x7BEE (b, forward extern with A arg per 54f8 precedent). Bound 7C2C-7C2E.
  */
-extern void frag_7BEE(int a_live);
+extern void frag_7BEE(int a_live); /* joins 7b72_routine_7b72 interior @+0x7C; see docs/evidence/extern-triage.md */
 
 void frag_7C2C(void)
 {

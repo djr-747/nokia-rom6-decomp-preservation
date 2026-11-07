@@ -24,9 +24,9 @@
  * via b to FRAG_5BC6 (forward extern, defined with FRAG_5B9E).
  * Bound 5B26-5B5B.
  */
-extern void sub_0674(void);
+extern void sub_0674(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void sub_5BD9(long a_live, int *par4, int *par5, int ar0_live);
-extern void dark_5B39_target(int b_live);
+extern void dark_5B39_target(int b_live); /* computed bacc, permanently dark; see docs/evidence/extern-triage.md */
 extern void frag_5BC6(void);
 
 void seg_5B26(void)

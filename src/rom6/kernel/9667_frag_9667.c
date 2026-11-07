@@ -15,10 +15,10 @@
  * = cell0xB; tail-branch dark 0x283D (A = 0, B computed; liveness
  * through the dark call unbound, flagged). Bound 9667-9681.
  */
-extern void port_write_54(int v);
-extern int port_read_12(void);
-extern void port_write_12(int v);
-extern void frag_283D(void);
+extern void port_write_54(int v);                                     /* HW port 54 (pa54 per 25F2/938c spans); no ROM definition */
+extern int port_read_12(void);                                        /* HW port 12 (supervisor RMW per 2088 span); no ROM definition */
+extern void port_write_12(int v);                                     /* HW port 12 (supervisor RMW per 2088 span); no ROM definition */
+extern void frag_283D(void); /* joins 2800_stretch_2800 interior @+0x3D; see docs/evidence/extern-triage.md */
 
 void frag_9667(long a_live, int *ar2, long b_live)
 {

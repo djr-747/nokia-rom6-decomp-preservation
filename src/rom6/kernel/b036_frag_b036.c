@@ -5,10 +5,10 @@
  *
  * Intent: Far-call chain with identical-tail branch. AR4 = 2504 feeds far call 0x1A8FD (fcalld, AR3 = 12074 preset in the delay slot, always executes), then far call 0x1A260, then the 0xA5E1 measure setup; nonzero cell 0x2EFE branches to B046 (bc 0xb046,aneq), whose bytes are identical to the own tail (calld 0xa2b9 with AR5 = -8739, return); else far call 0x180A7 first. AR5 preset shared across both paths (executes in its delay slot on either path).
  */
-extern void far_1A8FD(void);
-extern void far_1A260(void);
+extern void far_1A8FD(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
+extern void far_1A260(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
 extern void meas_setup_A_A5E1(void);
-extern void far_180A7(void);
+extern void far_180A7(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
 extern void msg_primitive_A2B9(int ***ppp5);
 
 static int *G_AR3;

@@ -17,7 +17,7 @@
  * flagged). Bound 4B81-4B99.
  */
 extern void frag_4B9A(int **ppar2);
-extern void frag_4BA6(void);
+extern void frag_4BA6(void); /* joins 4b9a_frag_4b9a interior @+0xC; see docs/evidence/extern-triage.md */
 
 void sub_4B81(void)
 {

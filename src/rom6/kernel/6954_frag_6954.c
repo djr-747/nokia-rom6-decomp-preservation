@@ -5,7 +5,7 @@
  *
  * Intent: Cell bump with early return. A = 8 + cell 0x564 stored back (ld, add, stl); A -= 16, non-negative returns (rc ageq). Else cell 0x60 += 1 (addm), tail-enters FRAG_692C (b 0x692c: has .asm, no C yet, forward extern). Bound 6954-6960.
  */
-extern void frag_692C(void);
+extern void sub_692C(void);
 
 void frag_6954(void)
 {
@@ -15,5 +15,5 @@ void frag_6954(void)
     if (a >= 0)                                  /* rc ageq */
         return;
     *(volatile int *)0x60 += 1;              /* addm #1,*(0x60) */
-    frag_692C();                                 /* b 0x692c tail */
+    sub_692C();                                 /* b 0x692c tail */
 }

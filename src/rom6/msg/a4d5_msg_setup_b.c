@@ -7,8 +7,8 @@
  * reads zero (rc aeq conditional prefix, exact skip semantics in the
  * .asm), call 0x4944, then return.
  */
-extern void helper_0658(void);
-extern void sub_4944(void);
+extern void helper_0658(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_4944(void); /* joins 4944_sub_4944; see docs/evidence/extern-triage.md */
 
 void msg_setup_b_A4D5(void)
 {

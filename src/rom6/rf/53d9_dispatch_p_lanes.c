@@ -5,13 +5,13 @@
  *
  * Intent: Far-call chain with fetch. Runs dark 0x672 (call, forward extern), far calls 0x1A7F8/0x1A7F1 (extended addresses, modeled extern per b036), PARAM_BUILDER_B6E6, INIT_FILTER_C717, SUB_9FA8 (all have .asm, no C yet, forward externs). A = cell 0x3FC8 threaded into 0x54A4 (call, unbound C, A arg per B-threading precedent); tail-enters dark 0x54BB (b, forward extern). 18w per .asm header (recombine MATCH).
  */
-extern void sub_0672(void);
-extern void far_1A7F8(void);
-extern void far_1A7F1(void);
-extern void param_builder_b6e6(void);
-extern void init_filter_c717(void);
-extern void sub_9FA8(void);
-extern void frag_54A4(int a_live);
+extern void sub_0672(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void far_1A7F8(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
+extern void far_1A7F1(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
+extern void param_builder_b6e6(void); /* joins b6e6_param_builder_b6e6; see docs/evidence/extern-triage.md */
+extern void init_filter_c717(void); /* joins c717_init_filter_c717; see docs/evidence/extern-triage.md */
+extern void sub_9FA8(void); /* joins 9fa8_sub_9fa8; see docs/evidence/extern-triage.md */
+extern void msg_fetch_routine_54A4(int a_live);
 extern void frag_54BB(void);
 
 void frag_53D9(void)
@@ -24,6 +24,6 @@ void frag_53D9(void)
     init_filter_c717();                          /* call 0xc717 */
     sub_9FA8();                                  /* call 0x9fa8 */
     a = *(volatile int *)0x3FC8;             /* ld *(0x3fc8),a */
-    frag_54A4(a);                                /* call 0x54a4 (A live) */
+    msg_fetch_routine_54A4(a);                                /* call 0x54a4 (A live) */
     frag_54BB();                                 /* b 0x54bb tail */
 }

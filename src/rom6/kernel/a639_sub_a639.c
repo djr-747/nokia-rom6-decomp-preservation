@@ -5,8 +5,8 @@
  *
  * Intent: Cell test plus preset swap. Runs 0x65C; bit 13 of cell 0x2628 clear skips the presets (bitf, rc ntc); A = 9, B = cell 0x260E, AR1 = 3244; cell 0x250F != 34 skips the AR1 = 3456 preset (bc 0xa64b,ntc lands on the call, in-span); call 0x3D79; clears low 11 bits of cell 0x2639 except bit 10 (andm -3073) and sets bit 10 (orm #1024); return.
  */
-extern void sub_065C(void);
-extern void sub_3D79(void);
+extern void sub_065C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_3D79(void); /* joins 3d79_pshm_kernel_caller; see docs/evidence/extern-triage.md */
 
 static int *G_AR1;
 

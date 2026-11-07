@@ -5,8 +5,8 @@
  *
  * Intent: Sieve with tail calls and TC clear. Runs 0x59C; AR3 = 11; cell == 26 or == 81 joins the own tail (bc 0x5821,tc lands on the rsbx plus ret at the span end, exact); B = live-in AND 240 (dead, cmpm is TC-only); cell != 16 tail-calls FRAG_5823 (C: frag_5823_tc_set); cell != 80 same; else clears TC (rsbx st0,tc, hardware state); return.
  */
-extern void sub_059C(void);
-extern void frag_5823_tc_set(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_5823(void);
 
 void sieve_580B(int b_live)
 {
@@ -21,10 +21,10 @@ void sieve_580B(int b_live)
     (void)cell;
     cell = *(volatile int *)11;              /* (AR3 unchanged) */
     if (cell != 16) {                            /* cmpm, bc tc */
-        frag_5823_tc_set(); return;              /* tail */
+        frag_5823(); return;              /* tail */
     }
     if (cell != 80) {                            /* cmpm, bc tc */
-        frag_5823_tc_set(); return;              /* tail */
+        frag_5823(); return;              /* tail */
     }
     /* rsbx st0,tc: TC clear (hardware state, no C form); ret */
 }

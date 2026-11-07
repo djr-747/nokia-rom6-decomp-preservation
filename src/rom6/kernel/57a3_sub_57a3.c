@@ -23,7 +23,7 @@
  * 57CC), modeled as tail call frag_57CC (exact: 57CC body executes next).
  * Bound 57A3-57CB; whole-routine RET FC00@57FD in the 57CC tail module.
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int frag_57D3(void);
 extern int frag_57CC(int b_live);
 extern int frag_57EE(int b_live);

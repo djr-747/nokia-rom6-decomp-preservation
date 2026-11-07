@@ -65,7 +65,7 @@
  * add-carry are tracked. Bound 59DC-5A67 (ret FC00@5A67; abuts
  * next span at 5A68). Entry call F074@5995 from FRAG_5993.
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_59DC(void)
 {

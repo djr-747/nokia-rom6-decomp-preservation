@@ -36,10 +36,10 @@
  * stored); void.
  */
 extern void sub_05B8(void);                              /* dark, no symbol */
-extern void port_write_48(int v);
-extern void port_write_49(int v);
-extern void port_write_50(int v);
-extern void port_write_4(int v);
+extern void port_write_48(int v);                                     /* HW port 48 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_49(int v);                                     /* HW port 49 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_50(int v);                                     /* HW port 50 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_4(int v);                                      /* HW port 4 (RF per 3cd2 port4850 seq); no ROM definition */
 extern void frag_2AC0(void);                             /* dark */
 extern void frag_2AB2(void);                             /* dark */
 extern void frag_2ABD(void);                             /* dark */

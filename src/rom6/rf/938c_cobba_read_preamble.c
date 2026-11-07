@@ -5,15 +5,15 @@
  *
  * Intent: COBBA audio-path read preamble. Runs dark SUB_05BA; cell 0x20FF = 2048; A = 0 stored low to 0x2202/0x2204; cell 0x2203 = 867; AR2 = 96, *AR2 = 128 strobed to port 54. Runs dark SUB_9682. AR2 = 96: cell 96 = port 0 (PORTR to a plain cell: A untouched per op_portr Smem-only) AND -17, strobed back to port 0 (21 settle cycles); cell 96 = 1792 strobed to port 1 (23 settle cycles); cell 96 = port 2 OR 1792 strobed to port 2. Bit 1 of cell 0x3EC8 clear returns (rc ntc). Else cell 96 = port 0 OR 16 strobed to port 0 (21 settle cycles); cell 96 = 2 strobed to port 55; returns. Ports 0/1/2/54/55 direct-mapped (extern ops). Bound 938C-93CD.
  */
-extern void sub_05BA(void);
-extern void sub_9682(void);
-extern int port_read_0(void);
-extern int port_read_2(void);
-extern void port_write_0(int v);
-extern void port_write_1(int v);
-extern void port_write_2(int v);
-extern void port_write_54(int v);
-extern void port_write_55(int v);
+extern void sub_05BA(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_9682(void); /* joins 9682_routine_9682; see docs/evidence/extern-triage.md */
+extern int port_read_0(void);                                         /* HW port 0 (codec/RF control per 938c homology); no ROM definition */
+extern int port_read_2(void);                                         /* HW port 2 (FRAME sample combine per 27EB span); no ROM definition */
+extern void port_write_0(int v);                                      /* HW port 0 (codec/RF control per 938c homology); no ROM definition */
+extern void port_write_1(int v);                                      /* HW port 1 (RF/codec per 3EE1 sweep); no ROM definition */
+extern void port_write_2(int v);                                      /* HW port 2 (supervisor per 2875 precedent); no ROM definition */
+extern void port_write_54(int v);                                     /* HW port 54 (pa54 per 25F2/938c spans); no ROM definition */
+extern void port_write_55(int v);                                     /* HW port 55 (codec ctrl per 938c/37c0 spans); no ROM definition */
 
 void cobba_read_preamble_938C(void)
 {

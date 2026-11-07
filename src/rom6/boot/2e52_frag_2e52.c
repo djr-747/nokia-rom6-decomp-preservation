@@ -5,8 +5,8 @@
  *
  * Intent: Bit-test chain plus call. Runs 0x37D8; TC = any-bit-set (BITF ground truth per ti-c54x op_bitf: TC = ((Smem & lk) != 0)). Chain: test cell 0x866#3, skip next when clear (rc ntc); test cell 0x2628#16384, jump to the call when clear (bc 0x2e61,ntc); test cell 0x250F#208, skip the call when set (rc tc); else call 0x2E64, return.
  */
-extern void sub_37D8(void);
-extern void sub_2E64(void);
+extern void sub_37D8(void); /* joins 37d8_frag_37d8; see docs/evidence/extern-triage.md */
+extern void sub_2E64(void); /* joins 2e64_dispatch_match_loop; see docs/evidence/extern-triage.md */
 
 void frag_2E52(void)
 {

@@ -6,7 +6,7 @@
  * Intent: Compare rung 213. B = A-live-in - 213 (sub #213,a,b per op_sub: dst = src minus operand); nonzero jumps to FRAG_4C2F (bc 0x4c2f,bneq: has .asm, no C yet, forward extern); equal tail-enters dark 0x700 (b, forward extern). B dead after (noted). Bound 4C29-4C2E.
  */
 extern void frag_4C2F(void);
-extern void frag_0700(void);
+extern void frag_0700(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void frag_4C29(int a_live)
 {

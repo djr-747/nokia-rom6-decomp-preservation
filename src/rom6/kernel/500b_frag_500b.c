@@ -23,7 +23,7 @@
  * targets them -- omitted from control flow but covered by EXPECT. A/B
  * internal; AR2/AR3 cursor locals. Bound 500B-505A (ret).
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void frag_500B(void)
 {

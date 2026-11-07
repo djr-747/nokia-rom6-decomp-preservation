@@ -5,7 +5,7 @@
  *
  * Intent: Single port write. PORT[13] = *AR4++ (live-in pointer, post-increment), return.
  */
-extern void port_write_13(int v);
+extern void port_write_13(int v);                                     /* HW port 13 (RF per 3EE1/44af spans); no ROM definition */
 
 void frag_44AF(int **ppar4)
 {

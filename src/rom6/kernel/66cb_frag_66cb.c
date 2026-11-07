@@ -5,7 +5,7 @@
  *
  * Intent: Save-conditional with delayed call. A = B-live-in - *AR5-live-in, non-negative tail-enters 0x676A (bc ageq: has .asm, no C yet, forward extern). Else stores B to *AR5; A = B + cell 0x2FD7 (add) then B = A - 51 (sub); B >= 0 copies B to A (xc 1,bgeq plus ld b,a) else A keeps B + cell; stores A to cell 9751; AR2 = 9749; runs DARAM save/restore 0x697F (calld, C: daram_save_restore; delay slot stores 0 to cell 9749, always runs first); tail-enters 0x676A (b, forward extern). SUB per op_sub. Bound 66CB-66E1.
  */
-extern void frag_676A(void);
+extern void frag_676A(void); /* joins 676a_branch_tail_676a; see docs/evidence/extern-triage.md */
 extern void daram_save_restore(void);
 
 void frag_66CB(int b_live, int *par5)

@@ -36,13 +36,13 @@
  * in-span on the top path, caller-passed on the 38AA path.
  * Bound 389C-38C8 (45w; the .asm header's old 41w count is stale).
  */
-extern void sub_062C(void);
-extern void frag_3943(void);
+extern void sub_062C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_3943(void); /* joins 3938_frag_3938 interior @+0xB; see docs/evidence/extern-triage.md */
 extern void frag_3913(long a_live, int *ar2_in);
 extern int frag_38FB(int a_live);
 extern int routine_38C9(int a_live, int *par3, int z_live);
-extern void port_write_8(int v);
-extern void port_write_9(int v);
+extern void port_write_8(int v);                                      /* HW port 8 (RF per 389c/3EE1 spans); no ROM definition */
+extern void port_write_9(int v);                                      /* HW port 9 (RF per 389c/3d79 spans); no ROM definition */
 
 void frag_389C(long a_live, int *ar2_in, int *ar3_live)
 {

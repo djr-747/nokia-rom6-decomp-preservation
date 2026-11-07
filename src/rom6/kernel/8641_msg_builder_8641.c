@@ -5,7 +5,7 @@
  *
  * Intent: MSG_BUILDER_8641 entry-call stub (2w). Head-calls dark SUB_0592. Defines SUB_8641 for the 5420-lane caller.
  */
-extern void sub_0592(void);
+extern void sub_0592(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_8641(void)
 {

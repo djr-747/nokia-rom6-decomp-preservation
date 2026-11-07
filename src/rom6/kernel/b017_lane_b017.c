@@ -14,17 +14,17 @@
  * wrap_A87F) + dark SUB_A5E1, tail-branches dark 0xB046.
  * Bound B017-B035.
  */
-extern void sub_0678(void);
+extern void sub_0678(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void msg_worker_A2C3(void);
 extern void wrap_A8BF(int b_live);
-extern void frag_B032(void);
-extern void sub_1A839(void);
-extern void sub_1A425(void);
-extern void frag_B030(void);
+extern void frag_B032(void); /* joins b017_lane_b017 interior @+0x1B; see docs/evidence/extern-triage.md */
+extern void sub_1A839(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
+extern void sub_1A425(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
+extern void frag_B030(void); /* joins b017_lane_b017 interior @+0x19; see docs/evidence/extern-triage.md */
 extern void frag_B036(void);
 extern void wrap_A87F(void);
-extern void sub_A5E1(void);
-extern void frag_B046(void);
+extern void meas_setup_A_A5E1(void);
+extern void frag_B046(void); /* joins b036_frag_b036 interior @+0x10; see docs/evidence/extern-triage.md */
 
 void lane_B017(int b_live)
 {
@@ -50,6 +50,6 @@ void lane_B017(int b_live)
         return;
     }
     wrap_A87F();                                     /* call 0xa87f */
-    sub_A5E1();                                      /* call 0xa5e1 (dark) */
+    meas_setup_A_A5E1();                                      /* call 0xa5e1 (dark) */
     frag_B046();                                     /* b 0xb046 */
 }

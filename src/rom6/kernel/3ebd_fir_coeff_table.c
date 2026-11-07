@@ -8,7 +8,7 @@
  * verified). Port 49 = *(0xC) (portw *(0x12... *(0xc),49). Runs into
  * the following words exterior. Bound 3EBD-3EBF.
  */
-extern void port_write_49(int v);
+extern void port_write_49(int v);                                     /* HW port 49 (RF per 22F3/3cd2 spans); no ROM definition */
 
 void fir_coeff_table_3EBD(void)
 {

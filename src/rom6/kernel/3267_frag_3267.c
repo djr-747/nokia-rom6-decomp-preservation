@@ -14,7 +14,7 @@
  * DISPATCH_MATCH_LOOP (b 0x2e64, bare extern per 361C: B/AR2/AR4 ride
  * unmodeled). Bound 3267-3272.
  */
-extern int sub_4007(int a_in, int b_in);
+extern int sub_4007(int a_in, int b_in); /* joins 4007_port0_txn; see docs/evidence/extern-triage.md */
 extern void dispatcher_entry_2E2F(void);
 extern void dispatch_match_loop(void);
 

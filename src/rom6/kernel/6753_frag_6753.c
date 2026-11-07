@@ -5,8 +5,8 @@
  *
  * Intent: Subtract-compare with save fallthrough. AL-alias cell != 2 tail-enters dark 0x676A (bc ntc). Else AR1 = 0x53D, A = 51; delayed-call into dark SUB_6976 (calld, void; delay stm dead as in 6679). A = B-live-in minus *(0x2FDD) (SUB Xmem,SHFT,src,dst SHFT 0, B threaded as param), non-negative tail-enters 0x676A (bc ageq). Else runs C DARAM_SAVE_RESTORE; AR2 = 0x53D into DARAM_CELL_STORE (calld with delay-slot src, per 6679); falls into dark 0x676A (fallthrough tail). Bound 6753-6769.
  */
-extern void frag_676A(void);
-extern void sub_6976(void);
+extern void frag_676A(void); /* joins 676a_branch_tail_676a; see docs/evidence/extern-triage.md */
+extern void sub_6976(void); /* joins 6973_sub_6973 interior @+0x3; see docs/evidence/extern-triage.md */
 extern void daram_save_restore(void);
 extern void daram_cell_store(int *src);
 

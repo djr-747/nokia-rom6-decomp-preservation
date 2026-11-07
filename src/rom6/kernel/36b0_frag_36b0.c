@@ -5,7 +5,7 @@
  *
  * Intent: Cell pair plus report. Writes cells 10217 = 11 and 10218 = 1 (stm/st pair, AR3 reloaded after); presets AR4/AR5 dead after (noted); calls ROUTINE_2C88 (dark, no .asm span, forward extern) then dispatcher_entry_2E2F; tail-enters DISPATCH_MATCH_LOOP (b 0x2e64, forward extern). Bound 36B0-36C1.
  */
-extern void routine_2C88(void);
+extern void routine_2C88(void); /* joins 2c88_ring_report_gate; see docs/evidence/extern-triage.md */
 extern void dispatcher_entry_2E2F(void);
 extern void dispatch_match_loop(void);
 

@@ -42,7 +42,7 @@
  * after (noted). Bound 5993-59DB (retd + ld/stl delays, abuts SUB_59DC
  * at 59DC). Zero in-image callers (per header evidence).
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void sub_59DC(void);
 
 void frag_5993(void)

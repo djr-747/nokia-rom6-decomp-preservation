@@ -5,13 +5,13 @@
  *
  * Intent: RF-tune converge chain. Copies 8 words 0x254A to 0x2513 (rpt/mvdd loop); bit 4 of cell 0x54F clear rejoins at 0x551C (bc ntc). Else moves cell 0x2576 to 0x253F (mvdk, dmad is destination); cell 0x250F != 34 rejoins at 0x5519 (cmpm ntc); else moves cell 0x34CB to 0x34CA; rejoins and clears bit 4 of 0x54F. Bit 9 of 0x54F clear rejoins at 0x5529; else single-word copy 0x2577 to 0x2540 and clears bit 9. Copies 32 words 0x2552 to 0x251B (rpt/mvdd loop). TC = bit 6 of cell 0x3EC8 (bitf, two settle nops); TC set also copies 4 more words (xc 2,tc over rpt/mvdd: exact skip per 4EBC precedent). A = cell 0x56D; B = port 56 (BL alias) OR 16; A != 0 rejoins at 0x5542 (bc aneq); else B &= -17, out to port 56; rejoins. AND-masks cells 0x2627/0x2512. A = cell 0x2477 into C PORTXACT_ENTRY_56DE (call, C-bound); dark SUB_56FC. B = cell 0x2627 AND -16385; cell 0x2476 != 3 rejoins at 0x5561; else clears bit 2 of 0x54F and sets B bit 14; stores B low to 0x2627. A = (cell 0x250F AND 240); A -= 32 (SUB #lk form: A = B - (lk << 0) per ti-c54x op_sub_lk); stores -23991 to 0x573; A != 0 runs unbound FRAG_55EF with B live (bc aneq, forward extern; B = A AND 240 per its entry SUB). Else dark SUB_06E6, then a masked-compare ladder over cells 0x250F/0x8/0x2547 storing tune keys (-20649/-20565/-20116/-20196) to 0x573, or rejoins at each mismatch (0x5577/0x5583/0x558B/0x5596 in-span). Then cell 0x2510 = 193, 0x56F = 176, bit 7 of 0x2512 set, AR1 = 0x250D; cell 0x250F != 34 runs C FRAG_55B1 with AR1 (bc ntc, C-bound); else cells 0x2652/0x2653/0x2651/0x2640 = 25/12/0/12, tail-enters C FRAG_5683 (b, C-bound). Port 56 direct-mapped. Bound 5503-55B0.
  */
-extern int port_read_56(void);
-extern void port_write_56(int v);
+extern int port_read_56(void);                                        /* HW port 56 (HPI/pa56 poll per 2baa span); no ROM definition */
+extern void port_write_56(int v);                                     /* HW port 56 (HPI/pa56 per 2baa span); no ROM definition */
 extern void portxact_entry_56DE(int a_in);
 extern void sub_56FC(void);
-extern void sub_06E6(void);
+extern void sub_06E6(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern void frag_55B1(int *par1);
-extern void frag_55EF(int b_live);
+extern void frag_55EF(int b_live); /* joins 55ef_msg_producer_converge; see docs/evidence/extern-triage.md */
 extern void frag_5683(void);
 
 void frag_5503(void)

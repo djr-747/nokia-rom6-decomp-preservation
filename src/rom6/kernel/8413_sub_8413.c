@@ -5,10 +5,10 @@
  *
  * Intent: Index-halve gate with three away tails. Runs 0x5A0 (dark, forward extern); B = AR5-live-in minus 3, halved arithmetic (sfta -1); BRC = B as a side effect (stlm, hardware state feeding callee repeat blocks, cited not bound); B < 0 signed returns (rc blt). Cell 0x250F != 34 or cell 0x34BF != 3 tail-enter 0x8436 (bc ntc pair, dark forward extern); bit 11 of cell 0x2648 clear tail-enters FRAG_8433 (bc ntc: bit-reversed span, asm-only, extern only). Else presets AR4/AR3 (dead, unused after, noted), clears bit 11 of cell 0x2648 (andm #-2049), tail-enters 0x843A (b, dark forward extern). Bound 8413-8432.
  */
-extern void sub_05A0(void);
-extern void frag_8436(void);
+extern void sub_05A0(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_8436(void); /* joins 8433_frag_8433 interior @+0x3; see docs/evidence/extern-triage.md */
 extern void frag_8433(void);
-extern void frag_843A(void);
+extern void frag_843A(void); /* joins 8433_frag_8433 interior @+0x7; see docs/evidence/extern-triage.md */
 
 void sub_8413(int ar5_live)
 {

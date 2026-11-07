@@ -5,8 +5,8 @@
  *
  * Intent: Twin delayed-call launcher. AR6 preset -8909 (each calld delay slot, executes before its call takes effect), calls 0x82D4 then 0x82FF, returns.
  */
-extern void sub_82D4(void);
-extern void sub_82FF(void);
+extern void sub_82D4(void); /* joins 82d4_head_82d4; see docs/evidence/extern-triage.md */
+extern void sub_82FF(void); /* joins 82fe_leaf43_82d4 interior @+0x1; see docs/evidence/extern-triage.md */
 
 static int *G_AR6;
 

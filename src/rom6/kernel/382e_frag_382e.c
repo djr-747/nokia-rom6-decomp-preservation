@@ -8,7 +8,7 @@
 extern void frag_383F(void);
 extern void frag_3844(void);
 extern void frag_3849(void);
-extern void frag_37DF(void);
+extern void frag_37DF(void); /* joins 37d8_frag_37d8 interior @+0x7; see docs/evidence/extern-triage.md */
 
 void frag_382E(int *par2)
 {

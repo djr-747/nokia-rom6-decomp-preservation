@@ -10,7 +10,7 @@
  * carrying live AR3/BK/AR1). Gap-internal, chain-link 2/5 (per header).
  * Bound 4DE2-4DE9.
  */
-extern void frag_4E00(int ar3_live, int bk_live, int ar1_live);
+extern void frag_4E00(int ar3_live, int bk_live, int ar1_live); /* joins 4dfa_frag_4dfa interior @+0x6; see docs/evidence/extern-triage.md */
 
 void frag_4DE2(int ar3_live)
 {

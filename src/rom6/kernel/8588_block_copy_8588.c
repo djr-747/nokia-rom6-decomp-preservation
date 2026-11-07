@@ -10,7 +10,7 @@
  * the block down twice more with two more folds. All stores are
  * plain 16-bit cells; exact order in the .asm.
  */
-extern void xor_fold_85AD(void);
+extern void xor_fold_85AD(void); /* joins 85ad_xor_chain_85ad; see docs/evidence/extern-triage.md */
 
 void block_copy_8588(int *src)
 {

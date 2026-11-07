@@ -60,7 +60,7 @@
  * (unobservable after). TC written by BITF/CMPM reads only.
  * Bound 50B2-5169 (retd + mvmd delay, abuts 516A). Caller 4D6C (call).
  */
-extern void sub_059C(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int div_step(int a, int divisor);
 extern void sub_2D5E(int *par2, int *par3);
 

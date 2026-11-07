@@ -26,14 +26,14 @@
  */
 extern void frag_4C29(int a_live);
 extern void routine_5B18(int *par2, int *par3, int ar1_live);
-extern void frag_4DA7(void);
-extern void sub_9281(void);
-extern void frag_4F5F(void);
-extern void frag_7FDC(void);
-extern void frag_4F6E(void);
-extern void frag_4FC2(void);
+extern void frag_4DA7(void); /* joins 4da7_dispatch_4da7; see docs/evidence/extern-triage.md */
+extern void sub_9281(void); /* joins 9281_sub_9281; see docs/evidence/extern-triage.md */
+extern void frag_4F5F(void); /* joins 4f5f_rolror_banz_4f5f; see docs/evidence/extern-triage.md */
+extern void frag_7FDC(void); /* joins 7fdc_routine_7fdc; see docs/evidence/extern-triage.md */
+extern void frag_4F6E(void); /* joins 4f6e_sub_4f6e; see docs/evidence/extern-triage.md */
+extern void frag_4FC2(void); /* joins 4fc2_sub_4fc2; see docs/evidence/extern-triage.md */
 extern void sub_4ECE(void);
-extern void frag_4D9C(void);
+extern void frag_4D9C(void); /* joins 4cb4_frag_4cb4 interior @+0xE8; see docs/evidence/extern-triage.md */
 
 void fill_2F5D_4BD7(long a_live_in, int *ar3_in, int ar7_in)
 {

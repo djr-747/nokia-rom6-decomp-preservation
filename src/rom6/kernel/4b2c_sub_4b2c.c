@@ -23,7 +23,7 @@
  * live-outs flagged); AR4 set in-span; A/B internal; TC untouched.
  * Bound 4B2C-4B66 (abuts 4B67).
  */
-extern void sub_059E(void);
+extern void sub_059E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void sub_4B2C(int *ar2_in, int *ar3_in)
 {

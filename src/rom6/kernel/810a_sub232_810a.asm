@@ -1,5 +1,6 @@
 ; ROM6 0x810A SUB232_810A -- 231w, symbols.yaml data_word.
 ; Evidence: Entry F074 066E 10F8 264F F943 7D60; RET @81F1 len 232 (longest in span); ZERO callers -- possible fall-through from 0x80FB RET (control-flow unconfirmed); inner 0x066E + 0x807F@0x
+; Wave-13: exit ret @81F1 owned here (gap orphan annexed).
 ; ORIGIN 0x810A
 	.sect ".text"
 	.mmregs
@@ -123,3 +124,4 @@ _start:
 	st     #15,*(0x2656)
 	calld  0x7c9e
 	stm    #9807,ar2
+	ret

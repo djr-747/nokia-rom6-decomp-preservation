@@ -5,8 +5,8 @@
  *
  * Intent: Cell test plus flag merge. Runs 0x656; A = cell 0x262B, zero returns early (rc aeq, exact skip); A -= 240, zero returns early (rc aeq); bit 9 of cell 0x263A clear jumps to the A4CB fragment (bc 0xa4cb,ntc: bytes ld/and/andm at target, forward extern, no C binding yet, per convention). Else sets bit 8 of cell 0x51E; B = cell 0x2639 AND 2 (dead, B unused after); clears low 2 bits of cell 0x2639; calls 0x7C57; return.
  */
-extern void helper_0656(void);
-extern void frag_A4CB(void);
+extern void helper_0656(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_A4CB(void); /* joins a4ba_routine_a4ba interior @+0x11; see docs/evidence/extern-triage.md */
 extern void sub_7C57(void);
 
 void routine_A4BA(void)

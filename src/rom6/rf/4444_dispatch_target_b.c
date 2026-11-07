@@ -6,7 +6,7 @@
  * Intent: Program-table broadcast plus call. B = AR3 (live-in, as value); AR5 = 1322; 3 copies (rpt #2) of program word 0x4450 (mvpd absolute: fixed program address, same word broadcast, no auto-increment evidenced) through AR5; cell 0x52B = B; call 0x52A; AR3++ (mar), return.
  */
 extern int prom_read_word(int prog_addr);      /* mvpd: program read */
-extern void sub_052A(void);
+extern void sub_052A(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void dispatch_target_B_4444(int *par3, int *par4)
 {

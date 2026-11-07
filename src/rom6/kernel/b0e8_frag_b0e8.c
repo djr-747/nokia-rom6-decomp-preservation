@@ -5,8 +5,8 @@
  *
  * Intent: Far-call pair plus primitive. AR4 = 2504 feeds far call 0x1A8FD (fcalld, AR3 = 12074 preset in the delay slot, always executes), then far call 0x1A260, then the A2B9 primitive with AR5 preset -8690 (calld delay slot), return.
  */
-extern void far_1A8FD(void);
-extern void far_1A260(void);
+extern void far_1A8FD(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
+extern void far_1A260(void); /* XPC page, off-image; see docs/evidence/extern-triage.md */
 extern void msg_primitive_A2B9(int ***ppp5);
 
 static int *G_AR3;

@@ -14,9 +14,9 @@
  * rides dead-or-live, noted). A, AR3, AR4 entry-live; AR0 the only live-out.
  * Bound 3640-3661 (exit F073->3664 + operand; 34w).
  */
-extern void frag_3667(void);
-extern void frag_3652(void);
-extern void frag_3664(void);
+extern void frag_3667(void); /* joins 3662_frag_3662 interior @+0x5; see docs/evidence/extern-triage.md */
+extern void frag_3652(void); /* joins 3640_frag_3640 interior @+0x12; see docs/evidence/extern-triage.md */
+extern void frag_3664(void); /* joins 3662_frag_3662 interior @+0x2; see docs/evidence/extern-triage.md */
 
 void frag_3640(int a_live, int *par3, int *par4, int *par0_out)
 {

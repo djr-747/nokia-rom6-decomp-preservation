@@ -5,7 +5,7 @@
  *
  * Intent: FRAG_3D3B entry-call stub (2w). Head-calls dark SUB_063A. Remainder dark.
  */
-extern void sub_063A(void);
+extern void sub_063A(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 
 void frag_3D3B(void)
 {

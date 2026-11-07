@@ -10,10 +10,10 @@
  * read after the load). Tail-enters dark 0x283D (b, forward extern, void per
  * 2867/2875 precedent). Bound 952E-953B (exit F073@953A->283D + operand 953B).
  */
-extern void sub_05D6(void);
-extern void sub_97DD(void);
-extern void portw_alias08_port1(void);
-extern void frag_283D(void);
+extern void sub_05D6(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_97DD(void); /* joins 97dd_wrap_97dd; see docs/evidence/extern-triage.md */
+extern void portw_alias08_port1(void); /* HW port alias, emulator-provided */
+extern void frag_283D(void); /* joins 2800_stretch_2800 interior @+0x3D; see docs/evidence/extern-triage.md */
 
 void frag_952E(void)
 {

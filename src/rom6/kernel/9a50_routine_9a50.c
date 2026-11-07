@@ -15,8 +15,8 @@
  * else return. BITF single-bit masks read TC exactly
  * (mask == test, both senses coincide). Bound 9A50-9A6F.
  */
-extern void sub_05D2(void);
-extern void frag_9A82(long a_live);
+extern void sub_05D2(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void frag_9A82(long a_live); /* joins 9a82_frag_9a82; see docs/evidence/extern-triage.md */
 extern void frag_9A70(int *par3);
 
 void routine_9A50(void)

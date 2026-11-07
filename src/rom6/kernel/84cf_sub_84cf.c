@@ -14,8 +14,8 @@
  * *(0x541) = *(0x3EAE) * 3 / 4 (mpy #3 plus sfta -2; the source is
  * a nonnegative tune parameter, so the shift matches division).
  */
-extern void helper_0648(void);
-extern void sub_2262(void);
+extern void helper_0648(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_2262(void); /* unowned @0x2262; see docs/evidence/extern-triage.md */
 
 void sub_84CF_init(void)
 {

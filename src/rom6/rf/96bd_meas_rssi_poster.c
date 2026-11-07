@@ -14,12 +14,12 @@
  * 0x9704. The port path ends calling 0x97DD and returns from
  * interrupt.
  */
-extern void helper_05C6(void);
-extern void stage_970B(void);
-extern void stage_96EC(void);
-extern void stage_9700(void);
-extern void stage_9704(void);
-extern void sub_97DD(void);
+extern void helper_05C6(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void stage_970B(void); /* joins 970b_frag_970b; see docs/evidence/extern-triage.md */
+extern void stage_96EC(void); /* joins 96bd_meas_rssi_poster interior @+0x2F; see docs/evidence/extern-triage.md */
+extern void stage_9700(void); /* joins 9700_frag_9700; see docs/evidence/extern-triage.md */
+extern void stage_9704(void); /* joins 9700_frag_9700 interior @+0x4; see docs/evidence/extern-triage.md */
+extern void sub_97DD(void); /* joins 97dd_wrap_97dd; see docs/evidence/extern-triage.md */
 
 void meas_rssi_poster_96BD(void)        /* interrupt context (rete) */
 {

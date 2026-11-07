@@ -6,8 +6,8 @@
  * Intent: FRAG_9700 bit-test fork (8w; the retd at 0x9708 belongs to the FRAG_9708 span). Bit 6 of *AR4-entry clear runs C FRAG_9708 with AR4 (bc ntc, C-bound passthrough). Else runs dark SUB_978F (call, forward extern); falls into unbound FRAG_970B with entry AR2 (has .asm, forward extern with AR2 param per its portr head).
  */
 extern void frag_9708(int *par4);
-extern void sub_978F(void);
-extern void frag_970B(int *par2);
+extern void sub_978F(void); /* joins 978f_sub_978f; see docs/evidence/extern-triage.md */
+extern void frag_970B(int *par2); /* joins 970b_frag_970b; see docs/evidence/extern-triage.md */
 
 void frag_9700(int *par4, int *par2)
 {

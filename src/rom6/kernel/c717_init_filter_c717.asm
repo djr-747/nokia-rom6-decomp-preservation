@@ -1,5 +1,6 @@
 ; ROM6 0xC717 INIT_FILTER_C717 -- 140w, symbols.yaml data_word.
 ; Evidence: Entry F074 0694 + rptz-zero + cc-C7A4 + mvdk-init mac/delay/sat loop; first-RET @0xC7A2 (len 140); 11 callers 53C7 53E1 5418 542A 5446 5481 549A B50E B56D C8AC C8BA; HYPOTHESIS ini
+; Wave-13: double-ret seam @C7A3 annexed (gap orphan; second ret).
 ; ORIGIN 0xC717
 	.sect ".text"
 	.mmregs
@@ -104,4 +105,5 @@ _start:
 	.word 9
 	popd   *ar0-
 	popm   ar0
+	ret
 	ret

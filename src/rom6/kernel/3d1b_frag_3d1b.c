@@ -5,10 +5,10 @@
  *
  * Intent: RF port program with cursor writeback. *AR3-entry = 2, AR3 = 0x1274, AR2 = 0x126E (entry AR3 threaded as param, overwritten); *AR2++ out to port 48 (settle nops); *AR3++ out to ports 49 then 50; *AR2 out to port 4 (18 settle cycles); cell 0x58E = stepped AR2 (mvdk, dmad is destination); cells 0x2660/0x265E decremented by 2 (addm); returns. Ports 4/48/49/50 direct-mapped. Bound 3D1B-3D3A.
  */
-extern void port_write_4(int v);
-extern void port_write_48(int v);
-extern void port_write_49(int v);
-extern void port_write_50(int v);
+extern void port_write_4(int v);                                      /* HW port 4 (RF per 3cd2 port4850 seq); no ROM definition */
+extern void port_write_48(int v);                                     /* HW port 48 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_49(int v);                                     /* HW port 49 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_50(int v);                                     /* HW port 50 (RF per 22F3/3cd2 spans); no ROM definition */
 
 void frag_3D1B(int *par3)
 {

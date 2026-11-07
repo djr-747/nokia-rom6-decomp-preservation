@@ -5,9 +5,9 @@
  *
  * Intent: Helper pair with trap edge. A = sub_059E result into AR5; AR2 = 5 feeds sub_2282 (calld delay slot). TC as left by sub_2282 (modeled live-in): set jumps to 0x6F8, which reads all-zero reserved words (unprogrammed trap, no return modeled); clear runs the 0x7C9E counter step with AR2 = 9807 in its calld delay slot, returns.
  */
-extern int sub_059E(void);
-extern void sub_2282(void);
-extern void trap_06F8(void);
+extern int sub_059E(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void sub_2282(void); /* unowned @0x2282; see docs/evidence/extern-triage.md */
+extern void trap_06F8(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
 extern int counter_step_7C9E(int *par2);
 
 static int *G_AR2;

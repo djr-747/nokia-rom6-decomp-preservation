@@ -34,6 +34,23 @@ spaces:
           0x27CD through FRETE; cascade targets listed in ivt.md.
         evidence:
           - roms/rom6/ivt.md
+      - address: 0x27E9
+        name: FRAME_SLOT_REA
+        confidence: static_branch
+        note: >-
+          Two-word STM #0,REA (oracle 2-word STM precedent; operand 0x27EA is the 0x0000 immediate); FRAME slot, 27CD abuts before, 27EB abuts after.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x27EB
+        name: FRAME_ISR_HEAD
+        confidence: static
+        note: >-
+          FRAME_ISR sample-combine head (21w): ST1 mode prologue, pa2/pa1
+          strobes, ~(port2)&(port1) combine, BITF dispatch; exit bc 0x296A
+          plus fallthrough 27FF->0x2800 into STRETCH_2800 (evidenced by
+          its header); entry by fallthrough from 27E9 via zero 0x27EA.
+        evidence:
+          - roms/rom6/ivt.md
       - address: 0x22DA
         name: SAMPLE_ISR_ENTRY
         confidence: static
@@ -41,6 +58,23 @@ spaces:
           V16 RX signal-processing ISR. FIR kernel on port-39 samples
           (coeffs 0x3EBD, BK=16, BRC=7), SQDST branch metrics, kind
           dispatch on *(0x22C). Feeds the Viterbi decoder.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x22F1
+        name: SAMPLE_SLOT_REA
+        confidence: static_branch
+        note: >-
+          Two-word STM #0,REA (oracle 2-word STM precedent; operand 0x22F2 is the 0x0000 immediate); SAMPLE slot, 22DA abuts before, 22F3 abuts after.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x22F3
+        name: SAMPLE_ISR_BODY
+        confidence: static
+        note: >-
+          SAMPLE_ISR body (764w): pa33 handshake, kind dispatch *(0x22C),
+          dual-MAC FIR (BRC=7, 8 taps), SQDST Viterbi metrics, gain/AGC lane,
+          epilogue FRETE at 0x25D8; dead lane 25D9-25DE; sub-entry 0x25DF
+          (V20 STATE prologue flowing to 25F0/25F2).
         evidence:
           - roms/rom6/ivt.md
       - address: 0x2B53
@@ -89,6 +123,23 @@ spaces:
           conditional calls. Tail closed: round-robin stores with
           13013 wrap, pa54 poll loop, coefficient MAC chain, DXR0
           transmit write, FRETE at 0x27CC.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x25F0
+        name: STATE_SLOT_REA
+        confidence: static_branch
+        note: >-
+          Two-word STM #0,REA (oracle 2-word STM precedent; operand 0x25F1 is the 0x0000 immediate); STATE slot, 25DF abuts before, 25F2 abuts after.
+        evidence:
+          - roms/rom6/ivt.md
+      - address: 0x25F2
+        name: STATE_ISR_BODY
+        confidence: static
+        note: >-
+          STATE_ISR body (502w): mailbox copy, CALL 0xC851 + CALL 0x05F0, McBSP
+          DRR0 SAT scaling, frame counter, pa54 poll, coefficient MAC chain,
+          DXR0 transmit write, FRETE at 0x27CC; exit bc 0x296A; sub-entry 0x27CD
+          (V17/V18/V24 FRAME prologue flowing to 27E9/27EB).
         evidence:
           - roms/rom6/ivt.md
       - address: 0x3986
@@ -462,6 +513,16 @@ spaces:
   data_word:
     description: C54x CPU data-space address; use data_read routing
     symbols:
+      - address: 0x0000
+        name: LOW_FILL_0000
+        confidence: static
+        backing: data
+        note: >-
+          Low-program fill 0x7C2A x123 + 5-word tail (D2EB/7BD7/4C66/DBD7/FD3C
+          decode per objdump; no entry); not the active IVT (vectors at FF80,
+          IPTR=0x1FF); no exterior refs; Pool: fill semantics open.
+        evidence:
+          - docs/01-memory-map.md
       - address: 0x0802
         name: VERSION_WORD
         confidence: static
@@ -2026,6 +2087,12 @@ spaces:
           4 table words AE70 AE71 AE75 AE79 @AE6C-AE6F (bytes verified) between RET@AE6B and RET@AE70;
           consumer add #AE6C @ADDA + reada @ADDE + cala b @ADE0 (routine 0xAD0D driver); target range
           AE70-AE79. Bound AE6C-AE6F.
+      - address: 0xAE70
+        name: RET_AE70
+        confidence: static_branch
+        note: >-
+          RET FC00 @AE70 (table closing boundary; ae71 routine starts AE71); orphan ret-abut, entry
+          unconfirmed; owned wave-13 as 1w asm span; HYPOTHESIS.
       - address: 0xAEAD
         name: DATA_TABLE_44
         confidence: static
@@ -3795,7 +3862,13 @@ spaces:
         confidence: static_branch
         note: >-
           Bound 8BD5-8BDD (FC00@8BDD objdump); caller F074@8643 (objdump call 0x8bd5); interior
-          rptbd@8BD8->8BDC; HYPOTHESIS.
+          rptbd@8BD8->8BDC; preceded by 2w post-retd call head 8BD3 (owned wave-13); HYPOTHESIS.
+      - address: 0x8BD3
+        name: HEAD_8BD3
+        confidence: static_branch
+        note: >-
+          Post-retd call head 8BD3-8BD4 (call 0x5B2, sub_05B2 forward extern); follows 8b9d retd delays;
+          no known callers, entry unconfirmed; owned wave-13; C intent in 8bd3_head_8bd3.c; HYPOTHESIS.
       - address: 0x8BDE
         name: ROUTINE_8BDE
         confidence: static_branch
@@ -5411,8 +5484,21 @@ spaces:
         note: >-
           Bound AF16-AF3D (38w; exit RET FC00@AF3D byte-verified, exit scan clean; interior join B@AF37->
           AF3A); entries 3x call F074@B3AE/B3DF/B42E->AF16 byte-verified (all target head+2, not AF14) +
-          post-RET at AF14 (FC00@AF13); 2w orphan stub AF14-AF15 (post-RET, zero entries) stays dark — split-
-          head, bound not extended; interior call@AF14->059A; remainder AF3E-AF56 (25w) stays dark;
+          post-RET at AF14 (FC00@AF13); 2w stub AF14-AF15 owned wave-13 (post-RET call head, entry
+          unconfirmed); interior call@AF14->059A; remainder AF3E+: AF3E-AF3F head owned wave-13,
+          AF40+ owned by af40 span; HYPOTHESIS.
+      - address: 0xAF14
+        name: HEAD_AF14
+        confidence: static_branch
+        note: >-
+          Post-ret call head AF14-AF15 (call 0x59A, dark); follows aeec ret @AF13; no known callers,
+          entry unconfirmed; owned wave-13; C intent in af14_head_af14.c; HYPOTHESIS.
+      - address: 0xAF3E
+        name: HEAD_AF3E
+        confidence: static_branch
+        note: >-
+          Post-ret call head AF3E-AF3F (call 0x59A, dark); follows af16 ret @AF3D; no known callers,
+          entry unconfirmed; shape-twin of HEAD_AF14; owned wave-13; C intent in af3e_head_af3e.c;
           HYPOTHESIS.
       - address: 0xB0E8
         name: FRAG_B0E8

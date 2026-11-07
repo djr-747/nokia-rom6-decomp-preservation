@@ -38,8 +38,8 @@
  * Bound 56FC-573A (ret FC00@573A; abuts next span at 573B).
  * Entry calls F074@5550/6841 (per header evidence).
  */
-extern void sub_059C(void);
-extern void div_core_4384(void);
+extern void sub_059C(void); /* RAM-resident, zero in mask dump; see docs/evidence/extern-triage.md */
+extern void div_core_4384(void); /* joins 4384_div_core_4384; see docs/evidence/extern-triage.md */
 extern void sub_57FE(void);
 
 void sub_56FC(void)

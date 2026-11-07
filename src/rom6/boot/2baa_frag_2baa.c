@@ -5,12 +5,12 @@
  *
  * Intent: RF gate plus mode-lane select head. *AR2-entry = 2048, strobed to port 1 (23 settle cycles); A = port 56 (portr, AL alias) AND 8, zero tail-enters dark 0x283D (bc aeq; A == 0). A = *(0x3490) AND 112 (Z from A, stm pair preserves it); AR2/AR3 lane pair 1235/14978, A == 0 joins at the in-span call gate 0x2BCD (bc aeq). Else A = (A << 4) - 1 (SUB #lk,SHFT,src form), lane pair 13459/14982, A == 0 joins at 0x2BCD the same way (unreachable for masked A, folded: ((A&112)<<4)-1 never 0). Calls dark SUB_39F0. A = *(0x34BF), zero enters C FRAG_2BAA_SEG2 (bc aeq; second segment, C-bound). A = *(0x3490), B = A AND 112, B == 0 joins the in-span bump at 0x2BE4 (bc beq). *(0x34BF) == 34 mismatch enters SEG2 (bc ntc). Else B = (B << 4) - 1, B == 0 joins 0x2BE4 (likewise unreachable, folded), else falls into SEG2 (b). At 0x2BE4: *(0x3490) += 16, AR2 = 2324, calls dark SUB_39A4, tail-enters dark 0x283D (b). Ports 1/56 direct-mapped (extern ops). AR2 entry cursor threaded as param (overwritten by lane stms). Bound 2BAA-2BEC; SEG2 bound 2BED-2C02 per its header.
  */
-extern int port_read_56(void);
-extern void port_write_1(int v);
-extern void sub_39F0(void);
-extern void sub_39A4(void);
+extern int port_read_56(void);                                        /* HW port 56 (HPI/pa56 poll per 2baa span); no ROM definition */
+extern void port_write_1(int v);                                      /* HW port 1 (RF/codec per 3EE1 sweep); no ROM definition */
+extern void sub_39F0(void); /* joins 39f0_pa60_57_writer_a; see docs/evidence/extern-triage.md */
+extern void sub_39A4(void); /* joins 39a4_routine_pa60_57; see docs/evidence/extern-triage.md */
 extern void frag_2BAA_seg2(void);
-extern void frag_283D(void);
+extern void frag_283D(void); /* joins 2800_stretch_2800 interior @+0x3D; see docs/evidence/extern-triage.md */
 
 void frag_2BAA(int *par2)
 {

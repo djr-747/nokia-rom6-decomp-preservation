@@ -6,10 +6,10 @@
  * Intent: Port 4/49/50 strobe with poll loop. Sets bit 10 of cell 0x13D0; saves cell 0x263A (pshd: C local); runs C PORT13_STABLE_READ (call, C-bound; A-OUT proven by the 3EE3 loop shape -- the stable reading overwrites entry A, fixed this wave). A = reading + 10 (ADD #lk SHFT-0); B = A - 4999 (SUB #lk per ti-c54x op_sub_lk); B > 0 presets A = 10 (xc 1,bgt over a plain slot, exact skip per 4EBC precedent; 16-bit narrowing noted). B = port 4 (BL alias); *AR4-entry out to port 49 (AR4 threaded as param, unstepped); MMR 0x13 out to port 50; A (AL alias) out to port 4 (23 settle cycles); spins while bit 10 of cell 0x13D0 stays set (bitf plus bc-to-self at 0x4498: busy-wait, terminates in hardware); restores cell 0x263A (popd: the interim andm #-97 is dead, cell net preserved, modeled exactly); BL out to port 4 (23 settle cycles); returns. Ports 4/49/50 direct-mapped. Bound 4474-44A5.
  */
 extern int port13_stable_read(void);
-extern int port_read_4(void);
-extern void port_write_4(int v);
-extern void port_write_49(int v);
-extern void port_write_50(int v);
+extern int port_read_4(void);                                         /* HW port 4 (RF per 3cd2 port4850 seq); no ROM definition */
+extern void port_write_4(int v);                                      /* HW port 4 (RF per 3cd2 port4850 seq); no ROM definition */
+extern void port_write_49(int v);                                     /* HW port 49 (RF per 22F3/3cd2 spans); no ROM definition */
+extern void port_write_50(int v);                                     /* HW port 50 (RF per 22F3/3cd2 spans); no ROM definition */
 
 void port4_49_50_io_4474(int a_live, int *par4)
 {
